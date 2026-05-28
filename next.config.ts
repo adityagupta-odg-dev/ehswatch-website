@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const BASE_PATH = "/ehswatch-website";
+const BASE_PATH = "/ehswatch-stage";
 
 const nextConfig: NextConfig = {
   output: "export",
