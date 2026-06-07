@@ -106,7 +106,7 @@ function FeaturedCard({ post }: { post: Post }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href={`#${post.slug}`}
+      href={`/blog/${post.slug}/`}
       className="group flex flex-col lg:flex-row bg-white overflow-hidden h-full"
       style={{
         border: "1px solid #E5E7EB",
@@ -183,7 +183,7 @@ function StandardCard({ post }: { post: Post }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href={`#${post.slug}`}
+      href={`/blog/${post.slug}/`}
       className="group flex flex-col bg-white overflow-hidden h-full"
       style={{
         border: "1px solid #E5E7EB",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ReactElement } from "react";
+import Link from "next/link";
 import { basePath } from "@/lib/basePath";
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
@@ -111,7 +112,7 @@ const Icons: Record<string, ReactElement> = {
 // ── Module data ────────────────────────────────────────────────────────────
 
 const MODULES = [
-  { name: "Action Tracker", desc: "Track corrective and preventive actions to closure with owners, due dates, reminders, and full accountability.", color: "#155eef", icon: "check-circle" },
+  { name: "Action Tracker", desc: "Track corrective and preventive actions to closure with owners, due dates, reminders, and full accountability.", color: "#155eef", icon: "check-circle", href: "/modules/action-tracker/" },
   { name: "Audit Management", desc: "Plan and run audits with configurable checklists, structured findings, and follow-up workflows that close compliance gaps faster.", color: "#6366f1", icon: "clipboard" },
   { name: "Customer Complaints", desc: "Capture, assign, investigate and resolve customer complaints through a structured workflow with full audit trail.", color: "#0891b2", icon: "chat-warning" },
   { name: "Emergency Response Drills", desc: "Schedule, record, and review emergency drills so teams can test readiness and turn lessons learned into tracked actions.", color: "#ef4444", icon: "alarm" },
@@ -134,7 +135,7 @@ const STEP = 3; // reveal 3 modules per click
 // ── Module cell ────────────────────────────────────────────────────────────
 
 function ModuleCell({ mod, isAnimated }: {
-  mod: typeof MODULES[number];
+  mod: typeof MODULES[number] & { href?: string };
   isAnimated: boolean;
 }) {
   const [linkHovered, setLinkHovered] = useState(false);
@@ -167,20 +168,38 @@ function ModuleCell({ mod, isAnimated }: {
       </p>
 
       {/* Explore link — only interactive element */}
-      <button
-        onMouseEnter={() => setLinkHovered(true)}
-        onMouseLeave={() => setLinkHovered(false)}
-        className="mt-1 self-start flex items-center gap-1 font-[family-name:var(--font-dm-sans)] font-medium text-[13px] transition-all duration-200"
-        style={{
-          color: linkHovered ? "#cc5700" : "#FF6D00",
-          transform: linkHovered ? "translateX(3px)" : "translateX(0)",
-        }}
-      >
-        <span>Explore</span>
-        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-          <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      {mod.href ? (
+        <Link
+          href={mod.href}
+          onMouseEnter={() => setLinkHovered(true)}
+          onMouseLeave={() => setLinkHovered(false)}
+          className="mt-1 self-start flex items-center gap-1 font-[family-name:var(--font-dm-sans)] font-medium text-[13px] transition-all duration-200"
+          style={{
+            color: linkHovered ? "#cc5700" : "#FF6D00",
+            transform: linkHovered ? "translateX(3px)" : "translateX(0)",
+          }}
+        >
+          <span>Explore</span>
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
+      ) : (
+        <button
+          onMouseEnter={() => setLinkHovered(true)}
+          onMouseLeave={() => setLinkHovered(false)}
+          className="mt-1 self-start flex items-center gap-1 font-[family-name:var(--font-dm-sans)] font-medium text-[13px] transition-all duration-200"
+          style={{
+            color: linkHovered ? "#cc5700" : "#FF6D00",
+            transform: linkHovered ? "translateX(3px)" : "translateX(0)",
+          }}
+        >
+          <span>Explore</span>
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
