@@ -81,7 +81,7 @@ export default function Navbar({
       nav.style.maxWidth       = `${lerp(2400, 860, t)}px`;
       nav.style.borderRadius   = `${lerp(0, 9999, t)}px`;
       nav.style.gap            = `${lerp(0, 0, t)}px`;   // gap handled per-link via padding
-      nav.style.background     = `rgba(255,255,255,${lerp(0, 0.92, t)})`;
+      nav.style.background     = `rgba(255,255,255,${lerp(lightHero ? 1 : 0, 0.92, t)})`;
       nav.style.boxShadow      = `0 8px 32px rgba(0,0,0,${lerp(0, 0.10, t)})`;
       nav.style.backdropFilter = `blur(${lerp(0, 12, t)}px)`;
 
@@ -173,7 +173,7 @@ export default function Navbar({
           paddingLeft: "40px", paddingRight: "40px",
           paddingTop: "14px", paddingBottom: "14px",
           maxWidth: "2400px", borderRadius: "0px",
-          background: "rgba(255,255,255,0)", boxShadow: "none", gap: "24px",
+          background: lightHero ? "rgba(255,255,255,1)" : "rgba(255,255,255,0)", boxShadow: "none", gap: "24px",
           willChange: "padding, max-width, border-radius, background",
         }}
       >
