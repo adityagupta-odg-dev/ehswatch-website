@@ -309,9 +309,10 @@ export default function Navbar({
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
+          onPointerDown={(e) => { e.currentTarget.releasePointerCapture(e.pointerId); }}
           aria-expanded={open}
           aria-label="Toggle menu"
-          className="lg:hidden relative z-[60] w-11 h-11 flex items-center justify-center rounded-full hover:bg-black/5 active:bg-black/10"
+          className="lg:hidden relative z-[60] w-11 h-11 flex items-center justify-center rounded-full hover:bg-black/5 active:bg-black/10 cursor-pointer"
           style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
         >
           <svg

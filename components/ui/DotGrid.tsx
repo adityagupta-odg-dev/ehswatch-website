@@ -106,8 +106,11 @@ export default function DotGrid({
     }
 
     resize();
-    const ro = new ResizeObserver(resize);
-    if (canvas.parentElement) ro.observe(canvas.parentElement);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(resize);
+      if (canvas.parentElement) ro.observe(canvas.parentElement);
+    }
 
     function tick() {
       frame++;
@@ -199,7 +202,7 @@ export default function DotGrid({
 
     return () => {
       cancelAnimationFrame(raf);
-      ro.disconnect();
+      ro?.disconnect();
       canvas.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("mouseleave", onMouseLeave);
     };
