@@ -22,7 +22,7 @@ const INDUSTRIES = [
     key: "construction",
     number: "1.",
     label: "Construction & Infrastructure",
-    video: VID + "Construction%20%26%20Infrastructure.mp4",
+    video: VID + "construction-infrastructure.mp4",
     solutions: [
       "Real‑time hazard and near‑miss reporting from the field",
       "Digital checklists and inspection templates for each site",
@@ -33,7 +33,7 @@ const INDUSTRIES = [
     key: "manufacturing",
     number: "2.",
     label: "Manufacturing & Engineering",
-    video: VID + "Manufacturing-%26-Engineering.mp4",
+    video: VID + "manufacturing-engineering.mp4",
     solutions: [
       "Scheduled audits and equipment‑specific inspection checklists",
       "Digital LOTO and maintenance work‑order workflows",
@@ -44,7 +44,7 @@ const INDUSTRIES = [
     key: "oil-gas",
     number: "3.",
     label: "Oil, Gas & Energy",
-    video: VID + "Oil-Gas-Energy.mp4",
+    video: VID + "oil-gas-energy.mp4",
     solutions: [
       "Digitised permit‑to‑work workflows with clear approvals",
       "Incident reporting and investigation tracking with closure workflows",
@@ -55,7 +55,7 @@ const INDUSTRIES = [
     key: "logistics",
     number: "4.",
     label: "Logistics, Warehousing & Transport",
-    video: VID + "Logistics%2C-Warehousing-%26-Transport.mp4",
+    video: VID + "logistics-warehousing-transport.mp4",
     solutions: [
       "Digital incident and near‑miss reporting for fleet and warehouse teams",
       "Inspection checklists for vehicles, forklifts, and racking systems",
@@ -66,7 +66,7 @@ const INDUSTRIES = [
     key: "facilities",
     number: "5.",
     label: "Facilities & Property Management",
-    video: VID + "Facilities-%26-Property-Management-3.mp4",
+    video: VID + "facilities-property-management.mp4",
     solutions: [
       "Vendor safety questionnaires and onboarding within the system",
       "Digital fire‑safety and building‑inspection checklists",
@@ -77,7 +77,7 @@ const INDUSTRIES = [
     key: "utilities",
     number: "6.",
     label: "Utilities & Public Services",
-    video: VID + "Utilities-and-Public-Services.mp4",
+    video: VID + "utilities-and-public-services.mp4",
     solutions: [
       "Mobile‑first incident and near‑miss reporting for field teams",
       "Digital checklists for outage‑management and safety‑permit workflows",
