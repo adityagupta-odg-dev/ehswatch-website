@@ -286,7 +286,7 @@ export default function HeroDashboard() {
                 <p className="text-[9px] sm:text-[10px] font-semibold text-[#1a1f2e] uppercase tracking-wide mb-1 sm:mb-2 flex-shrink-0">
                   Incidents by Severity
                 </p>
-                <div className="flex items-center justify-center gap-3 sm:gap-4 flex-1 min-h-0">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 flex-1 min-h-0 overflow-hidden">
                   {/* SVG Donut */}
                   <svg
                     viewBox="0 0 160 160"
@@ -327,9 +327,9 @@ export default function HeroDashboard() {
                   </svg>
 
                   {/* Legend */}
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row sm:flex-col flex-wrap justify-center gap-x-2 gap-y-1 sm:gap-2">
                     {DONUT_SEGMENTS.map((seg) => (
-                      <div key={seg.label} className="flex items-center gap-1.5">
+                      <div key={seg.label} className="flex items-center gap-1 sm:gap-1.5">
                         <div
                           className="flex-shrink-0 rounded-[2px]"
                           style={{ width: 10, height: 10, backgroundColor: seg.color }}
