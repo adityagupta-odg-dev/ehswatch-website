@@ -536,7 +536,8 @@ export default function IRISChatShowcase() {
       const el = outerRef.current;
       if (!el) return;
       const scrolled = -el.getBoundingClientRect().top;
-      const newStep = scrolled < 0 ? -1 : Math.min(Math.floor(scrolled / window.innerHeight), 5);
+      const stepSize = window.innerHeight / 10; // ~1 scroll click per step
+      const newStep = scrolled < 0 ? -1 : Math.min(Math.floor(scrolled / stepSize), 5);
 
       if (newStep === prevStepRef.current) return; // no change — skip
       prevStepRef.current = newStep;
@@ -587,8 +588,8 @@ export default function IRISChatShowcase() {
         </div>
       </section>
 
-      {/* 700vh sticky scroll */}
-      <div ref={outerRef} style={{ height:"700vh" }}>
+      {/* ~170vh sticky scroll — one scroll click per step */}
+      <div ref={outerRef} style={{ height:"170vh" }}>
         <div className="sticky top-0 bg-white overflow-hidden" style={{ height:"100vh" }}>
 
           {/* Desktop: 3-col */}
