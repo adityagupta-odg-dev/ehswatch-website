@@ -20,3 +20,7 @@ export function resolveHref(cta: unknown): string {
   const c = cta as Record<string, unknown>;
   return c.type === "anchor" ? (c.anchor as string) || "#" : (c.url as string) || "#";
 }
+
+// Aliases for backwards compatibility with existing components
+export const iconFeaturesToArray = normalizeArray;
+export const ctaHref = resolveHref;
