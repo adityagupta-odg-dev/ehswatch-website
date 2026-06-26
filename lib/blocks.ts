@@ -22,5 +22,9 @@ export function resolveHref(cta: unknown): string {
 }
 
 // Aliases for backwards compatibility with existing components
-export const iconFeaturesToArray = normalizeArray;
+export function iconFeaturesToArray(
+  items: Record<string, unknown> | unknown[] | null | undefined
+): Array<{ icon?: string; title?: string; description?: string; link?: unknown }> {
+  return normalizeArray<{ icon?: string; title?: string; description?: string; link?: unknown }>(items);
+}
 export const ctaHref = resolveHref;
