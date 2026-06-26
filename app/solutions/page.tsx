@@ -10,8 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Solutions — EHSWatch",
-  description:
-    "Every industry has different risks. EHSWatch is configured to the compliance requirements, workflows and hazard profiles of your sector.",
+  description: "Every industry has different risks. EHSWatch is configured to the compliance requirements, workflows and hazard profiles of your sector.",
 };
 
 export default function SolutionsPage() {
@@ -21,9 +20,7 @@ export default function SolutionsPage() {
       <main>
         <SolutionsHero />
         <SolutionsIndustries />
-
         <Testimonials title="A Snapshot of Real‑World Impact" />
-
         <SolutionsCTA />
       </main>
       <Footer />

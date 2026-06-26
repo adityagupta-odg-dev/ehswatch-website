@@ -1,0 +1,62 @@
+name: Deploy to Stage
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Bundle static assets into standalone
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+
+      - name: Archive build
+        run: tar -czf /tmp/build.tar.gz -C .next/standalone .
+
+      - name: Upload to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: /tmp/build.tar.gz
+          target: /tmp/
+          strip_components: 2
+
+      - name: Swap and restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            rm -rf /var/www/html/stage.odigma.ooo/ehswatch-next-new
+            mkdir -p /var/www/html/stage.odigma.ooo/ehswatch-next-new
+            tar -xzf /tmp/build.tar.gz -C /var/www/html/stage.odigma.ooo/ehswatch-next-new
+            rm /tmp/build.tar.gz
+            rm -rf /var/www/html/stage.odigma.ooo/ehswatch-next-old
+            mv /var/www/html/stage.odigma.ooo/ehswatch-next                /var/www/html/stage.odigma.ooo/ehswatch-next-old
+            mv /var/www/html/stage.odigma.ooo/ehswatch-next-new                /var/www/html/stage.odigma.ooo/ehswatch-next
+            pm2 restart ehswatch-stage --update-env
+            rm -rf /var/www/html/stage.odigma.ooo/ehswatch-next-old

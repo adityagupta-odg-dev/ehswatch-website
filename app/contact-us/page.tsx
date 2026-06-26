@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Get in touch with the EHSWatch team for demos, onboarding support, or to find out how we can help your organisation.",
 };
 
-export default function SupportPage() {
+export default function ContactUsPage() {
   return (
     <>
       <Navbar lightHero={true} />
