@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { basePath } from "@/lib/basePath";
+import type { CmsCaseStudy } from "@/lib/types";
 
 const UNSPLASH = "https://images.unsplash.com";
 
@@ -15,7 +15,7 @@ interface Card {
   img: string;
 }
 
-const CARDS: Card[] = [
+const FALLBACK_CARDS: Card[] = [
   {
     slug: "construction",
     title: "42% faster incident reporting across 18 active construction sites.",
@@ -46,6 +46,17 @@ const CARDS: Card[] = [
   },
 ];
 
+/** Map a CMS case study item to the internal Card shape. */
+function cmsToCard(item: CmsCaseStudy): Card {
+  const a = item.attributes;
+  return {
+    slug: a.slug,
+    title: a.title,
+    body: a.summary ?? "",
+    img: a.cover?.url ?? UNSPLASH + "/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=700&h=400&q=75",
+  };
+}
+
 /* ═══════════════════════════════════════════════════════
    CTA
 ═══════════════════════════════════════════════════════ */
@@ -70,7 +81,7 @@ function WideCard({ card }: { card: Card }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href="#"
+      href={`/case-studies/${card.slug}`}
       className="flex flex-col md:flex-row bg-white overflow-hidden w-full"
       style={{
         border: "1px solid #F0F0F0",
@@ -127,7 +138,7 @@ function SquareCard({ card }: { card: Card }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href="#"
+      href={`/case-studies/${card.slug}`}
       className="flex flex-col bg-white overflow-hidden"
       style={{
         border: "1px solid #F0F0F0",
@@ -180,18 +191,55 @@ function SquareCard({ card }: { card: Card }) {
 /* ═══════════════════════════════════════════════════════
    SECTION
 ═══════════════════════════════════════════════════════ */
-export default function CaseStudiesGrid() {
-  const [wide1, sq1, sq2, wide2] = CARDS;
+interface CaseStudiesGridProps {
+  /** Live case study items from the CMS /case-studies endpoint.
+   *  When omitted the component renders the built-in fallback cards. */
+  cmsItems?: CmsCaseStudy[];
+}
+
+export default function CaseStudiesGrid({ cmsItems }: CaseStudiesGridProps = {}) {
+  // Map CMS items to internal Card shape; fall back to hardcoded data.
+  const cards: Card[] =
+    cmsItems && cmsItems.length > 0
+      ? cmsItems.map(cmsToCard)
+      : FALLBACK_CARDS;
+
+  // Layout: first card wide, next pair side-by-side, remaining cards alternate
+  // wide / square-pair to handle any number of items from the CMS.
+  const [first, ...rest] = cards;
+  const pairs: Card[][] = [];
+  const wideExtra: Card[] = [];
+
+  for (let i = 0; i < rest.length; i += 3) {
+    const chunk = rest.slice(i, i + 3);
+    if (chunk.length === 1) {
+      // Single remaining card — render wide
+      wideExtra.push(chunk[0]);
+    } else {
+      // Two square cards + optional third wide
+      pairs.push(chunk);
+    }
+  }
+
   return (
-    <section className="pt-10 pb-16 px-5 md:px-8 lg:px-12" style={{ background: "#FFFFFF" }}>
+    <section id="case-studies" className="pt-10 pb-16 px-5 md:px-8 lg:px-12" style={{ background: "#FFFFFF" }}>
       <div className="max-w-[1200px] mx-auto flex flex-col gap-4">
 
-        <WideCard card={wide1} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SquareCard card={sq1} />
-          <SquareCard card={sq2} />
-        </div>
-        <WideCard card={wide2} />
+        {first && <WideCard card={first} />}
+
+        {pairs.map((chunk, idx) => (
+          <React.Fragment key={idx}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SquareCard card={chunk[0]} />
+              {chunk[1] && <SquareCard card={chunk[1]} />}
+            </div>
+            {chunk[2] && <WideCard card={chunk[2]} />}
+          </React.Fragment>
+        ))}
+
+        {wideExtra.map((card) => (
+          <WideCard key={card.slug} card={card} />
+        ))}
 
         {/* View more */}
         <div className="flex justify-center pt-4">

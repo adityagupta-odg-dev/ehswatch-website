@@ -5,6 +5,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+/* ── CMS prop types ── */
+export interface ContactOfficeItem {
+  label: string;
+  description: string;
+}
+
+export interface ContactPageProps {
+  /** Headline for the hero banner (falls back to hardcoded default) */
+  heroHeadline?: string;
+  /** Subheadline for the hero banner (falls back to hardcoded default) */
+  heroSubheadline?: string;
+  /** Office / contact info items rendered in the left sidebar (falls back to hardcoded defaults) */
+  officeItems?: ContactOfficeItem[];
+}
+
 /* ── Validation schema ── */
 const schema = z.object({
   name:    z.string().min(2, "Name must be at least 2 characters"),
@@ -47,7 +62,19 @@ function FieldError({ message }: { message?: string }) {
   );
 }
 
-export default function ContactPage() {
+/* ── Hardcoded fallback office items ── */
+const DEFAULT_OFFICE_ITEMS: ContactOfficeItem[] = [
+  { label: "USA Office", description: "7138 Sale Ave,\nWest Hills, CA 91307, USA" },
+  { label: "India Office", description: "Awfis Space Solutions,\nHyderabad, Telangana, India" },
+  { label: "Email", description: "sales@ehswatch.com" },
+];
+
+export default function ContactPage({
+  heroHeadline,
+  heroSubheadline,
+  officeItems,
+}: ContactPageProps = {}) {
+  const resolvedOfficeItems = officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -115,14 +142,15 @@ export default function ContactPage() {
           <h1
             className="font-[family-name:var(--font-gothic-a1)] font-bold text-[36px] sm:text-[52px] md:text-[64px] leading-[1.05] tracking-[-0.03em] text-[#0a0f1e] animate-hero-rise"
             style={{ animationDelay: "80ms" }}
-          >
-            Get in Touch with <span style={{ color: "#1d4ed8" }}>Our Team</span>
-          </h1>
+            dangerouslySetInnerHTML={{
+              __html: heroHeadline ?? 'Get in Touch with <span style="color:#1d4ed8">Our Team</span>',
+            }}
+          />
           <p
             className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] text-[#6b7280] max-w-[520px] text-pretty animate-hero-rise"
             style={{ animationDelay: "180ms" }}
           >
-            Reach out for demos, onboarding support, or to discuss how EHSWatch fits your organisation.
+            {heroSubheadline ?? "Reach out for demos, onboarding support, or to discuss how EHSWatch fits your organisation."}
           </p>
         </div>
       </section>
@@ -155,24 +183,16 @@ export default function ContactPage() {
 
               {/* ── Left: contact info ── */}
               <div className="flex flex-col gap-9">
-                <div>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2.5">USA Office</p>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151] text-pretty">
-                    7138 Sale Ave,<br />West Hills, CA 91307, USA
-                  </p>
-                </div>
-                <div>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2.5">India Office</p>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151] text-pretty">
-                    Awfis Space Solutions,<br />Hyderabad, Telangana, India
-                  </p>
-                </div>
-                <div>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2.5">Email</p>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151]">
-                    sales@ehswatch.com
-                  </p>
-                </div>
+                {resolvedOfficeItems.map((item, idx) => (
+                  <div key={idx}>
+                    <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2.5">
+                      {item.label}
+                    </p>
+                    <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151] text-pretty whitespace-pre-line">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               {/* ── Right: form ── */}

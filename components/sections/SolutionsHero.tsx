@@ -1,8 +1,41 @@
 "use client";
 
 import GlareButton from "@/components/ui/GlareButton";
+import { ctaHref } from "@/lib/blocks";
 
-export default function SolutionsHero() {
+interface HeroBlock {
+  heading?: string;
+  subheading?: string;
+  eyebrow?: string;
+  primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+  secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+}
+
+// Hardcoded fallbacks
+const FALLBACK_HEADING = (
+  <>
+    Every Industry Has Different Risks.{" "}
+    <span style={{ color: "#1d4ed8" }}>Your EHS Platform Should Know the Difference.</span>
+  </>
+);
+const FALLBACK_PRIMARY_LABEL  = "Book a Demo";
+const FALLBACK_SECONDARY_LABEL = "Explore Industries";
+const FALLBACK_SECONDARY_HREF  = "#industries";
+
+export default function SolutionsHero({ heroBlock }: { heroBlock?: Record<string, unknown> | null }) {
+  const block = heroBlock as HeroBlock | null | undefined;
+
+  const primaryLabel   = block?.primary_cta?.label   ?? FALLBACK_PRIMARY_LABEL;
+  const primaryHref    = block?.primary_cta           ? ctaHref(block.primary_cta as Parameters<typeof ctaHref>[0]) : "#";
+  const secondaryLabel = block?.secondary_cta?.label  ?? FALLBACK_SECONDARY_LABEL;
+  const secondaryHref  = block?.secondary_cta         ? ctaHref(block.secondary_cta as Parameters<typeof ctaHref>[0]) : FALLBACK_SECONDARY_HREF;
+
+  // If CMS supplies a heading, render it as a plain string; otherwise use the
+  // hardcoded JSX with the blue highlight span.
+  const headingNode = block?.heading
+    ? <>{block.heading}</>
+    : FALLBACK_HEADING;
+
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-4 sm:px-6 pt-[90px] sm:pt-[120px] md:pt-[148px] pb-[60px] sm:pb-[80px] md:pb-[100px]"
@@ -65,31 +98,30 @@ export default function SolutionsHero() {
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[30px] sm:text-[42px] md:text-[54px] leading-[1.08] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
         >
-          Every Industry Has Different Risks.{" "}
-          <span style={{ color: "#1d4ed8" }}>Your EHS Platform Should Know the Difference.</span>
+          {headingNode}
         </h1>
 
         <div className="flex flex-wrap gap-3 justify-center animate-hero-rise" style={{ animationDelay: "320ms" }}>
           <GlareButton
-            href="#"
+            href={primaryHref}
             className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white transition-all duration-200 hover:shadow-lg"
             style={{
               backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
               boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
             }}
           >
-            Book a Demo
+            {primaryLabel}
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </GlareButton>
           <GlareButton
-            href="#industries"
+            href={secondaryHref}
             fillColor="#FFA660"
             hoverTextColor="#ffffff"
             className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-[#1b1b1b] border border-[#d1d5db] hover:border-[#9ca3af]"
           >
-            Explore Industries
+            {secondaryLabel}
           </GlareButton>
         </div>
       </div>

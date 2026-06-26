@@ -11,6 +11,30 @@ const STATS = [
   { target: 60, display: (n: number) => `${Math.round(n)}`, suffix: "%", desc1: "Reduction in incident reporting", desc2: "time across teams" },
 ];
 
+export interface StatsItem {
+  value: string
+  suffix?: string
+  label: string
+  icon?: string
+}
+
+function parseCmsStats(items: StatsItem[]) {
+  return items.map((item) => {
+    const numericValue = parseFloat(item.value.replace(/[^0-9.]/g, "")) || 0;
+    const isKilo = numericValue >= 1000;
+    return {
+      target: numericValue,
+      display: (n: number) =>
+        isKilo
+          ? `${(n / 1000).toFixed(n >= numericValue ? 0 : 1)}K`
+          : `${Math.round(n)}`,
+      suffix: item.suffix ?? "",
+      desc1: item.label,
+      desc2: "",
+    };
+  });
+}
+
 const DURATION = 2000; // ms
 // ease-out-cubic
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -52,13 +76,19 @@ function Counter({
   return <>{display(value)}</>;
 }
 
-export default function Stats() {
+interface StatsProps {
+  cmsItems?: StatsItem[]
+}
+
+export default function Stats({ cmsItems }: StatsProps = {}) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.3 });
+
+  const stats = cmsItems && cmsItems.length > 0 ? parseCmsStats(cmsItems) : STATS;
 
   return (
     <section ref={ref} className="bg-white py-10 md:py-[73px]">
       <div className="max-w-[1280px] mx-auto px-6 md:px-[32px] grid grid-cols-2 md:grid-cols-4 gap-y-10">
-        {STATS.map((stat, i) => (
+        {stats.map((stat, i) => (
           <Reveal
             key={stat.desc1}
             variant={i % 2 === 0 ? "slide-right" : "slide-left"}
