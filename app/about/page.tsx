@@ -9,6 +9,8 @@ import type { Metadata } from "next";
 import { getPage } from "@/lib/api";
 import { findBlock, findBlocks, iconFeaturesToArray, ctaHref } from "@/lib/blocks";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "About Us — EHSWatch",
   description: "Built to simplify EHSQ. Designed to protect. The intelligent safety platform trusted by 25K+ teams worldwide.",

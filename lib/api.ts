@@ -4,7 +4,11 @@ import type {
   CollectionResponse, FormSubmitResult, SingletonResponse,
 } from "@/lib/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_CMS_API_URL ?? "https://stage.odigma.ooo/ehswatch-cms/api/v1";
+const PUBLIC_API_BASE = "https://stage.odigma.ooo/ehswatch-cms/api/v1";
+const API_BASE =
+  typeof window === "undefined"
+    ? "http://stage.odigma.ooo/ehswatch-cms/api/v1"
+    : "https://stage.odigma.ooo/ehswatch-cms/api/v1";
 
 async function apiFetch<T>(path: string): Promise<T | null> {
   try {
@@ -80,7 +84,7 @@ export async function getForm(slug: string) {
 
 export async function submitForm(slug: string, data: Record<string, unknown>): Promise<FormSubmitResult> {
   try {
-    const res = await fetch(`${API_BASE}/forms/${slug}/submit`, {
+    const res = await fetch(`${PUBLIC_API_BASE}/forms/${slug}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(data),

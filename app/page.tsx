@@ -13,6 +13,8 @@ import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
 import { findBlock, ctaHref } from "@/lib/blocks";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [testimonialsRes, logosRes, homePageRes] = await Promise.all([
     getTestimonials(),
