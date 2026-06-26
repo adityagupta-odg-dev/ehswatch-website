@@ -7,6 +7,8 @@ import Link from "next/link";
 import { basePath } from "@/lib/basePath";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Case Studies — EHSWatch",
   description:

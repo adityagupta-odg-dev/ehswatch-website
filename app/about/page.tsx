@@ -7,6 +7,8 @@ import Stats from "@/components/sections/Stats";
 import CTABanner from "@/components/sections/CTABanner";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "About Us — EHSWatch",
   description: "Built to simplify EHSQ. Designed to protect. The intelligent safety platform trusted by 25K+ teams worldwide.",

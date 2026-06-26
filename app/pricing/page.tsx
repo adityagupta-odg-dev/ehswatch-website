@@ -6,6 +6,8 @@ import PricingCalculator from "@/components/sections/PricingCalculator";
 import PricingFAQ from "@/components/sections/PricingFAQ";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Pricing — EHSWatch",
   description: "Simple, flexible pricing for enterprise-grade EHS management. Pay only for the modules you need.",

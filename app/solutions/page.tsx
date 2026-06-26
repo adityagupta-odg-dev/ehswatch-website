@@ -6,6 +6,8 @@ import SolutionsCTA from "@/components/sections/SolutionsCTA";
 import Testimonials from "@/components/sections/Testimonials";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Solutions — EHSWatch",
   description:

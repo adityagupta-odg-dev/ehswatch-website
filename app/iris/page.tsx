@@ -3,6 +3,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import IrisPage from "@/components/sections/IrisPage";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "IRIS — AI-Powered EHSQ | EHSWatch",
   description:

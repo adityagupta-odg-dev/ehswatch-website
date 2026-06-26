@@ -12,6 +12,8 @@ import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [testimonialsRes, logosRes] = await Promise.all([
     getTestimonials(),
