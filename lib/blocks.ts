@@ -1,4 +1,5 @@
 import type { CmsBlock } from "@/lib/types";
+export type { CmsBlock } from "@/lib/types";
 
 export function findBlock<T = Record<string, unknown>>(blocks: CmsBlock[], type: string): T | null {
   const block = blocks.find(b => b.type === type);
