@@ -2,7 +2,32 @@
 
 import GlareButton from "@/components/ui/GlareButton";
 
-export default function CaseStudiesHero() {
+interface CaseStudiesHeroProps {
+  cmsHeadline?: string;
+  cmsSubheadline?: string;
+  cmsPrimaryCta?: { label: string; url: string };
+  cmsSecondaryCta?: { label: string; url: string };
+}
+
+export default function CaseStudiesHero({
+  cmsHeadline,
+  cmsSubheadline,
+  cmsPrimaryCta,
+  cmsSecondaryCta,
+}: CaseStudiesHeroProps = {}) {
+  const headlineParts = cmsHeadline
+    ? { main: cmsHeadline, accent: null }
+    : { main: "Proof from the Field,", accent: "Not the Pitch." };
+
+  const subheadline =
+    cmsSubheadline ??
+    "EHSQ teams across construction, energy, manufacturing, logistics and other sectors use EHSWatch to cut reporting time, accelerate audits, close actions faster and gain clear visibility into risk across every site.";
+
+  const primaryLabel = cmsPrimaryCta?.label ?? "Explore Case Studies";
+  const primaryHref = cmsPrimaryCta?.url ?? "#case-studies";
+  const secondaryLabel = cmsSecondaryCta?.label ?? "Talk to Experts";
+  const secondaryHref = cmsSecondaryCta?.url ?? "#";
+
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-6 pt-[148px] pb-[72px]"
@@ -53,32 +78,39 @@ export default function CaseStudiesHero() {
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[46px] md:text-[56px] leading-[1.06] tracking-[-0.03em] animate-hero-rise"
           style={{ color: "#0a1628", animationDelay: "80ms" }}
         >
-          Proof from the Field,<br />
-          <span style={{ color: "#1d4ed8" }}>Not the Pitch.</span>
+          {headlineParts.accent ? (
+            <>
+              {headlineParts.main}
+              <br />
+              <span style={{ color: "#1d4ed8" }}>{headlineParts.accent}</span>
+            </>
+          ) : (
+            headlineParts.main
+          )}
         </h1>
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] max-w-[580px] animate-hero-rise"
           style={{ color: "#6b7280", animationDelay: "200ms", textWrap: "pretty" } as React.CSSProperties}
         >
-          EHSQ teams across construction, energy, manufacturing, logistics and other sectors use EHSWatch to cut reporting time, accelerate audits, close actions faster and gain clear visibility into risk across every site.
+          {subheadline}
         </p>
         <div className="flex flex-wrap gap-3 justify-center animate-hero-rise" style={{ animationDelay: "320ms" }}>
           <GlareButton
-            href="#case-studies"
+            href={primaryHref}
             className="gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-white"
             style={{
               backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
             }}
           >
-            Explore Case Studies
+            {primaryLabel}
           </GlareButton>
           <GlareButton
             fillColor="#FFA660"
             hoverTextColor="#ffffff"
-            href="#"
+            href={secondaryHref}
             className="gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-[#1b1b1b] border border-[#d1d5db]"
           >
-            Talk to Experts
+            {secondaryLabel}
           </GlareButton>
         </div>
       </div>

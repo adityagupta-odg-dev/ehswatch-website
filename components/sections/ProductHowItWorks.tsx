@@ -12,7 +12,16 @@ const S4  = HOW + "/Track%20progress%20in%20real%20time";
 const S5  = HOW + "/Use%20insights%20to%20improve%20safety";
 
 /* ── Step copy ────────────────────────────────────────────────────── */
-const STEPS = [
+export interface CmsStep {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  icon?: string;
+  image?: { url: string; alt?: string } | null;
+  sub_items?: any[];
+}
+
+const STATIC_STEPS = [
   {
     n: 1,
     title: "Set up your safety processes",
@@ -587,14 +596,24 @@ const VISUALS = [Visual1, Visual2, Visual3, Visual4, Visual5];
 /* ── Geometry ────────────────────────────────────────────────────── */
 const CIRCLE = 28;
 const GAP    = 36;
-const TRACK  = (STEPS.length - 1) * (CIRCLE + GAP);
+
+interface ProductHowItWorksProps {
+  cmsSteps?: CmsStep[];
+}
 
 /* ══════════════════════════════════════════════════════════════════
    MAIN EXPORT
    One step visible at a time; wrapper <div> carries scroll height
    so the <section> itself has no explicit height style.
    ══════════════════════════════════════════════════════════════════ */
-export default function ProductHowItWorks() {
+export default function ProductHowItWorks({ cmsSteps }: ProductHowItWorksProps = {}) {
+  // Build normalised step list: prefer CMS if provided and non-empty
+  const STEPS = (cmsSteps && cmsSteps.length > 0)
+    ? cmsSteps.map((s, i) => ({ n: i + 1, title: s.title, body: s.description }))
+    : STATIC_STEPS;
+
+  const TRACK = (STEPS.length - 1) * (CIRCLE + GAP);
+
   const [activeStep,  setActiveStep]  = useState(0);
   const [displayStep, setDisplayStep] = useState(0);
   const [textVisible, setTextVisible] = useState(true);

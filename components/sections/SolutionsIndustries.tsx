@@ -5,6 +5,34 @@ import { basePath } from "@/lib/basePath";
 
 const VID = basePath + "/images/Solutions_/Videos/";
 
+// ── CMS card shape from solution_carousel block ──────────────────────────────
+interface CmsAccordionItem {
+  title: string;
+  description: string;
+}
+
+interface CmsCard {
+  /** May be a plain string path or an object with a url property */
+  video: string | { id?: unknown; url: string; alt?: string } | null;
+  title: string;
+  subheading?: string;
+  description?: string;
+  accordion_items?: CmsAccordionItem[];
+}
+
+/** Resolve a CMS video value to a plain URL string */
+function resolveVideoUrl(video: CmsCard["video"]): string {
+  if (!video) return "";
+  if (typeof video === "string") {
+    // Relative CMS path — prepend stage origin so Next can load it
+    if (video.startsWith("/")) return `https://stage.odigma.ooo${video}`;
+    return video;
+  }
+  const url = video.url ?? "";
+  if (url.startsWith("/")) return `https://stage.odigma.ooo${url}`;
+  return url;
+}
+
 /* ── keyframes ── */
 const STYLES = `
 @keyframes sol-bar-grow {
@@ -87,9 +115,34 @@ const INDUSTRIES = [
 ];
 
 const TAB_DURATION = 4000;
-const N = INDUSTRIES.length;
 
-export default function SolutionsIndustries() {
+/** Map a CMS card to the internal INDUSTRIES item shape */
+function cmsCardToIndustry(card: CmsCard, idx: number) {
+  const videoUrl = resolveVideoUrl(card.video);
+  const bullets: string[] = card.accordion_items && card.accordion_items.length > 0
+    ? card.accordion_items.map((a) => a.description || a.title)
+    : card.description
+      ? [card.description]
+      : [];
+
+  return {
+    key:       `cms-${idx}`,
+    number:    `${idx + 1}.`,
+    label:     card.title,
+    video:     videoUrl,
+    solutions: bullets,
+  };
+}
+
+export default function SolutionsIndustries({ cmsCards }: { cmsCards?: CmsCard[] }) {
+  // Use CMS data when provided; otherwise fall back to the hardcoded list
+  const ACTIVE_INDUSTRIES =
+    cmsCards && cmsCards.length > 0
+      ? cmsCards.map(cmsCardToIndustry)
+      : INDUSTRIES;
+
+  const N = ACTIVE_INDUSTRIES.length;
+
   const [active,      setActive]      = useState(0);
   const [cycleKey,    setCycleKey]    = useState(0);
   const [inView,      setInView]      = useState(false);
@@ -139,8 +192,8 @@ export default function SolutionsIndustries() {
     setTimeout(() => setVisible(true), 200);
   }, [active]);
 
-  const ind = INDUSTRIES[active];
-  const nextInd = INDUSTRIES[(active + 1) % N];
+  const ind = ACTIVE_INDUSTRIES[active];
+  const nextInd = ACTIVE_INDUSTRIES[(active + 1) % N];
 
   return (
     <section
@@ -169,7 +222,7 @@ export default function SolutionsIndustries() {
             aria-label="Industries"
             className="flex border-b border-[#dde2eb] overflow-x-auto scrollbar-none"
           >
-            {INDUSTRIES.map((tab, i) => (
+            {ACTIVE_INDUSTRIES.map((tab, i) => (
               <button
                 key={tab.key}
                 role="tab"

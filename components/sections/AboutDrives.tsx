@@ -2,7 +2,21 @@
 
 import Reveal from "@/components/ui/Reveal";
 
-const CARDS = [
+interface IconFeatureItem {
+  icon?: string | null;
+  title?: string;
+  description?: string;
+}
+
+interface AboutDrivesCms {
+  items: IconFeatureItem[];
+}
+
+interface AboutDrivesProps {
+  cms?: AboutDrivesCms;
+}
+
+const FALLBACK_CARDS = [
   {
     label: "Mission",
     color: "#155eef",
@@ -30,6 +44,16 @@ const CARDS = [
   },
 ];
 
+// Generic fallback icon used when CMS provides no icon SVG
+function DefaultIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="9" stroke="#155eef" strokeWidth="1.6" />
+      <circle cx="14" cy="14" r="1.8" fill="#155eef" />
+    </svg>
+  );
+}
+
 // The distinctive tab notch shape from the original design
 function TabShape({ label, color }: { label: string; color: string }) {
   return (
@@ -50,7 +74,18 @@ function TabShape({ label, color }: { label: string; color: string }) {
   );
 }
 
-export default function AboutDrives() {
+export default function AboutDrives({ cms }: AboutDrivesProps = {}) {
+  // Build the cards array — prefer CMS items, fall back to hardcoded FALLBACK_CARDS
+  const cards =
+    cms && cms.items.length > 0
+      ? cms.items.map((item) => ({
+          label: item.title ?? "",
+          color: "#155eef",
+          body: item.description ?? "",
+          icon: <DefaultIcon />,
+        }))
+      : FALLBACK_CARDS;
+
   return (
     <section className="bg-[#f1f7ff] py-[50px] md:py-[90px] lg:py-[110px] px-4 md:px-6">
       <div className="max-w-[1000px] mx-auto">
@@ -66,8 +101,8 @@ export default function AboutDrives() {
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-[72px]">
-          {CARDS.map((card, i) => (
-            <Reveal key={card.label} variant={i === 0 ? "slide-right" : "slide-left"} duration={750} delay={i * 100}>
+          {cards.map((card, i) => (
+            <Reveal key={card.label || i} variant={i === 0 ? "slide-right" : "slide-left"} duration={750} delay={i * 100}>
               <div className="relative pt-[44px]">
                 <TabShape label={card.label} color={card.color} />
 

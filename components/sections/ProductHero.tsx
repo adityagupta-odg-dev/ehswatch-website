@@ -3,7 +3,24 @@
 import { basePath } from "@/lib/basePath";
 import GlareButton from "@/components/ui/GlareButton";
 
-export default function ProductHero() {
+interface ProductHeroProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsCtaLabel?: string;
+  cmsCtaUrl?: string;
+}
+
+export default function ProductHero({
+  cmsHeading,
+  cmsSubheading,
+  cmsCtaLabel,
+  cmsCtaUrl,
+}: ProductHeroProps = {}) {
+  const headingLine1 = cmsHeading ? cmsHeading.split("\n")[0] : "One Platform.";
+  const headingLine2 = cmsHeading ? cmsHeading.split("\n")[1] : "Every EHSQ Process.";
+  const subheading = cmsSubheading ?? "From field incidents to board‑level dashboards — all connected, all in real time.";
+  const ctaLabel = cmsCtaLabel ?? "Book a Demo";
+  const ctaUrl   = cmsCtaUrl   ?? "#";
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-4 sm:px-6 pt-[90px] sm:pt-[120px] md:pt-[148px] pb-[60px] sm:pb-[80px] md:pb-[100px]"
@@ -80,18 +97,22 @@ export default function ProductHero() {
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[34px] sm:text-[48px] md:text-[60px] leading-[1.06] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
         >
-          One Platform.
-          <br />
-          <span style={{ color: "#1d4ed8" }}>Every EHSQ Process.</span>
+          {headingLine1}
+          {headingLine2 && (
+            <>
+              <br />
+              <span style={{ color: "#1d4ed8" }}>{headingLine2}</span>
+            </>
+          )}
         </h1>
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] md:text-[18px] leading-[1.75] max-w-[490px] animate-hero-rise text-gray-700"
           style={{ animationDelay: "200ms" }}
         >
-          From field incidents to board‑level dashboards — all connected, all in real time.
+          {subheading}
         </p>
         <GlareButton
-          href="#"
+          href={ctaUrl}
           className="inline-flex items-center gap-2 px-8 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white transition-all duration-200 animate-hero-rise hover:shadow-lg"
           style={{
             animationDelay: "320ms",
@@ -99,7 +120,7 @@ export default function ProductHero() {
             boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
           }}
         >
-          Book a Demo
+          {ctaLabel}
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

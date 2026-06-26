@@ -5,7 +5,7 @@ import { basePath } from "@/lib/basePath";
 
 const ICONS_BASE = basePath + "/images/Manual%20Safety%20Processes%20Are%20%20Slowing%20You%20Down";
 
-const PAIN_POINTS = [
+const DEFAULT_PAIN_POINTS = [
   {
     iconSrc: ICONS_BASE + "/Data%20scattered%20across%20platforms.svg",
     label: "Data scattered across platforms",
@@ -28,11 +28,42 @@ const PAIN_POINTS = [
   },
 ];
 
+// Bob animation parameters cycled when using CMS items
+const BOB_PARAMS = [
+  { bobDuration: "3.2s", amplitude: "10px", bobDelay: "0s" },
+  { bobDuration: "3.8s", amplitude: "8px", bobDelay: "0.5s" },
+  { bobDuration: "3.5s", amplitude: "12px", bobDelay: "0.3s" },
+  { bobDuration: "3.0s", amplitude: "6px", bobDelay: "1.0s" },
+];
+
+export interface PainPointItem {
+  label: string;
+  description?: string;
+  icon?: string;
+}
+
+interface PainPointsProps {
+  cmsItems?: PainPointItem[];
+}
+
 // Concentric ring sizes (px). 4 rings only. Largest first so smaller rings sit on top.
 const RING_SIZES = [1060, 800, 570, 340];
 
-export default function PainPoints() {
+export default function PainPoints({ cmsItems }: PainPointsProps = {}) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.2 });
+
+  const PAIN_POINTS =
+    cmsItems && cmsItems.length > 0
+      ? cmsItems.map((item, i) => {
+          const bob = BOB_PARAMS[i % BOB_PARAMS.length];
+          return {
+            iconSrc: item.icon ?? "",
+            label: item.label,
+            ...bob,
+          };
+        })
+      : DEFAULT_PAIN_POINTS;
+
   const [tl, tr, bl, br] = PAIN_POINTS;
 
   return (

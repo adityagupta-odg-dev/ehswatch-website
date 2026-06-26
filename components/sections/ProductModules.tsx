@@ -5,6 +5,7 @@ import type { ReactElement } from "react";
 import Link from "next/link";
 import GlareButton from "@/components/ui/GlareButton";
 import { basePath } from "@/lib/basePath";
+import type { CmsProductModule } from "@/lib/types";
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
 
@@ -191,9 +192,35 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
   );
 }
 
+// ── CMS module adapter ─────────────────────────────────────────────────────
+
+function adaptCmsModules(cmsModules: CmsProductModule[]): typeof MODULES {
+  return cmsModules.map((m) => {
+    const a = m.attributes;
+    // Use the CMS icon key if it maps to a known SVG, otherwise fall back to "check-circle"
+    const iconKey = a.icon && Object.prototype.hasOwnProperty.call(Icons, a.icon)
+      ? a.icon
+      : "check-circle";
+    return {
+      name: a.name,
+      href: `/modules/${a.slug}`,
+      desc: a.tagline || a.description,
+      color: "#155eef",
+      icon: iconKey,
+    };
+  });
+}
+
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function ProductModules() {
+interface ProductModulesProps {
+  cmsModules?: CmsProductModule[];
+}
+
+export default function ProductModules({ cmsModules }: ProductModulesProps = {}) {
+  const SOURCE_MODULES =
+    cmsModules && cmsModules.length > 0 ? adaptCmsModules(cmsModules) : MODULES;
+
   const [visibleCount, setVisibleCount] = useState(INITIAL_ROWS * COLS);
   // Track which row indices have finished their entrance animation
   const [animatedRows, setAnimatedRows] = useState<Set<number>>(
@@ -201,11 +228,11 @@ export default function ProductModules() {
   );
   const [sectionEl, setSectionEl] = useState<HTMLElement | null>(null);
 
-  const visibleModules = MODULES.slice(0, visibleCount);
-  const hasMore = visibleCount < MODULES.length;
+  const visibleModules = SOURCE_MODULES.slice(0, visibleCount);
+  const hasMore = visibleCount < SOURCE_MODULES.length;
 
   const handleViewMore = () => {
-    const nextCount = Math.min(visibleCount + STEP, MODULES.length);
+    const nextCount = Math.min(visibleCount + STEP, SOURCE_MODULES.length);
     setVisibleCount(nextCount);
     // Mark the new row index as animated after a brief delay (let React render first)
     const newRowIdx = Math.ceil(visibleCount / COLS);
@@ -226,7 +253,7 @@ export default function ProductModules() {
   };
 
   // Build rows for correct border logic
-  const rows: typeof MODULES[] = [];
+  const rows: (typeof MODULES)[] = [];
   for (let i = 0; i < visibleModules.length; i += COLS) {
     rows.push(visibleModules.slice(i, i + COLS));
   }
