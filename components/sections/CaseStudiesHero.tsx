@@ -15,9 +15,9 @@ export default function CaseStudiesHero({
   cmsPrimaryCta,
   cmsSecondaryCta,
 }: CaseStudiesHeroProps = {}) {
-  const headlineParts = cmsHeadline
-    ? { main: cmsHeadline, accent: null }
-    : { main: "Proof from the Field,", accent: "Not the Pitch." };
+  const headlineHtml = (
+    cmsHeadline ?? 'Proof from the Field,<br/><span>Not the Pitch.</span>'
+  ).replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">');
 
   const subheadline =
     cmsSubheadline ??
@@ -77,17 +77,8 @@ export default function CaseStudiesHero({
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[46px] md:text-[56px] leading-[1.06] tracking-[-0.03em] animate-hero-rise"
           style={{ color: "#0a1628", animationDelay: "80ms" }}
-        >
-          {headlineParts.accent ? (
-            <>
-              {headlineParts.main}
-              <br />
-              <span style={{ color: "#1d4ed8" }}>{headlineParts.accent}</span>
-            </>
-          ) : (
-            headlineParts.main
-          )}
-        </h1>
+          dangerouslySetInnerHTML={{ __html: headlineHtml }}
+        />
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] max-w-[580px] animate-hero-rise"
           style={{ color: "#6b7280", animationDelay: "200ms", textWrap: "pretty" } as React.CSSProperties}
