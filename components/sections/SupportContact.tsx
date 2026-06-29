@@ -55,7 +55,9 @@ function ContactForm() {
         name: fd.get("name"),
         email: fd.get("email"),
         company: fd.get("company"),
-        topic: fd.get("topic"),
+        category: fd.get("category"),
+        priority: fd.get("priority"),
+        subject: fd.get("subject"),
         message: fd.get("message"),
         captcha_token: captchaToken ?? "",
       });
@@ -98,19 +100,34 @@ function ContactForm() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Company</label>
-          <input name="company" type="text" placeholder="Acme Corp" className={inputClass} />
+          <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Company <span className="text-[#e53e3e]">*</span></label>
+          <input required name="company" type="text" placeholder="Acme Corp" className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Topic <span className="text-[#e53e3e]">*</span></label>
-          <select required name="topic" defaultValue="" className={inputClass}>
-            <option value="" disabled>Select a topic</option>
-            <option>Technical Issue</option>
-            <option>Billing & Pricing</option>
-            <option>Feature Request</option>
-            <option>Documentation</option>
-            <option>General Enquiry</option>
+          <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Issue Category <span className="text-[#e53e3e]">*</span></label>
+          <select required name="category" defaultValue="" className={inputClass}>
+            <option value="" disabled>Select category</option>
+            <option value="Bug report">Bug report</option>
+            <option value="Feature request">Feature request</option>
+            <option value="Onboarding question">Onboarding question</option>
+            <option value="Billing">Billing</option>
+            <option value="Other">Other</option>
           </select>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Subject <span className="text-[#e53e3e]">*</span></label>
+        <input required name="subject" type="text" placeholder="Brief description of your issue" className={inputClass} />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Priority <span className="text-[#e53e3e]">*</span></label>
+        <div className="flex flex-wrap gap-3">
+          {["Low", "Normal", "High", "Urgent"].map((p) => (
+            <label key={p} className="flex items-center gap-2 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#374151] cursor-pointer">
+              <input required type="radio" name="priority" value={p} className="accent-[#155eef]" />
+              {p}
+            </label>
+          ))}
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
