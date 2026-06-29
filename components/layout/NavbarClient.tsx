@@ -225,7 +225,7 @@ export default function NavbarClient({
               <div
                 key={link.label}
                 ref={(el) => { linkRefs.current[i] = el; }}
-                className="relative group shrink-0 pointer-events-auto"
+                className="relative group shrink-0 pointer-events-auto pb-[10px] -mb-[10px]"
                 style={{
                   color: initColor, textShadow: initShadow,
                   fontSize: "15px", paddingLeft: "14px", paddingRight: "14px",
@@ -242,7 +242,7 @@ export default function NavbarClient({
                 </button>
 
                 {/* Dropdown panel — 2-column */}
-                <div className="absolute top-[calc(100%+10px)] left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_56px_rgba(0,0,0,0.14)] border border-[#f0f2f5] p-4 w-[480px] opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_56px_rgba(0,0,0,0.14)] border border-[#f0f2f5] p-4 w-[480px] opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50">
                   {/* caret */}
                   <div className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-[#f0f2f5] rotate-45" />
                   <div className="grid grid-cols-2 gap-3">
@@ -252,14 +252,21 @@ export default function NavbarClient({
                         href={item.href}
                         className="group/card flex flex-col gap-2.5 rounded-xl overflow-hidden transition-all duration-200"
                       >
-                        {/* Thumbnail image */}
+                        {/* Thumbnail — show image if available, gradient placeholder otherwise */}
                         <div className="w-full overflow-hidden rounded-xl" style={{ aspectRatio: "16/9" }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={basePath + item.img}
-                            alt={item.label}
-                            className="w-full h-full object-cover group-hover/card:scale-[1.03] transition-transform duration-300"
-                          />
+                          {item.img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={basePath + item.img}
+                              alt={item.label}
+                              className="w-full h-full object-cover group-hover/card:scale-[1.03] transition-transform duration-300"
+                            />
+                          ) : (
+                            <div
+                              className="w-full h-full group-hover/card:scale-[1.03] transition-transform duration-300"
+                              style={{ background: "linear-gradient(135deg, #e8f0fe 0%, #c7d7fd 50%, #dde9ff 100%)" }}
+                            />
+                          )}
                         </div>
                         {/* Text */}
                         <div className="px-1 pb-2 flex flex-col gap-1">
