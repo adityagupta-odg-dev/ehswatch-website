@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SolutionsHero from "@/components/sections/SolutionsHero";
-import SolutionsIndustries from "@/components/sections/SolutionsIndustries";
+import SolutionsZigzag from "@/components/sections/SolutionsZigzag";
 import SolutionsCTA from "@/components/sections/SolutionsCTA";
 import Testimonials from "@/components/sections/Testimonials";
 import { getPage, getTestimonials } from "@/lib/api";
@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 
 export default async function IndustriesPage() {
   const [pageData, testimonialsRes] = await Promise.all([
-    getPage("industries"),
+    getPage("solutions"),
     getTestimonials(),
   ]);
 
-  const blocks: any[] = pageData?.data?.attributes?.content ?? [];
+  const blocks: any[] = (pageData?.data as any)?.attributes?.content ?? [];
   const cmsTestimonials = testimonialsRes?.data ?? [];
 
   const cmsHero = findBlock<{
@@ -49,8 +49,8 @@ export default async function IndustriesPage() {
               : undefined
           }
         />
-        <SolutionsIndustries />
-        <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
+        <SolutionsZigzag />
+        <Testimonials title="A Snapshot of Real‑World Impact" cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
         <SolutionsCTA />
       </main>
       <Footer />
