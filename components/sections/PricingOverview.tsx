@@ -13,6 +13,7 @@ const DEFAULT_CHECKLIST_ITEMS = [
 ];
 
 interface PricingOverviewProps {
+  cmsEyebrow?: string;
   heading?: string;
   body?: string;
   checklistHeading?: string;
@@ -20,6 +21,7 @@ interface PricingOverviewProps {
 }
 
 export default function PricingOverview({
+  cmsEyebrow,
   heading,
   body,
   checklistHeading,
