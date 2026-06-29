@@ -6,11 +6,18 @@ export default async function Navbar({ lightHero }: { lightHero?: boolean }) {
   const mainNav = (header?.data as any)?.attributes?.main_nav ?? [];
   const ctas    = (header?.data as any)?.attributes?.ctas ?? [];
 
-  const cmsNav = (mainNav as any[]).map((item) => ({
-    label:       item.label as string,
-    href:        item.type === "dropdown" ? "#" : (item.url as string) || "#",
-    hasDropdown: item.type === "dropdown",
-    hideOnScroll: false,
+  // Find first and last link-type items to apply hideOnScroll (mirrors original hardcoded behaviour)
+  const linkIndices = (mainNav as any[])
+    .map((item: any, i: number) => (item.type !== "dropdown" ? i : -1))
+    .filter((i: number) => i !== -1);
+  const firstLinkIdx = linkIndices[0] ?? -1;
+  const lastLinkIdx  = linkIndices[linkIndices.length - 1] ?? -1;
+
+  const cmsNav = (mainNav as any[]).map((item: any, idx: number) => ({
+    label:        item.label as string,
+    href:         item.type === "dropdown" ? "#" : (item.url as string) || "#",
+    hasDropdown:  item.type === "dropdown",
+    hideOnScroll: idx === firstLinkIdx || idx === lastLinkIdx,
     children: item.type === "dropdown"
       ? (item.children as any[] ?? []).map((c: any) => ({
           label: c.label as string,
