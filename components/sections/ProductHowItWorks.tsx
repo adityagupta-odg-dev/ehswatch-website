@@ -11,8 +11,18 @@ const S3  = HOW + "/Route%20work%20to%20the%20right%20people";
 const S4  = HOW + "/Track%20progress%20in%20real%20time";
 const S5  = HOW + "/Use%20insights%20to%20improve%20safety";
 
-/* ── Step copy ────────────────────────────────────────────────────── */
-const STEPS = [
+/* ── CMS step shape ───────────────────────────────────────────────── */
+export interface CmsStep {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  icon?: string;
+  image?: { url?: string } | null;
+  sub_items?: Array<{ icon?: string; title?: string; description?: string }>;
+}
+
+/* ── Default step copy ────────────────────────────────────────────── */
+const DEFAULT_STEPS: Array<{ n: number; title: string; body: string }> = [
   {
     n: 1,
     title: "Set up your safety processes",
@@ -42,7 +52,6 @@ const STEPS = [
 
 /* ══════════════════════════════════════════════════════════════════
    STEP 1 — Set up your safety processes
-   Assets: Row/Pill/Yes.svg · Row/Pill/No.svg
    ══════════════════════════════════════════════════════════════════ */
 function Visual1({ active }: { active: boolean }) {
   const rows = [
@@ -74,7 +83,6 @@ function Visual1({ active }: { active: boolean }) {
           <span style={{ width: 118, fontSize: 11, fontWeight: 600, color: "#94a3b8" }}>Remarks</span>
         </div>
 
-        {/* Rows — use actual Figma pill SVGs + remarks field */}
         {rows.map((row, i) => (
           <div
             key={i}
@@ -90,7 +98,6 @@ function Visual1({ active }: { active: boolean }) {
             <span style={{ flex: 1, fontSize: 12.5, color: "#374151", fontWeight: 450, lineHeight: 1.45, paddingRight: 14 }}>
               {row.item}
             </span>
-            {/* Yes/No pill — inlined Figma SVG paths, no external file */}
             <div style={{ width: 86 }}>
               {row.yes ? (
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#dcfce7", borderRadius: 20, padding: "4px 11px" }}>
@@ -110,7 +117,6 @@ function Visual1({ active }: { active: boolean }) {
                 </div>
               )}
             </div>
-            {/* Remarks input mockup */}
             <div style={{
               width: 118, height: 30,
               background: "#f8fafc",
@@ -130,7 +136,6 @@ function Visual1({ active }: { active: boolean }) {
 
 /* ══════════════════════════════════════════════════════════════════
    STEP 2 — Capture information from the field
-   Assets: Mobile App.svg (full phone)
    ══════════════════════════════════════════════════════════════════ */
 function Visual2({ active }: { active: boolean }) {
   return (
@@ -161,8 +166,6 @@ function Visual2({ active }: { active: boolean }) {
 
 /* ══════════════════════════════════════════════════════════════════
    STEP 3 — Route work to the right people
-   Assets: Card/Avatar Wrap.svg · Card/calendar.svg · Card/clock.svg
-           Card/Alert/Check.svg · Card/Alert/clock.svg
    ══════════════════════════════════════════════════════════════════ */
 function Visual3({ active }: { active: boolean }) {
   const alerts = [
@@ -185,7 +188,6 @@ function Visual3({ active }: { active: boolean }) {
           transition: "opacity 0.55s cubic-bezier(0.34,1.1,0.64,1), transform 0.55s cubic-bezier(0.34,1.1,0.64,1)",
         }}
       >
-        {/* Blue header */}
         <div style={{ background: "#0087ff", padding: "18px 22px", display: "flex", alignItems: "center", gap: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`${S3}/Card/Avatar%20Wrap.svg`} alt="Team" style={{ height: 50, width: "auto", flexShrink: 0 }} />
@@ -200,9 +202,7 @@ function Visual3({ active }: { active: boolean }) {
           </div>
         </div>
 
-        {/* Body */}
         <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Due date row */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, opacity: active ? 1 : 0, transition: "opacity 0.35s ease 0.32s" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${S3}/Card/calendar.svg`} alt="Due date" style={{ width: 24, height: 24, flexShrink: 0 }} />
@@ -219,7 +219,6 @@ function Visual3({ active }: { active: boolean }) {
 
           <div style={{ height: 1, background: "#f1f5f9" }} />
 
-          {/* Alerts header */}
           <div style={{ display: "flex", alignItems: "center", gap: 9, opacity: active ? 1 : 0, transition: "opacity 0.35s ease 0.42s" }}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M9 2a5 5 0 0 0-5 5v3L2.5 12.5h13L14 10V7A5 5 0 0 0 9 2z" stroke="#0f172a" strokeWidth="1.4" strokeLinejoin="round"/>
@@ -229,7 +228,6 @@ function Visual3({ active }: { active: boolean }) {
             <span style={{ fontSize: 13.5, fontWeight: 700, color: "#0f172a" }}>Automated Alerts &amp; Reminders</span>
           </div>
 
-          {/* Alert rows — actual Figma check / clock icons */}
           <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
             {alerts.map((alert, i) => (
               <div
@@ -255,7 +253,6 @@ function Visual3({ active }: { active: boolean }) {
 
 /* ══════════════════════════════════════════════════════════════════
    STEP 4 — Track progress in real time
-   Assets: Fav icon.png (sidebar logo)
    ══════════════════════════════════════════════════════════════════ */
 function Visual4({ active }: { active: boolean }) {
   const [counts, setCounts] = useState([0, 0, 0, 0]);
@@ -284,7 +281,6 @@ function Visual4({ active }: { active: boolean }) {
     { label: "INCIDENT RATE",      val: counts[3], fmt: (v: number) => v.toFixed(1) },
   ];
 
-  // Donut: High 35%, Medium 25%, Low 40%. r=26, circ≈163.36
   const r = 26, circ = 2 * Math.PI * r;
   const donutSegs = [
     { pct: 0.35, color: "#ef4444", label: "High" },
@@ -301,7 +297,6 @@ function Visual4({ active }: { active: boolean }) {
     { label: "Overdue",  pct: 25, color: "#ef4444" },
   ];
 
-  // Sidebar nav — Figma asset filenames
   const leftNav = [
     { file: "Home.svg",           active: false },
     { file: "Graph.svg",          active: true  },
@@ -334,11 +329,9 @@ function Visual4({ active }: { active: boolean }) {
       >
         {/* Left sidebar */}
         <div style={{ width: 46, background: "white", borderRight: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 12, gap: 2, flexShrink: 0 }}>
-          {/* Fav icon logo (SVG) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`${S4}/Fav%20icon.svg`} alt="EHSWatch" style={{ width: 22, height: "auto", objectFit: "contain", marginBottom: 8 }} />
           <div style={{ width: 26, height: 1, background: "#f1f5f9", marginBottom: 6 }} />
-          {/* Nav icons — Figma assets */}
           {leftNav.map((nav, i) => (
             <div key={i} style={{ width: 34, height: 30, borderRadius: 7, background: nav.active ? "#eff4ff" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -349,8 +342,6 @@ function Visual4({ active }: { active: boolean }) {
 
         {/* Main content */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#f8fafc" }}>
-
-          {/* Header */}
           <div style={{ background: "white", borderBottom: "1px solid #f1f5f9", padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
             <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Welcome</span>
             <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
@@ -364,7 +355,6 @@ function Visual4({ active }: { active: boolean }) {
             </div>
           </div>
 
-          {/* Filter row */}
           <div style={{ background: "white", borderBottom: "1px solid #f1f5f9", padding: "6px 14px", display: "flex", gap: 10, flexShrink: 0 }}>
             {[{ label: "Filter by Date", val: "12/06/2025" }, { label: "Filter by Location", val: "Offshore" }].map((f, i) => (
               <div key={i} style={{ flex: 1, border: "1px solid #e8edf5", borderRadius: 6, padding: "4px 9px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -378,10 +368,7 @@ function Visual4({ active }: { active: boolean }) {
             ))}
           </div>
 
-          {/* Content */}
           <div style={{ flex: 1, padding: "9px 14px", display: "flex", flexDirection: "column", gap: 8, overflow: "hidden" }}>
-
-            {/* 2×2 KPI cards */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, flexShrink: 0 }}>
               {kpis.map((k, i) => (
                 <div key={i} style={{
@@ -390,7 +377,6 @@ function Visual4({ active }: { active: boolean }) {
                   display: "flex", alignItems: "center", gap: 10,
                   opacity: active ? 1 : 0, transition: `opacity 0.35s ease ${0.1 + i * 0.07}s`,
                 }}>
-                  {/* Figma KPI icon */}
                   <div style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`${S4}/${kpiIcons[i]}`} alt={k.label} style={{ width: 28, height: 28, objectFit: "contain" }} />
@@ -403,10 +389,7 @@ function Visual4({ active }: { active: boolean }) {
               ))}
             </div>
 
-            {/* Charts row */}
             <div style={{ display: "flex", gap: 8, flex: 1, overflow: "hidden", minHeight: 0 }}>
-
-              {/* Donut — Incidents by Severity */}
               <div style={{ flex: 1, background: "white", borderRadius: 8, padding: "10px 12px", border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", opacity: active ? 1 : 0, transition: "opacity 0.4s ease 0.38s" }}>
                 <p style={{ fontSize: 7.5, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 8px" }}>Incidents by Severity</p>
                 <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, minHeight: 0 }}>
@@ -439,15 +422,12 @@ function Visual4({ active }: { active: boolean }) {
                 </div>
               </div>
 
-              {/* Bar chart — Actions by Status */}
               <div style={{ flex: 1.3, background: "white", borderRadius: 8, padding: "10px 12px", border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", opacity: active ? 1 : 0, transition: "opacity 0.4s ease 0.44s" }}>
                 <p style={{ fontSize: 7.5, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 6px" }}>Actions by Status</p>
                 <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
-                  {/* Y axis */}
                   <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", paddingBottom: 16, paddingRight: 4 }}>
                     {[20,15,10,5].map(n => <span key={n} style={{ fontSize: 6.5, color: "#94a3b8" }}>{n}</span>)}
                   </div>
-                  {/* Bars + labels */}
                   <div style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 6, paddingBottom: 0 }}>
                     {bars.map((bar, i) => (
                       <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
@@ -463,7 +443,6 @@ function Visual4({ active }: { active: boolean }) {
                     ))}
                   </div>
                 </div>
-                {/* Legend */}
                 <div style={{ display: "flex", gap: 7, marginTop: 4, flexWrap: "wrap" }}>
                   {bars.map(bar => (
                     <div key={bar.label} style={{ display: "flex", alignItems: "center", gap: 3 }}>
@@ -473,12 +452,10 @@ function Visual4({ active }: { active: boolean }) {
                   ))}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
 
-        {/* Right mini sidebar — Figma assets */}
         <div style={{ width: 34, background: "white", borderLeft: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", padding: "12px 0", gap: 10, flexShrink: 0 }}>
           {rightNav.map(file => (
             // eslint-disable-next-line @next/next/no-img-element
@@ -488,7 +465,6 @@ function Visual4({ active }: { active: boolean }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`${S4}/Dark%20mode.svg`} alt="" style={{ width: 16, height: 16, objectFit: "contain" }} />
         </div>
-
       </div>
     </div>
   );
@@ -496,12 +472,8 @@ function Visual4({ active }: { active: boolean }) {
 
 /* ══════════════════════════════════════════════════════════════════
    STEP 5 — Use insights to improve safety
-   Assets: Right/Step/Surface Patterns.svg
-           Right/Step/Flag Preventive Actions-1.svg
-           Right/Step/Flag Preventive Actions.svg
-           Right/Step/Safer Workplaces.svg
    ══════════════════════════════════════════════════════════════════ */
-const INSIGHT_STEPS = [
+const DEFAULT_INSIGHT_STEPS = [
   {
     img: `${S5}/Right/Step/Surface%20Patterns.svg`,
     title: "Surface Patterns",
@@ -524,11 +496,27 @@ const INSIGHT_STEPS = [
   },
 ];
 
-function Visual5({ active }: { active: boolean }) {
+function Visual5({
+  active,
+  subItems,
+}: {
+  active: boolean;
+  subItems?: Array<{ icon?: string; title?: string; description?: string }>;
+}) {
+  // Use CMS sub_items if provided, otherwise fall back to defaults
+  const insightSteps =
+    subItems && subItems.length > 0
+      ? subItems.map((si, i) => ({
+          img: DEFAULT_INSIGHT_STEPS[i]?.img ?? `${S5}/Right/Step/Surface%20Patterns.svg`,
+          title: si.title || DEFAULT_INSIGHT_STEPS[i]?.title || "",
+          desc: si.description || DEFAULT_INSIGHT_STEPS[i]?.desc || "",
+        }))
+      : DEFAULT_INSIGHT_STEPS;
+
   return (
     <div className="w-full h-full flex items-center justify-center px-2 overflow-hidden">
       <div style={{ width: "100%", maxWidth: 440, display: "flex", flexDirection: "column" }}>
-        {INSIGHT_STEPS.map((step, i) => (
+        {insightSteps.map((step, i) => (
           <React.Fragment key={i}>
             <div
               style={{
@@ -545,7 +533,6 @@ function Visual5({ active }: { active: boolean }) {
                 transition: `opacity 0.5s cubic-bezier(0.34,1.1,0.64,1) ${0.08 + i * 0.12}s, transform 0.5s cubic-bezier(0.34,1.1,0.64,1) ${0.08 + i * 0.12}s`,
               }}
             >
-              {/* Icon box with actual Figma SVG */}
               <div style={{ width: 54, height: 54, borderRadius: 14, background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={step.img} alt={step.title} style={{ width: 32, height: 32, objectFit: "contain" }} />
@@ -559,8 +546,7 @@ function Visual5({ active }: { active: boolean }) {
               </div>
             </div>
 
-            {/* Animated connector line */}
-            {i < INSIGHT_STEPS.length - 1 && (
+            {i < insightSteps.length - 1 && (
               <div style={{ paddingLeft: 44, height: 20, display: "flex", alignItems: "center" }}>
                 <div
                   style={{
@@ -582,23 +568,61 @@ function Visual5({ active }: { active: boolean }) {
 }
 
 /* ── Visual registry ──────────────────────────────────────────────── */
-const VISUALS = [Visual1, Visual2, Visual3, Visual4, Visual5];
+const STATIC_VISUALS = [Visual1, Visual2, Visual3, Visual4];
 
 /* ── Geometry ────────────────────────────────────────────────────── */
 const CIRCLE = 28;
 const GAP    = 36;
-const TRACK  = (STEPS.length - 1) * (CIRCLE + GAP);
+
+/* ══════════════════════════════════════════════════════════════════
+   Props interface
+   ══════════════════════════════════════════════════════════════════ */
+interface ProductHowItWorksProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsSteps?: CmsStep[];
+}
 
 /* ══════════════════════════════════════════════════════════════════
    MAIN EXPORT
-   One step visible at a time; wrapper <div> carries scroll height
-   so the <section> itself has no explicit height style.
    ══════════════════════════════════════════════════════════════════ */
-export default function ProductHowItWorks() {
+export default function ProductHowItWorks({
+  cmsHeading,
+  cmsSubheading,
+  cmsSteps,
+}: ProductHowItWorksProps = {}) {
   const [activeStep,  setActiveStep]  = useState(0);
   const [displayStep, setDisplayStep] = useState(0);
   const [textVisible, setTextVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
+
+  // Build steps from CMS or use defaults
+  const steps = cmsSteps && cmsSteps.length > 0
+    ? cmsSteps.map((s, i) => ({
+        n: i + 1,
+        title: s.title || DEFAULT_STEPS[i]?.title || `Step ${i + 1}`,
+        body: s.description || DEFAULT_STEPS[i]?.body || "",
+        sub_items: s.sub_items,
+      }))
+    : DEFAULT_STEPS.map(s => ({ ...s, sub_items: undefined }));
+
+  const TRACK = (steps.length - 1) * (CIRCLE + GAP);
+
+  const heading = cmsHeading
+    ? cmsHeading.replace(/<[^>]+>/g, "").trim()
+    : "How EHSWatch Works";
+
+  // Detect the <span> portion for blue styling
+  const headingSpanMatch = (cmsHeading || "How <span>EHSWatch</span> Works").match(/<span>([\s\S]*?)<\/span>/);
+  const headingSpanText = headingSpanMatch ? headingSpanMatch[1] : "EHSWatch";
+  const headingPlain = (cmsHeading || "How <span>EHSWatch</span> Works").replace(/<[^>]+>/g, "");
+  const headingSpanIdx = headingPlain.indexOf(headingSpanText);
+  const headingBefore = headingSpanIdx >= 0 ? headingPlain.slice(0, headingSpanIdx) : headingPlain;
+  const headingAfter = headingSpanIdx >= 0 ? headingPlain.slice(headingSpanIdx + headingSpanText.length) : "";
+
+  const subheading =
+    cmsSubheading ||
+    "EHSWatch is designed to make EHSQ management simple for every team member — from the field to the leadership team.";
 
   /* Scroll-driven step detection */
   useEffect(() => {
@@ -609,13 +633,13 @@ export default function ProductHowItWorks() {
       if (scrollable <= 0) return;
       const scrolled  = -rect.top;
       const progress  = Math.max(0, Math.min(0.9999, scrolled / scrollable));
-      const step      = Math.min(STEPS.length - 1, Math.floor(progress * STEPS.length));
+      const step      = Math.min(steps.length - 1, Math.floor(progress * steps.length));
       setActiveStep(step);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [steps.length]);
 
   /* Fade-out → swap content → fade-in */
   useEffect(() => {
@@ -625,28 +649,30 @@ export default function ProductHowItWorks() {
     return () => clearTimeout(t);
   }, [activeStep, displayStep]);
 
-  const fillH = activeStep === 0 ? 0 : (activeStep / (STEPS.length - 1)) * TRACK;
+  const fillH = activeStep === 0 ? 0 : (activeStep / (steps.length - 1)) * TRACK;
 
   return (
     <section
       ref={sectionRef}
       className="bg-[#f1f7ff]"
-      style={{ height: `${STEPS.length * 100}vh` }}
+      style={{ height: `${steps.length * 100}vh` }}
     >
-      {/* Sticky viewport — one screen tall */}
+      {/* Sticky viewport */}
       <div className="sticky top-0 overflow-hidden flex flex-col" style={{ height: "100vh" }}>
 
-        {/* ── Heading ── */}
+        {/* Heading */}
         <div className="flex-none text-center px-6 pt-[11vh] pb-[1vh]">
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b] tracking-[-0.025em]">
-            How <span className="text-[#155eef]">EHSWatch</span> Works
+            {headingBefore}
+            <span className="text-[#155eef]">{headingSpanText}</span>
+            {headingAfter}
           </h2>
           <p className="mt-3 font-[family-name:var(--font-dm-sans)] text-[14px] md:text-[16px] text-[#4b5563] leading-[1.7] mx-auto max-w-[700px]">
-            EHSWatch is designed to make EHSQ management simple for every team member — from the field to the leadership team.
+            {subheading}
           </p>
         </div>
 
-        {/* ── Main row ── */}
+        {/* Main row */}
         <div className="flex-1 flex items-center gap-8 md:gap-12 max-w-[1200px] mx-auto w-full px-6 md:px-10 pt-[1vh] pb-[5vh]">
 
           {/* Vertical stepper */}
@@ -659,7 +685,7 @@ export default function ProductHowItWorks() {
               className="absolute w-[2px] rounded-full bg-[#155eef] transition-[height] duration-500 ease-out"
               style={{ top: CIRCLE / 2, height: `${fillH}px` }}
             />
-            {STEPS.map((step, i) => (
+            {steps.map((step, i) => (
               <div
                 key={i}
                 className="relative z-10 flex items-center justify-center rounded-full text-[11px] font-bold"
@@ -693,35 +719,45 @@ export default function ProductHowItWorks() {
           >
             <div className="flex items-center gap-2 mb-4">
               <span className="font-[family-name:var(--font-dm-sans)] font-bold text-[11px] text-[#155eef] tracking-[1.6px] uppercase">
-                Step {STEPS[displayStep].n}
+                Step {steps[displayStep].n}
               </span>
               <span className="inline-block w-7 h-[1.5px] bg-[#155eef] opacity-35 rounded-full" />
             </div>
             <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[22px] md:text-[26px] leading-snug mb-4 text-[#0a0f1e]">
-              {STEPS[displayStep].title}
+              {steps[displayStep].title}
             </h3>
             <p className="font-[family-name:var(--font-dm-sans)] text-[14px] md:text-[15px] leading-[1.82] text-[#4b5563]">
-              {STEPS[displayStep].body}
+              {steps[displayStep].body}
             </p>
           </div>
 
           {/* Animated visual panel */}
           <div className="hidden md:block flex-1 min-w-0 overflow-hidden" style={{ height: "62vh" }}>
             <div className="w-full h-full relative overflow-hidden">
-              {VISUALS.map((Visual, i) => (
-                <div
-                  key={i}
-                  className="absolute inset-0"
-                  style={{
-                    opacity:       i === activeStep ? 1 : 0,
-                    transform:     i === activeStep ? "translateY(0) scale(1)" : "translateY(12px) scale(0.98)",
-                    transition:    "opacity 0.45s ease, transform 0.45s ease",
-                    pointerEvents: i === activeStep ? "auto" : "none",
-                  }}
-                >
-                  <Visual active={i === activeStep} />
-                </div>
-              ))}
+              {steps.map((step, i) => {
+                const isLast = i === steps.length - 1;
+                return (
+                  <div
+                    key={i}
+                    className="absolute inset-0"
+                    style={{
+                      opacity:       i === activeStep ? 1 : 0,
+                      transform:     i === activeStep ? "translateY(0) scale(1)" : "translateY(12px) scale(0.98)",
+                      transition:    "opacity 0.45s ease, transform 0.45s ease",
+                      pointerEvents: i === activeStep ? "auto" : "none",
+                    }}
+                  >
+                    {isLast ? (
+                      <Visual5 active={i === activeStep} subItems={step.sub_items} />
+                    ) : (
+                      (() => {
+                        const V = STATIC_VISUALS[i] || STATIC_VISUALS[STATIC_VISUALS.length - 1];
+                        return <V active={i === activeStep} />;
+                      })()
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

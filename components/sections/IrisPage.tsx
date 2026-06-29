@@ -32,6 +32,32 @@ interface ProblemCard {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CMS Props — all optional; hardcoded fallbacks are used when absent
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface IrisCmsProps {
+  cmsHero?: {
+    eyebrow?: string;
+    headline?: string;
+    subheadline?: string;
+    primary_cta?: any;
+  };
+  cmsTextCta?: {
+    heading?: string;
+    subheading?: string;
+    cta?: any;
+  };
+  cmsProblems?: Array<{ title?: string; description?: string; icon?: string }>;
+  cmsCapabilities?: Array<{
+    title?: string;
+    description?: string;
+    eyebrow?: string;
+    sub_items?: any[];
+  }>;
+  cmsCtaBanner?: { headline?: string; subhead?: string; primary_cta?: any };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Inline SVG Icons — one per capability
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1257,7 +1283,50 @@ function ProblemsGrid() {
 // Main page component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function IrisPage() {
+export default function IrisPage({
+  cmsHero,
+  cmsTextCta,
+  cmsProblems,
+  cmsCapabilities,
+  cmsCtaBanner,
+}: IrisCmsProps = {}) {
+  // ── Derived CMS values with hardcoded fallbacks ──────────────────────────
+  const heroHeadline    = cmsHero?.headline    || "Meet IRIS";
+  const heroSubheadline = cmsHero?.subheadline || undefined;
+  const ctaBannerHeadline = cmsCtaBanner?.headline || "Put IRIS to work on your safety data";
+  const ctaBannerSubhead  = cmsCtaBanner?.subhead  || "See what you’ve been missing. Book a demo and explore every AI capability live.";
+
+  // ACTIVE_PROBLEMS: prefer CMS items, fall back to module-level PROBLEMS constant.
+  // Icons are preserved from the hardcoded array by index (CMS supplies icon name strings,
+  // not React nodes — the existing SVG icon components are reused as fallbacks).
+  const ACTIVE_PROBLEMS: ProblemCard[] =
+    cmsProblems && cmsProblems.length > 0
+      ? cmsProblems.map((item, i) => ({
+          title: item.title || PROBLEMS[i]?.title || "",
+          desc:  item.description || PROBLEMS[i]?.desc || "",
+          icon:  PROBLEMS[i]?.icon ?? null,
+          color: PROBLEMS[i]?.color || "#155eef",
+          bg:    PROBLEMS[i]?.bg    || "#eff4ff",
+        }))
+      : PROBLEMS;
+
+  // CAPABILITIES: overlay CMS title/desc by index if provided; keep all
+  // styling, icons, features and benefits from the hardcoded array.
+  // This merged array is passed down to any capabilities sub-section rendered below.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const CAPABILITIES_MERGED: Capability[] =
+    cmsCapabilities && cmsCapabilities.length > 0
+      ? CAPABILITIES.map((cap, i) => {
+          const cms = cmsCapabilities[i];
+          if (!cms) return cap;
+          return {
+            ...cap,
+            title: cms.title || cap.title,
+            desc:  cms.description || cap.desc,
+          };
+        })
+      : CAPABILITIES;
+
   // Inject CSS keyframes once on client mount
   useEffect(() => {
     const tag = document.createElement("style");
@@ -1376,11 +1445,23 @@ export default function IrisPage() {
 
         {/* ── Title ── */}
         <div className="relative z-10 text-center mb-2 animate-hero-rise" style={{ animationDelay:"60ms" }}>
-          <h1 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[44px] md:text-[56px] leading-[1.06] tracking-[-0.03em] text-[#0a0f1e]">
-            Meet IRIS
-            <br />
-            <span style={{ color:"#1d4ed8" }}>Intelligent Risk &amp; Insight System</span>
-          </h1>
+          {cmsHero?.headline ? (
+            <h1
+              className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[44px] md:text-[56px] leading-[1.06] tracking-[-0.03em] text-[#0a0f1e]"
+              dangerouslySetInnerHTML={{ __html: heroHeadline }}
+            />
+          ) : (
+            <h1 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[44px] md:text-[56px] leading-[1.06] tracking-[-0.03em] text-[#0a0f1e]">
+              Meet IRIS
+              <br />
+              <span style={{ color:"#1d4ed8" }}>Intelligent Risk &amp; Insight System</span>
+            </h1>
+          )}
+          {heroSubheadline && (
+            <p className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.7] text-[#4b5563] mt-4 max-w-[600px] mx-auto text-pretty">
+              {heroSubheadline}
+            </p>
+          )}
         </div>
 
         {/* ── CTAs ── */}
@@ -1590,7 +1671,7 @@ export default function IrisPage() {
           {/* Grid — no outer border, internal dividers only (matches modules style) */}
           <div ref={problemsGridRef}>
             {[0, 1].map((rowIdx) => {
-              const row = PROBLEMS.slice(rowIdx * 3, rowIdx * 3 + 3);
+              const row = ACTIVE_PROBLEMS.slice(rowIdx * 3, rowIdx * 3 + 3);
               const isLastRow = rowIdx === 1;
               return (
                 <div key={rowIdx} className="problems-row grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 iris-stagger iris-reveal-target" style={{ transitionDelay: `${rowIdx * 120}ms` }}>
@@ -1646,11 +1727,11 @@ export default function IrisPage() {
       >
         <div className="max-w-[800px] mx-auto flex flex-col gap-3 md:gap-[16px] items-center text-center">
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[44px] leading-tight text-[#0a0f1e] whitespace-nowrap">
-            Put IRIS to work on your safety data
+            {ctaBannerHeadline}
           </h2>
 
           <p className="font-[family-name:var(--font-dm-sans)] text-[14px] md:text-[15px] leading-relaxed text-[#6b7280] max-w-[500px] whitespace-nowrap">
-            See what you&apos;ve been missing. Book a demo and explore every AI capability live.
+            {ctaBannerSubhead}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-[16px] items-center justify-center pt-4 md:pt-[24px]">

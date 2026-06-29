@@ -14,29 +14,30 @@ export const metadata: Metadata = {
 
 export default async function IrisPageRoute() {
   const pageData = await getPage("iris");
-  const blocks: any[] = pageData?.data?.attributes?.content ?? [];
+  const blocks: Array<{ type: string; data: Record<string, unknown> }> =
+    (pageData?.data?.attributes?.content as Array<{ type: string; data: Record<string, unknown> }>) ?? [];
 
-  const cmsHero         = findBlock(blocks, "hero");
-  const cmsTextCta      = findBlock(blocks, "text_cta");
-  const cmsIconFeatures = findBlock<{ items?: Record<string, any> }>(blocks, "icon_features");
+  const cmsHero         = findBlock<{ eyebrow?: string; headline?: string; subheadline?: string; primary_cta?: unknown }>(blocks, "hero") ?? undefined;
+  const cmsTextCta      = findBlock<{ heading?: string; subheading?: string; cta?: unknown }>(blocks, "text_cta") ?? undefined;
+  const cmsIconFeatures = findBlock<{ items?: Record<string, unknown> }>(blocks, "icon_features");
   const cmsProblems     = iconFeaturesToArray(cmsIconFeatures?.items);
-  const cmsNumberSteps  = findBlock<{ steps?: any }>(blocks, "number_steps");
+  const cmsNumberSteps  = findBlock<{ steps?: unknown }>(blocks, "number_steps");
   const rawSteps        = cmsNumberSteps?.steps;
   const cmsCapabilities = rawSteps
-    ? Array.isArray(rawSteps) ? rawSteps : Object.values(rawSteps)
-    : null;
-  const cmsCtaBanner    = findBlock(blocks, "cta_banner");
+    ? (Array.isArray(rawSteps) ? rawSteps : Object.values(rawSteps as Record<string, unknown>))
+    : undefined;
+  const cmsCtaBanner    = findBlock<{ headline?: string; subhead?: string; primary_cta?: unknown }>(blocks, "cta_banner") ?? undefined;
 
   return (
     <>
       <Navbar lightHero />
       <main>
         <IrisPage
-          cmsHero={cmsHero ?? undefined}
-          cmsTextCta={cmsTextCta ?? undefined}
+          cmsHero={cmsHero}
+          cmsTextCta={cmsTextCta}
           cmsProblems={cmsProblems.length > 0 ? cmsProblems : undefined}
-          cmsCapabilities={cmsCapabilities && cmsCapabilities.length > 0 ? cmsCapabilities : undefined}
-          cmsCtaBanner={cmsCtaBanner ?? undefined}
+          cmsCapabilities={cmsCapabilities && cmsCapabilities.length > 0 ? cmsCapabilities as Array<{ title?: string; description?: string; eyebrow?: string; sub_items?: unknown[] }> : undefined}
+          cmsCtaBanner={cmsCtaBanner}
         />
       </main>
       <Footer />

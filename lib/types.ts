@@ -151,7 +151,7 @@ export interface CmsCaseStudy {
     industry: string;
     summary: string;
     body: string;
-    results: Array<{ metric: string; before: string; after: string }>;
+    results: Array<{ label?: string; value?: string; metric?: string; before?: string; after?: string }>;
     status: string;
     published_at: string;
     cover: CmsImage | null;

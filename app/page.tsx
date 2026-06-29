@@ -11,7 +11,7 @@ import Testimonials from "@/components/sections/Testimonials";
 import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
-import { findBlock, ctaHref } from "@/lib/blocks";
+import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
 
 export const dynamic = "force-dynamic";
 
@@ -25,37 +25,172 @@ export default async function HomePage() {
   const cmsLogos = logosRes?.data ?? [];
   const blocks = homePageRes?.data?.attributes?.content ?? [];
 
+  // ── hero block ──────────────────────────────────────────────────────────────
+  const heroBlock = findBlock<{
+    headline?: string;
+    subheadline?: string;
+    eyebrow?: string;
+    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+  }>(blocks, "hero");
+
+  // ── stats_row block ─────────────────────────────────────────────────────────
+  const statsBlock = findBlock<{
+    items?: Array<{ label?: string; value?: string; suffix?: string | null }>;
+  }>(blocks, "stats_row");
+
+  // ── pain_points block ───────────────────────────────────────────────────────
+  const painBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    items?: Array<{ label?: string; description?: string; icon?: string }>;
+  }>(blocks, "pain_points");
+
+  // ── image_text block (AI / IRIS section) ───────────────────────────────────
+  const imageTextBlock = findBlock<{
+    heading?: string;
+    body?: string;
+    eyebrow?: string;
+    cta?: {
+      cta?: { label?: string; url?: string; type?: string };
+    };
+  }>(blocks, "image_text");
+
+  // ── solution_carousel block (WorkEnvironments) ──────────────────────────────
+  const solutionBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    cards?: Record<string, { title?: string; subheading?: string; description?: string }> | Array<{ title?: string; subheading?: string; description?: string }>;
+  }>(blocks, "solution_carousel");
+
+  // Normalise solution cards (CMS sends them as a keyed object)
+  const solutionCards = solutionBlock?.cards
+    ? normalizeArray<{ title?: string; subheading?: string; description?: string }>(solutionBlock.cards).map(c => ({
+        title:      c.title      || "",
+        subheading: c.subheading || "",
+        description:c.description|| "",
+      }))
+    : undefined;
+
+  // ── blog_highlights block ───────────────────────────────────────────────────
+  const blogBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    items?: Array<{
+      slug?: string;
+      title?: string;
+      excerpt?: string;
+      category?: string;
+      published_at?: string;
+      featured_image_url?: string | null;
+    }>;
+  }>(blocks, "blog_highlights");
+
+  const cmsBlogPosts = blogBlock?.items
+    ? blogBlock.items
+        .filter((i) => !!i.slug && !!i.title)
+        .map((i) => ({
+          slug:              i.slug!,
+          title:             i.title!,
+          excerpt:           i.excerpt,
+          category:          i.category,
+          published_at:      i.published_at,
+          featured_image_url:i.featured_image_url,
+        }))
+    : undefined;
+
+  // ── cta_banner block ────────────────────────────────────────────────────────
   const ctaBlock = findBlock<{
     headline?: string;
     subheadline?: string;
-    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+    subhead?: string;
+    primary_cta?: {
+      label?: string; url?: string; type?: string; anchor?: string;
+      cta?: { label?: string; url?: string; type?: string; anchor?: string };
+    };
+    secondary_cta?: {
+      label?: string; url?: string; type?: string; anchor?: string;
+      cta?: { label?: string; url?: string; type?: string; anchor?: string };
+    };
   }>(blocks, "cta_banner");
+
+  // CTA banner uses a nested .cta shape in the API response
+  const ctaPrimary   = ctaBlock?.primary_cta?.cta   ?? ctaBlock?.primary_cta;
+  const ctaSecondary = ctaBlock?.secondary_cta?.cta  ?? ctaBlock?.secondary_cta;
 
   return (
     <>
       <Navbar lightHero />
       <main>
-        <Hero />
-        <TrustedLogos cmsLogos={cmsLogos.length > 0 ? cmsLogos : undefined} />
-        <Stats />
-        <PainPoints />
-        <OnePlatform />
-        <AISection />
-        <WorkEnvironments />
-        <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
-        <Blogs />
-        <CTABanner
-          cmsHeadline={ctaBlock?.headline || undefined}
-          cmsSubhead={ctaBlock?.subheadline || undefined}
+        <Hero
+          cmsHeadline={heroBlock?.headline || undefined}
+          cmsSubheadline={heroBlock?.subheadline || undefined}
+          cmsEyebrow={heroBlock?.eyebrow || undefined}
           cmsPrimaryCta={
-            ctaBlock?.primary_cta?.label
-              ? { label: ctaBlock.primary_cta.label, url: ctaHref(ctaBlock.primary_cta) }
+            heroBlock?.primary_cta?.label
+              ? { label: heroBlock.primary_cta.label, url: ctaHref(heroBlock.primary_cta) }
               : undefined
           }
           cmsSecondaryCta={
-            ctaBlock?.secondary_cta?.label
-              ? { label: ctaBlock.secondary_cta.label, url: ctaHref(ctaBlock.secondary_cta) }
+            heroBlock?.secondary_cta?.label
+              ? { label: heroBlock.secondary_cta.label, url: ctaHref(heroBlock.secondary_cta) }
+              : undefined
+          }
+        />
+        <TrustedLogos cmsLogos={cmsLogos.length > 0 ? cmsLogos : undefined} />
+        <Stats
+          cmsItems={
+            statsBlock?.items && statsBlock.items.length > 0
+              ? statsBlock.items.map((item) => ({
+                  label:  item.label  || "",
+                  value:  item.value  || "0",
+                  suffix: item.suffix ?? null,
+                }))
+              : undefined
+          }
+        />
+        <PainPoints
+          cmsHeading={painBlock?.heading || undefined}
+          cmsSubheading={painBlock?.subheading || undefined}
+          cmsItems={
+            painBlock?.items && painBlock.items.length > 0
+              ? painBlock.items.map((item) => ({
+                  label:       item.label       || "",
+                  description: item.description || "",
+                  icon:        item.icon        || "",
+                }))
+              : undefined
+          }
+        />
+        <OnePlatform />
+        <AISection
+          cmsHeading={imageTextBlock?.heading || undefined}
+          cmsBody={imageTextBlock?.body || undefined}
+          cmsCtaLabel={imageTextBlock?.cta?.cta?.label || undefined}
+          cmsCtaUrl={imageTextBlock?.cta?.cta?.url || undefined}
+        />
+        <WorkEnvironments
+          cmsHeading={solutionBlock?.heading || undefined}
+          cmsSubheading={solutionBlock?.subheading || undefined}
+          cmsCards={solutionCards}
+        />
+        <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
+        <Blogs
+          cmsHeading={blogBlock?.heading || undefined}
+          cmsSubheading={blogBlock?.subheading || undefined}
+          cmsPosts={cmsBlogPosts}
+        />
+        <CTABanner
+          cmsHeadline={ctaBlock?.headline || undefined}
+          cmsSubhead={ctaBlock?.subheadline || ctaBlock?.subhead || undefined}
+          cmsPrimaryCta={
+            ctaPrimary?.label
+              ? { label: ctaPrimary.label, url: ctaHref(ctaPrimary) }
+              : undefined
+          }
+          cmsSecondaryCta={
+            ctaSecondary?.label
+              ? { label: ctaSecondary.label, url: ctaHref(ctaSecondary) }
               : undefined
           }
         />

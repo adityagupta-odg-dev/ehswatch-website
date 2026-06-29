@@ -2,32 +2,45 @@
 
 import Reveal from "@/components/ui/Reveal";
 
-const CARDS = [
+interface DriveItem {
+  title: string;
+  description: string;
+}
+
+interface AboutDrivesCmsProps {
+  cmsHeading?: string | undefined;
+  cmsItems?: DriveItem[] | undefined;
+}
+
+const DEFAULT_CARDS: DriveItem[] = [
   {
-    label: "Mission",
-    color: "#155eef",
-    body: "To help organisations simplify EHSQ management with a platform that makes reporting faster, compliance easier and safety performance more visible across every team and site.",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <circle cx="14" cy="14" r="9" stroke="#155eef" strokeWidth="1.6" />
-        <circle cx="14" cy="14" r="4" fill="#155eef" opacity="0.2" />
-        <circle cx="14" cy="14" r="1.8" fill="#155eef" />
-        <path d="M14 2v3M14 23v3M2 14h3M23 14h3" stroke="#155eef" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
+    title: "Mission",
+    description:
+      "To help organisations simplify EHSQ management with a platform that makes reporting faster, compliance easier and safety performance more visible across every team and site.",
   },
   {
-    label: "Vision",
-    color: "#155eef",
-    body: "A world where every organisation has the tools to make safety as instinctive as the work itself — where protection is built into every process, every site, every day.",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M3 14s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#155eef" strokeWidth="1.6" strokeLinejoin="round" />
-        <circle cx="14" cy="14" r="3" fill="#155eef" opacity="0.2" stroke="#155eef" strokeWidth="1.6" />
-        <circle cx="14" cy="14" r="1.2" fill="#155eef" />
-      </svg>
-    ),
+    title: "Vision",
+    description:
+      "A world where every organisation has the tools to make safety as instinctive as the work itself — where protection is built into every process, every site, every day.",
   },
+];
+
+const CARD_ICONS = [
+  (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="9" stroke="#155eef" strokeWidth="1.6" />
+      <circle cx="14" cy="14" r="4" fill="#155eef" opacity="0.2" />
+      <circle cx="14" cy="14" r="1.8" fill="#155eef" />
+      <path d="M14 2v3M14 23v3M2 14h3M23 14h3" stroke="#155eef" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
+  (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <path d="M3 14s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#155eef" strokeWidth="1.6" strokeLinejoin="round" />
+      <circle cx="14" cy="14" r="3" fill="#155eef" opacity="0.2" stroke="#155eef" strokeWidth="1.6" />
+      <circle cx="14" cy="14" r="1.2" fill="#155eef" />
+    </svg>
+  ),
 ];
 
 // The distinctive tab notch shape from the original design
@@ -50,7 +63,24 @@ function TabShape({ label, color }: { label: string; color: string }) {
   );
 }
 
-export default function AboutDrives() {
+export default function AboutDrives({
+  cmsHeading,
+  cmsItems,
+}: AboutDrivesCmsProps = {}) {
+  const heading = cmsHeading || "Purpose Behind <span class=\"text-[#155eef]\">Every Feature</span>";
+  const cards =
+    cmsItems && cmsItems.length > 0
+      ? cmsItems.map((item) => ({
+          label: item.title || "",
+          color: "#155eef",
+          body: item.description || "",
+        }))
+      : DEFAULT_CARDS.map((item) => ({
+          label: item.title,
+          color: "#155eef",
+          body: item.description,
+        }));
+
   return (
     <section className="bg-[#f1f7ff] py-[50px] md:py-[90px] lg:py-[110px] px-4 md:px-6">
       <div className="max-w-[1000px] mx-auto">
@@ -58,16 +88,17 @@ export default function AboutDrives() {
         {/* Heading */}
         <Reveal variant="fade-up" duration={700}>
           <div className="text-center mb-[60px] md:mb-[72px]">
-            <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b] tracking-[-0.025em]">
-              Purpose Behind <span className="text-[#155eef]">Every Feature</span>
-            </h2>
+            <h2
+              className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b] tracking-[-0.025em]"
+              dangerouslySetInnerHTML={{ __html: heading }}
+            />
           </div>
         </Reveal>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-[72px]">
-          {CARDS.map((card, i) => (
-            <Reveal key={card.label} variant={i === 0 ? "slide-right" : "slide-left"} duration={750} delay={i * 100}>
+          {cards.map((card, i) => (
+            <Reveal key={`${card.label}-${i}`} variant={i === 0 ? "slide-right" : "slide-left"} duration={750} delay={i * 100}>
               <div className="relative pt-[44px]">
                 <TabShape label={card.label} color={card.color} />
 
@@ -81,7 +112,7 @@ export default function AboutDrives() {
                 >
                   {/* Icon */}
                   <div className="mb-5 w-11 h-11 rounded-[12px] bg-[#eff6ff] flex items-center justify-center">
-                    {card.icon}
+                    {CARD_ICONS[i % CARD_ICONS.length]}
                   </div>
 
                   {/* Text */}

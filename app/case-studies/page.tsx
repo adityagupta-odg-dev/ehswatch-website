@@ -6,14 +6,20 @@ import Reveal from "@/components/ui/Reveal";
 import Link from "next/link";
 import { basePath } from "@/lib/basePath";
 import type { Metadata } from "next";
+import { getCaseStudies, getPage } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Case Studies — EHSWatch",
-  description:
-    "See how EHSQ teams across construction, energy, manufacturing and logistics use EHSWatch to cut reporting time, accelerate audits and gain full visibility into risk.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageRes = await getPage("case-studies");
+  const meta = pageRes?.data?.attributes?.meta;
+  return {
+    title: meta?.meta_title || "Case Studies — EHSWatch",
+    description:
+      meta?.meta_description ||
+      "See how EHSQ teams across construction, energy, manufacturing and logistics use EHSWatch to cut reporting time, accelerate audits and gain full visibility into risk.",
+  };
+}
 
 function CaseStudiesCTA() {
   return (
@@ -61,13 +67,19 @@ function CaseStudiesCTA() {
   );
 }
 
-export default function CaseStudiesPage() {
+export default async function CaseStudiesPage() {
+  const [caseStudiesRes] = await Promise.all([
+    getCaseStudies(),
+  ]);
+
+  const cmsStudies = caseStudiesRes?.data ?? [];
+
   return (
     <>
       <Navbar lightHero={true} />
       <main>
         <CaseStudiesHero />
-        <CaseStudiesGrid />
+        <CaseStudiesGrid cmsStudies={cmsStudies.length > 0 ? cmsStudies : undefined} />
         <CaseStudiesCTA />
       </main>
       <Footer />

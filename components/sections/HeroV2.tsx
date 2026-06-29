@@ -6,7 +6,26 @@ import DotGrid from "@/components/ui/DotGrid";
 import GlareButton from "@/components/ui/GlareButton";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
-export default function HeroV2() {
+interface HeroProps {
+  cmsHeadline?: string;
+  cmsSubheadline?: string;
+  cmsEyebrow?: string;
+  cmsPrimaryCta?: { label: string; url: string };
+  cmsSecondaryCta?: { label: string; url: string };
+}
+
+export default function HeroV2({
+  cmsHeadline,
+  cmsSubheadline,
+  cmsPrimaryCta,
+  cmsSecondaryCta,
+}: HeroProps) {
+  const headline = cmsHeadline || "From Manual Chaos to Smart Safety.";
+  const subheadline =
+    cmsSubheadline || "AI-powered EHS platform to streamline reporting everywhere.";
+  const primaryCta = cmsPrimaryCta || { label: "Book a Demo", url: "#" };
+  const secondaryCta = cmsSecondaryCta || { label: "Watch Demo", url: "#" };
+
   return (
     <section className="relative w-full bg-white overflow-hidden">
 
@@ -41,14 +60,28 @@ export default function HeroV2() {
                 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[36px] sm:text-[48px] md:text-[62px] lg:text-[72px] xl:text-[77px] leading-[1.1] text-[#0f172a] tracking-[0.2px] lg:tracking-[0.5px] animate-hero-rise"
                 style={{ animationDelay: "60ms" }}
               >
-                From Manual Chaos to <br className="hidden sm:block" /> Smart Safety.
+                {headline.includes("<br") ? (
+                  <span dangerouslySetInnerHTML={{ __html: headline }} />
+                ) : (
+                  <>
+                    {headline.includes("Smart Safety") ? (
+                      <>
+                        {headline.split("Smart Safety")[0]}
+                        <br className="hidden sm:block" />
+                        {"Smart Safety" + headline.split("Smart Safety")[1]}
+                      </>
+                    ) : (
+                      headline
+                    )}
+                  </>
+                )}
               </h1>
 
               <p
                 className="font-[family-name:var(--font-dm-sans)] font-medium text-[15px] sm:text-[17px] lg:text-[20px] leading-relaxed text-[#475569] max-w-[580px] animate-hero-rise text-pretty"
                 style={{ animationDelay: "180ms" }}
               >
-                AI-powered EHS platform to streamline reporting everywhere.
+                {subheadline}
               </p>
 
               <div
@@ -56,17 +89,17 @@ export default function HeroV2() {
                 style={{ animationDelay: "300ms" }}
               >
                 <GlareButton
-                  href="#"
+                  href={primaryCta.url || "#"}
                   className="px-7 py-[10px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[16px] sm:text-[18px] text-white whitespace-nowrap"
                   style={{
                     background: "linear-gradient(102deg, #ffa964 0%, #ff8e37 34%, #ff7812 50%, #ff6d00 120%)",
                   }}
                 >
-                  Book a Demo
+                  {primaryCta.label}
                 </GlareButton>
 
                 <Link
-                  href="#"
+                  href={secondaryCta.url || "#"}
                   className="flex items-center gap-2 font-[family-name:var(--font-dm-sans)] font-medium text-[15px] sm:text-[17px] text-[#0f172a] whitespace-nowrap group"
                 >
                   <span className="flex items-center justify-center w-[32px] h-[32px] sm:w-[36px] sm:h-[36px] rounded-full border border-[#0f172a]/25 group-hover:bg-[#0f172a]/5 transition-colors">
@@ -74,7 +107,7 @@ export default function HeroV2() {
                       <polygon points="3,1 13,7 3,13" fill="#0f172a" />
                     </svg>
                   </span>
-                  Watch Demo
+                  {secondaryCta.label}
                 </Link>
               </div>
             </div>

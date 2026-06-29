@@ -132,7 +132,7 @@ const MODULES = [
 
 const INITIAL_ROWS = 2;
 const COLS = 3;
-const STEP = COLS; // reveal one row (3 items) at a time
+const STEP = COLS;
 
 // ── Module cell ────────────────────────────────────────────────────────────
 
@@ -153,7 +153,6 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
         borderTop: "none",
       }}
     >
-      {/* Icon */}
       <div
         className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
         style={{ backgroundColor: mod.color + "14", color: mod.color }}
@@ -161,17 +160,14 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
         {Icons[mod.icon]}
       </div>
 
-      {/* Name */}
       <h3 className="font-[family-name:var(--font-gothic-a1)] font-semibold text-[15px] text-[#0a0f1e] leading-snug">
         {mod.name}
       </h3>
 
-      {/* Description */}
       <p className="font-[family-name:var(--font-dm-sans)] text-[13px] text-[#6b7280] leading-[1.65] flex-1">
         {mod.desc}
       </p>
 
-      {/* Explore link — only interactive element */}
       <Link
         href={mod.href}
         onMouseEnter={() => setLinkHovered(true)}
@@ -191,11 +187,20 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
   );
 }
 
+// ── Props ──────────────────────────────────────────────────────────────────
+
+interface ProductModulesProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+}
+
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function ProductModules() {
+export default function ProductModules({
+  cmsHeading,
+  cmsSubheading,
+}: ProductModulesProps = {}) {
   const [visibleCount, setVisibleCount] = useState(INITIAL_ROWS * COLS);
-  // Track which row indices have finished their entrance animation
   const [animatedRows, setAnimatedRows] = useState<Set<number>>(
     () => new Set(Array.from({ length: INITIAL_ROWS }, (_, i) => i))
   );
@@ -207,7 +212,6 @@ export default function ProductModules() {
   const handleViewMore = () => {
     const nextCount = Math.min(visibleCount + STEP, MODULES.length);
     setVisibleCount(nextCount);
-    // Mark the new row index as animated after a brief delay (let React render first)
     const newRowIdx = Math.ceil(visibleCount / COLS);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -219,21 +223,27 @@ export default function ProductModules() {
   const handleViewLess = () => {
     setVisibleCount(INITIAL_ROWS * COLS);
     setAnimatedRows(new Set(Array.from({ length: INITIAL_ROWS }, (_, i) => i)));
-    // Scroll back to top of this section so user doesn't end up at the bottom
     if (sectionEl) {
       sectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
-  // Build rows for correct border logic
   const rows: typeof MODULES[] = [];
   for (let i = 0; i < visibleModules.length; i += COLS) {
     rows.push(visibleModules.slice(i, i + COLS));
   }
 
+  // Resolve heading — strip HTML tags and split on <span> for styled portion
+  const rawHeading = cmsHeading || "Our <span>Modules</span>";
+  const spanMatch = rawHeading.match(/<span>([\s\S]*?)<\/span>/);
+  const spanText = spanMatch ? spanMatch[1] : "Modules";
+  const plainHeading = rawHeading.replace(/<[^>]+>/g, "");
+  const spanIdx = plainHeading.indexOf(spanText);
+  const headingBefore = spanIdx >= 0 ? plainHeading.slice(0, spanIdx) : plainHeading;
+  const headingAfter = spanIdx >= 0 ? plainHeading.slice(spanIdx + spanText.length) : "";
+
   return (
     <section ref={(el) => setSectionEl(el)} className="bg-white py-[50px] md:py-[90px] lg:py-[110px] px-4 md:px-6">
-      {/* Fix 2-col border on sm breakpoint: colIndex=1 should not have right border in 2-column layout */}
       <style>{`
         @media (min-width: 640px) and (max-width: 1023px) {
           .modules-row > *:nth-child(2n) { border-right: none !important; }
@@ -242,11 +252,20 @@ export default function ProductModules() {
       <div className="max-w-[1160px] mx-auto">
 
         {/* Section title */}
-        <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight tracking-[-0.025em] text-center mb-10 md:mb-14 text-[#1b1b1b]">
-          Our <span style={{ color: "#0060F9" }}>Modules</span>
-        </h2>
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight tracking-[-0.025em] text-[#1b1b1b]">
+            {headingBefore}
+            <span style={{ color: "#0060F9" }}>{spanText}</span>
+            {headingAfter}
+          </h2>
+          {cmsSubheading && (
+            <p className="mt-3 font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] text-[#6b7280] leading-relaxed mx-auto max-w-[600px]">
+              {cmsSubheading}
+            </p>
+          )}
+        </div>
 
-        {/* Grid — no outer border, internal lines only */}
+        {/* Grid */}
         <div className="w-full">
           {rows.map((row, rowIdx) => {
             const isLastVisibleRow = rowIdx === rows.length - 1;
@@ -300,14 +319,14 @@ export default function ProductModules() {
         </div>
 
         {/* Callout strip */}
-        <div 
+        <div
           className="mt-16 rounded-[24px] px-8 md:px-14 py-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden"
           style={{
-            background: '#f1f7ff',
+            background: "#f1f7ff",
             backgroundImage: `url(${basePath}/images/product/cta-background.svg)`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         >
           <p className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[17px] text-[#0a0f1e] leading-[1.72] max-w-[580px] text-center md:text-left">
@@ -317,7 +336,10 @@ export default function ProductModules() {
           <GlareButton
             href="#"
             className="shrink-0 inline-flex items-center gap-2 px-7 py-3 rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white whitespace-nowrap"
-            style={{ backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)" }}
+            style={{
+              backgroundImage:
+                "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
+            }}
           >
             Book a Demo
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">

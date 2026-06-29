@@ -2,7 +2,25 @@
 
 import GlareButton from "@/components/ui/GlareButton";
 
-export default function PricingHero() {
+interface PricingHeroProps {
+  eyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+}
+
+export default function PricingHero({
+  eyebrow,
+  headline = "Simple, Flexible Pricing for Enterprise EHS",
+  subheadline = "Pay only for the modules you need. No hidden fees, no bundled features you won’t use — just the capabilities that match your EHS requirements.",
+  primaryCtaLabel = "Build Your Package",
+  primaryCtaHref = "#calculator",
+  secondaryCtaLabel = "Book a Demo",
+  secondaryCtaHref = "#",
+}: PricingHeroProps = {}) {
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-4 sm:px-6 pt-[90px] sm:pt-[120px] md:pt-[148px] pb-[60px] sm:pb-[80px] md:pb-[100px]"
@@ -61,44 +79,46 @@ export default function PricingHero() {
 
       {/* Content */}
       <div className="relative z-20 max-w-[760px] w-full mx-auto text-center flex flex-col items-center gap-5 md:gap-6">
+        {eyebrow && (
+          <span className="font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold uppercase tracking-[0.12em] text-[#1d4ed8]">
+            {eyebrow}
+          </span>
+        )}
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[34px] sm:text-[48px] md:text-[56px] leading-[1.08] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
-        >
-          Simple, Flexible Pricing
-          <br className="hidden sm:block" />
-          <span style={{ color: "#1d4ed8" }}> for Enterprise EHS</span>
-        </h1>
+          dangerouslySetInnerHTML={{ __html: headline }}
+        />
 
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] md:text-[18px] text-gray-600 leading-[1.75] max-w-[560px] animate-hero-rise text-pretty"
           style={{ animationDelay: "180ms" }}
         >
-          Pay only for the modules you need. No hidden fees, no bundled features you won&apos;t use — just the capabilities that match your EHS requirements.
+          {subheadline}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 animate-hero-rise" style={{ animationDelay: "280ms" }}>
           <GlareButton
-            href="#calculator"
+            href={primaryCtaHref}
             className="inline-flex items-center gap-2 px-8 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white transition-all duration-200 hover:shadow-lg"
             style={{
               backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
               boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
             }}
           >
-            Build Your Package
+            {primaryCtaLabel}
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </GlareButton>
           <GlareButton
-            href="#"
+            href={secondaryCtaHref}
             fillColor="#FFA660"
             hoverTextColor="#ffffff"
             className="px-8 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] border"
             style={{ borderColor: "#d1d5db", color: "#374151" }}
           >
-            Book a Demo
+            {secondaryCtaLabel}
           </GlareButton>
         </div>
       </div>

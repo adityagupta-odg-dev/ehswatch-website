@@ -2,8 +2,23 @@
 
 import { useEffect, useRef } from "react";
 
-export default function AboutStory() {
+interface AboutStoryCmsProps {
+  cmsHeading?: string | undefined;
+  cmsBody?: string | undefined;
+}
+
+export default function AboutStory({
+  cmsHeading,
+  cmsBody,
+}: AboutStoryCmsProps = {}) {
   const bodyRef = useRef<HTMLDivElement>(null);
+
+  const heading = cmsHeading || "About <span class=\"text-[#155eef]\">EHSWatch</span>";
+  const bodyHtml =
+    cmsBody ||
+    `<p>EHSWatch was built to <strong class="font-semibold text-[#1b1b1b]">eliminate the delays and errors</strong> caused by spreadsheets, paper forms, and disconnected systems — with a single platform that makes safety easier to manage. Designed for real-world EHSQ teams, it brings reporting, actions, visibility and compliance into one streamlined experience.</p>
+<p>We understand that safety teams need more than software. They need speed, clarity and confidence. That is why EHSWatch is built to support organisations across industries with a platform that is <strong class="font-semibold text-[#1b1b1b]">practical, intuitive and ready for day-to-day operations</strong>.</p>
+<p>With <strong class="font-semibold text-[#1b1b1b]">20+ years of perfecting safety software</strong>, we&apos;ve empowered <strong class="font-semibold text-[#1b1b1b]">25K+ users</strong> to cut reporting time by <strong class="font-semibold text-[#1b1b1b]">60%</strong> while maintaining <strong class="font-semibold text-[#1b1b1b]">95% customer satisfaction</strong>. Built for construction, manufacturing, oil &amp; gas and beyond, EHSWatch turns chaos into clarity — anywhere, anytime.</p>`;
 
   useEffect(() => {
     const body = bodyRef.current;
@@ -64,27 +79,21 @@ export default function AboutStory() {
 
         {/* Sticky left — title */}
         <div className="md:sticky md:top-[120px]">
-          <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] md:text-[40px] leading-[1.12] text-[#1b1b1b] tracking-[-0.03em]">
-            About{" "}
-            <span className="text-[#155eef]">EHSWatch</span>
-          </h2>
+          <h2
+            className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] md:text-[40px] leading-[1.12] text-[#1b1b1b] tracking-[-0.03em]"
+            dangerouslySetInnerHTML={{ __html: heading }}
+          />
           <p className="mt-4 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#9ca3af] leading-relaxed max-w-[260px]">
             Two decades of building better safety.
           </p>
         </div>
 
         {/* Scroll-reveal body */}
-        <div ref={bodyRef} className="flex flex-col gap-7">
-          <p className="font-[family-name:var(--font-dm-sans)] text-[16px] md:text-[17px] leading-[1.78] tracking-[-0.011em] font-normal">
-            EHSWatch was built to <strong className="font-semibold text-[#1b1b1b]">eliminate the delays and errors</strong> caused by spreadsheets, paper forms, and disconnected systems — with a single platform that makes safety easier to manage. Designed for real-world EHSQ teams, it brings reporting, actions, visibility and compliance into one streamlined experience.
-          </p>
-          <p className="font-[family-name:var(--font-dm-sans)] text-[16px] md:text-[17px] leading-[1.78] tracking-[-0.011em] font-normal">
-            We understand that safety teams need more than software. They need speed, clarity and confidence. That is why EHSWatch is built to support organisations across industries with a platform that is <strong className="font-semibold text-[#1b1b1b]">practical, intuitive and ready for day-to-day operations</strong>.
-          </p>
-          <p className="font-[family-name:var(--font-dm-sans)] text-[16px] md:text-[17px] leading-[1.78] tracking-[-0.011em] font-normal">
-            With <strong className="font-semibold text-[#1b1b1b]">20+ years of perfecting safety software</strong>, we&apos;ve empowered <strong className="font-semibold text-[#1b1b1b]">25K+ users</strong> to cut reporting time by <strong className="font-semibold text-[#1b1b1b]">60%</strong> while maintaining <strong className="font-semibold text-[#1b1b1b]">95% customer satisfaction</strong>. Built for construction, manufacturing, oil &amp; gas and beyond, EHSWatch turns chaos into clarity — anywhere, anytime.
-          </p>
-        </div>
+        <div
+          ref={bodyRef}
+          className="flex flex-col gap-7 font-[family-name:var(--font-dm-sans)] text-[16px] md:text-[17px] leading-[1.78] tracking-[-0.011em] font-normal [&_p]:mb-0 [&_strong]:font-semibold [&_strong]:text-[#1b1b1b]"
+          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+        />
 
       </div>
     </section>

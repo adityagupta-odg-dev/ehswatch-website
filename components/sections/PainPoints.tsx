@@ -5,7 +5,19 @@ import { basePath } from "@/lib/basePath";
 
 const ICONS_BASE = basePath + "/images/Manual%20Safety%20Processes%20Are%20%20Slowing%20You%20Down";
 
-const PAIN_POINTS = [
+interface PainPointItem {
+  label: string;
+  description?: string;
+  icon?: string;
+}
+
+interface PainPointsProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsItems?: PainPointItem[];
+}
+
+const FALLBACK_PAIN_POINTS = [
   {
     iconSrc: ICONS_BASE + "/Data%20scattered%20across%20platforms.svg",
     label: "Data scattered across platforms",
@@ -28,12 +40,45 @@ const PAIN_POINTS = [
   },
 ];
 
+// Bob animation values for CMS items (cycle through defaults)
+const BOB_PARAMS = [
+  { bobDuration: "3.2s", amplitude: "10px", bobDelay: "0s" },
+  { bobDuration: "3.8s", amplitude: "8px",  bobDelay: "0.5s" },
+  { bobDuration: "3.5s", amplitude: "12px", bobDelay: "0.3s" },
+  { bobDuration: "3.0s", amplitude: "6px",  bobDelay: "1.0s" },
+];
+
+// Map CMS icon slugs to local SVG filenames
+const ICON_MAP: Record<string, string> = {
+  "rectangle-stack":    "Data%20scattered%20across%20platforms.svg",
+  "clock":              "Delayed%20reporting%20and%20follow-up.svg",
+  "eye-slash":          "Limited%20visibility%20into%20problems.svg",
+  "shield-exclamation": "Reactive%20compliance%20checks.svg",
+};
+
 // Concentric ring sizes (px). 4 rings only. Largest first so smaller rings sit on top.
 const RING_SIZES = [1060, 800, 570, 340];
 
-export default function PainPoints() {
+export default function PainPoints({ cmsHeading, cmsSubheading, cmsItems }: PainPointsProps) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.2 });
-  const [tl, tr, bl, br] = PAIN_POINTS;
+
+  // Build pain points from CMS or fallback
+  const painPoints = (cmsItems && cmsItems.length > 0)
+    ? cmsItems.map((item, i) => {
+        const bob = BOB_PARAMS[i % BOB_PARAMS.length];
+        const iconFile = item.icon ? ICON_MAP[item.icon] : undefined;
+        const iconSrc = iconFile
+          ? `${ICONS_BASE}/${iconFile}`
+          : `${ICONS_BASE}/${encodeURIComponent(item.label)}.svg`;
+        return { iconSrc, label: item.label, ...bob };
+      })
+    : FALLBACK_PAIN_POINTS;
+
+  const [tl, tr, bl, br] = painPoints;
+
+  // Heading: CMS heading + subheading concatenation, or fallback split
+  const headingLine1 = cmsHeading || "Manual Safety Processes Are";
+  const headingLine2 = cmsSubheading || "Slowing You Down";
 
   return (
     <section
@@ -74,22 +119,22 @@ export default function PainPoints() {
         {/* Desktop layout */}
         <div className="hidden md:flex flex-col gap-5 lg:gap-[24px] items-center py-3 lg:py-6">
           <div className="flex justify-between w-full max-w-[850px]">
-            <PainPill {...tl} />
-            <PainPill {...tr} />
+            {tl && <PainPill {...tl} />}
+            {tr && <PainPill {...tr} />}
           </div>
 
           <div className="text-center">
             <p className="font-[family-name:var(--font-gothic-a1)] font-bold text-[24px] lg:text-[32px] leading-tight lg:leading-[48px] text-[#1b1b1b] tracking-[-0.5px] lg:tracking-[-0.6px]">
-              Manual Safety Processes Are
+              {headingLine1}
             </p>
             <p className="font-[family-name:var(--font-gothic-a1)] font-bold text-[24px] lg:text-[32px] leading-tight lg:leading-[48px] text-[#155eef] tracking-[-0.5px] lg:tracking-[-0.6px]">
-              Slowing You Down
+              {headingLine2}
             </p>
           </div>
 
           <div className="flex justify-between w-full max-w-[850px]">
-            <PainPill {...bl} />
-            <PainPill {...br} />
+            {bl && <PainPill {...bl} />}
+            {br && <PainPill {...br} />}
           </div>
         </div>
 
@@ -97,14 +142,14 @@ export default function PainPoints() {
         <div className="md:hidden flex flex-col gap-6 items-center py-8">
           <div className="text-center">
             <p className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[30px] leading-tight text-[#1b1b1b] tracking-[-0.5px]">
-              Manual Safety Processes Are
+              {headingLine1}
             </p>
             <p className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[30px] leading-tight text-[#155eef] tracking-[-0.5px]">
-              Slowing You Down
+              {headingLine2}
             </p>
           </div>
           <div className="flex flex-col gap-3 w-full max-w-[400px]">
-            {PAIN_POINTS.map((p) => (
+            {painPoints.map((p) => (
               <PainPill key={p.label} {...p} />
             ))}
           </div>
