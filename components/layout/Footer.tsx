@@ -35,6 +35,54 @@ const MODULES_COL2: { label: string; href: string }[] = [
   { label: "Training Management",  href: "/product" },
 ];
 
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+  linkedin: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+      <circle cx="4" cy="4" r="2"/>
+    </svg>
+  ),
+  twitter: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  ),
+  x: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  ),
+  youtube: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/>
+      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0a1628"/>
+    </svg>
+  ),
+  facebook: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+    </svg>
+  ),
+  instagram: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.5" fill="white"/>
+    </svg>
+  ),
+  tiktok: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.73a4.85 4.85 0 01-1.01-.04z"/>
+    </svg>
+  ),
+};
+
+const FALLBACK_SOCIALS = [
+  { platform: "linkedin", url: "#" },
+  { platform: "twitter",  url: "#" },
+  { platform: "youtube",  url: "#" },
+];
+
 export default async function Footer() {
   const footer = await getFooter();
   const attrs = (footer?.data as any)?.attributes;
@@ -46,6 +94,9 @@ export default async function Footer() {
   const ctaHeadline = attrs?.cta?.headline || "See how EHSWatch transforms safety management across your organisation.";
   const ctaPrimaryLabel = (attrs?.cta?.primary?.label) || (attrs?.cta?.primary_cta?.label) || "Book a Demo";
   const ctaPrimaryHref  = (attrs?.cta?.primary?.url) || (attrs?.cta?.primary_cta?.url) || "#";
+
+  const rawSocials = (attrs?.social_links ?? []) as { platform: string; url: string }[];
+  const socialLinks = rawSocials.length > 0 ? rawSocials : FALLBACK_SOCIALS;
 
   const columns = (attrs?.columns ?? []) as { heading: string; links: { label: string; url: string }[] }[];
   const companyCol = columns.find((c) => (c.heading || (c as any).title || "").toLowerCase().includes("company"));
@@ -73,23 +124,22 @@ export default async function Footer() {
             {tagline}
           </p>
           <div className="flex gap-[10px] pt-2 md:pt-[10px]">
-            <Link href="#" className="w-[30px] h-[30px] rounded-full border border-[rgba(255,255,255,0.8)] flex items-center justify-center hover:bg-white/10 transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-                <circle cx="4" cy="4" r="2"/>
-              </svg>
-            </Link>
-            <Link href="#" className="w-[30px] h-[30px] rounded-full border border-[rgba(255,255,255,0.8)] flex items-center justify-center hover:bg-white/10 transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </Link>
-            <Link href="#" className="w-[30px] h-[30px] rounded-full border border-[rgba(255,255,255,0.8)] flex items-center justify-center hover:bg-white/10 transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/>
-                <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0a1628"/>
-              </svg>
-            </Link>
+            {socialLinks.map(({ platform, url }) => {
+              const icon = SOCIAL_ICONS[platform.toLowerCase()];
+              if (!icon) return null;
+              return (
+                <Link
+                  key={platform}
+                  href={url || "#"}
+                  target={url && url !== "#" ? "_blank" : undefined}
+                  rel={url && url !== "#" ? "noopener noreferrer" : undefined}
+                  className="w-[30px] h-[30px] rounded-full border border-[rgba(255,255,255,0.8)] flex items-center justify-center hover:bg-white/10 transition-colors"
+                  aria-label={platform}
+                >
+                  {icon}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -112,7 +162,7 @@ export default async function Footer() {
           </ul>
         </div>
 
-        {/* ── Modules column — 2-column grid of 15 modules ── */}
+        {/* ── Modules column — 2-column grid ── */}
         <div className="flex flex-col gap-3 md:gap-[20px] items-start">
           <p className="font-[family-name:var(--font-inter)] font-semibold text-[11px] text-white tracking-[0.99px] uppercase">
             MODULES
@@ -178,15 +228,25 @@ export default async function Footer() {
           {copyright}
         </p>
         <div className="flex gap-4 md:gap-[20px] items-center flex-wrap justify-center">
-          {["Privacy Policy", "Terms of Service", "Cookie Settings"].map((label) => (
-            <Link
-              key={label}
-              href="#"
-              className="font-[family-name:var(--font-inter)] text-[11px] md:text-[12px] text-[rgba(255,255,255,0.3)] hover:text-white/60 transition-colors"
-            >
-              {label}
-            </Link>
-          ))}
+          {legalLinks.length > 0
+            ? legalLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.url || "#"}
+                  className="font-[family-name:var(--font-inter)] text-[11px] md:text-[12px] text-[rgba(255,255,255,0.3)] hover:text-white/60 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))
+            : ["Privacy Policy", "Terms of Service", "Cookie Settings"].map((label) => (
+                <Link
+                  key={label}
+                  href="#"
+                  className="font-[family-name:var(--font-inter)] text-[11px] md:text-[12px] text-[rgba(255,255,255,0.3)] hover:text-white/60 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
         </div>
       </div>
     </footer>
