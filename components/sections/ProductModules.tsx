@@ -207,11 +207,11 @@ export default function ProductModules({
   );
   const [sectionEl, setSectionEl] = useState<HTMLElement | null>(null);
 
-  const visibleModules = SOURCE_MODULES.slice(0, visibleCount);
-  const hasMore = visibleCount < SOURCE_MODULES.length;
+  const visibleModules = MODULES.slice(0, visibleCount);
+  const hasMore = visibleCount < MODULES.length;
 
   const handleViewMore = () => {
-    const nextCount = Math.min(visibleCount + STEP, SOURCE_MODULES.length);
+    const nextCount = Math.min(visibleCount + STEP, MODULES.length);
     setVisibleCount(nextCount);
     const newRowIdx = Math.ceil(visibleCount / COLS);
     requestAnimationFrame(() => {

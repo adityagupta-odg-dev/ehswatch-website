@@ -4,12 +4,14 @@ interface ProductOverviewProps {
   cmsHeading?: string;
   cmsSubheading?: string;
   cmsBody?: string;
+  cmsImage?: { url?: string; alt?: string };
 }
 
 export default function ProductOverview({
   cmsHeading,
   cmsSubheading,
   cmsBody,
+  cmsImage,
 }: ProductOverviewProps = {}) {
   const heading = cmsHeading || "The Platform <span>Built for EHSQ</span>";
   const subheading = cmsSubheading || "No gaps. No silos. No workarounds.";

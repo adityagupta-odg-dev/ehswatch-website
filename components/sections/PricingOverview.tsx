@@ -113,7 +113,7 @@ export default function PricingOverview({
                         </svg>
                       </div>
                       <span className="font-[family-name:var(--font-dm-sans)] text-[13px] sm:text-[14px] leading-[1.6] text-[#374151] text-pretty">
-                        {item.text}
+                        {need}
                       </span>
                     </div>
 
