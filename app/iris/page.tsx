@@ -5,10 +5,11 @@ import IrisPage from "@/components/sections/IrisPage";
 import { getPage } from "@/lib/api";
 import { findBlock, iconFeaturesToArray } from "@/lib/blocks";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "IRIS — AI-Powered EHSQ | EHSWatch",
-  description:
-    "Meet IRIS, EHSWatch's Intelligent Risk & Insight System. Six AI capabilities embedded across your EHSQ workflows.",
+  description: "Meet IRIS, EHSWatch's Intelligent Risk & Insight System. Six AI capabilities embedded across your EHSQ workflows.",
 };
 
 export default async function IrisPageRoute() {

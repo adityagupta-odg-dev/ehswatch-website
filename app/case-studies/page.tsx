@@ -7,6 +7,8 @@ import { getPage, getCaseStudies } from "@/lib/api";
 import { findBlock, ctaHref } from "@/lib/blocks";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Case Studies — EHSWatch",
   description:

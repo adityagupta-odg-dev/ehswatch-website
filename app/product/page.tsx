@@ -11,6 +11,8 @@ import { findBlock } from "@/lib/blocks";
 import type { Metadata } from "next";
 import type { StatsItem } from "@/components/sections/Stats";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Product — EHSWatch",
   description: "One Platform. Every EHSQ Process. From field incidents to board-level dashboards — all connected, all in real time.",
