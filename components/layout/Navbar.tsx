@@ -3,8 +3,8 @@ import NavbarClient from "./NavbarClient";
 
 export default async function Navbar({ lightHero }: { lightHero?: boolean }) {
   const header = await getHeader();
-  const mainNav = header?.data?.attributes?.main_nav ?? [];
-  const ctas    = header?.data?.attributes?.ctas ?? [];
+  const mainNav = (header?.data as any)?.attributes?.main_nav ?? [];
+  const ctas    = (header?.data as any)?.attributes?.ctas ?? [];
 
   const cmsNav = (mainNav as any[]).map((item) => ({
     label:       item.label as string,
