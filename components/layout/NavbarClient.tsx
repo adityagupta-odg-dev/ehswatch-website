@@ -257,7 +257,7 @@ export default function NavbarClient({
                           {item.img ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                              src={basePath + item.img}
+                              src={item.img.startsWith("http") ? item.img : basePath + item.img}
                               alt={item.label}
                               className="w-full h-full object-cover group-hover/card:scale-[1.03] transition-transform duration-300"
                             />
