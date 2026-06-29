@@ -26,7 +26,7 @@ const FALLBACK_LOGOS = [
 
 export default function TrustedLogos({ cmsLogos }: { cmsLogos?: CmsClientLogo[] }) {
   const CLIENT_LOGOS = cmsLogos && cmsLogos.length > 0
-    ? cmsLogos.map((l) => ({ src: l.attributes.logo.url, alt: l.attributes.name }))
+    ? cmsLogos.map((l) => ({ src: l.attributes.logo.attributes.url, alt: l.attributes.name }))
     : FALLBACK_LOGOS;
   const TRACK = [...CLIENT_LOGOS, ...CLIENT_LOGOS, ...CLIENT_LOGOS];
   return (

@@ -6,6 +6,17 @@ export interface CmsImage {
   alt: string;
 }
 
+
+export interface CmsMedia {
+  id: number;
+  type: string;
+  attributes: {
+    url: string;
+    alt: string | null;
+    name: string;
+    file_name: string;
+  };
+}
 export interface CmsLink {
   label: string;
   type: "internal" | "external" | "anchor" | "email" | "phone" | "video_popup";
@@ -175,7 +186,7 @@ export interface CmsClientLogo {
     name: string;
     url: string;
     industry: string;
-    logo: CmsImage;
+    logo: CmsMedia;
   };
 }
 
