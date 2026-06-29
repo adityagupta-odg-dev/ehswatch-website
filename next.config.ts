@@ -15,6 +15,20 @@ const nextConfig: NextConfig = {
       static: 0,
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/solutions",
+        destination: "/industries",
+        permanent: true,
+      },
+      {
+        source: "/solutions/",
+        destination: "/industries/",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "stage.odigma.ooo" },

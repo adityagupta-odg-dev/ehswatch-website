@@ -13,7 +13,7 @@ const ALL_NAV = [
   { label: "About Us",  href: "/about",        hideOnScroll: true,  hasDropdown: false },
   { label: "Products",  href: "/product",      hideOnScroll: false, hasDropdown: false },
   { label: "IRIS",      href: "/iris",         hideOnScroll: false, hasDropdown: false },
-  { label: "Solutions", href: "/solutions-v2", hideOnScroll: false, hasDropdown: false },
+  { label: "Industries", href: "/industries",   hideOnScroll: false, hasDropdown: false },
   { label: "Pricing",   href: "/pricing",      hideOnScroll: false, hasDropdown: false },
   { label: "Resources", href: "#",             hideOnScroll: false, hasDropdown: true  },
   { label: "Contact Us", href: "/contact-us",   hideOnScroll: true,  hasDropdown: false },
