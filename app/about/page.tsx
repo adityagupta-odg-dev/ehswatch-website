@@ -65,6 +65,16 @@ export default async function AboutPage() {
         }))
       : undefined;
 
+  // ── cta_banner block ────────────────────────────────────────────────────────
+  const ctaData = findBlock<{
+    headline?: string;
+    subhead?: string;
+    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string; cta?: { label?: string; url?: string; type?: string; anchor?: string } };
+    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string; cta?: { label?: string; url?: string; type?: string; anchor?: string } };
+  }>(blocks, "cta_banner");
+  const ctaPrimary   = ctaData?.primary_cta?.cta   ?? ctaData?.primary_cta;
+  const ctaSecondary = ctaData?.secondary_cta?.cta  ?? ctaData?.secondary_cta;
+
   // ── stats_row block ─────────────────────────────────────────────────────────
   const statsData = findBlock<{
     heading?: string | null;
@@ -104,7 +114,12 @@ export default async function AboutPage() {
           cmsItems={drivesItems}
         />
         <Stats cmsItems={statsItems} />
-        <CTABanner />
+        <CTABanner
+          cmsHeadline={ctaData?.headline || undefined}
+          cmsSubhead={ctaData?.subhead || undefined}
+          cmsPrimaryCta={ctaPrimary?.label ? { label: ctaPrimary.label, url: ctaPrimary.url || ctaPrimary.anchor || "#" } : undefined}
+          cmsSecondaryCta={ctaSecondary?.label ? { label: ctaSecondary.label, url: ctaSecondary.url || ctaSecondary.anchor || "#" } : undefined}
+        />
       </main>
       <Footer />
     </>
