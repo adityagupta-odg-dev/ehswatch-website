@@ -8,7 +8,7 @@ import Reveal from "@/components/ui/Reveal";
 import GlareButton from "@/components/ui/GlareButton";
 import { basePath } from "@/lib/basePath";
 import type { Metadata } from "next";
-import { getBlogPosts, getPage } from "@/lib/api";
+import { getBlogPosts, getPage, getForm } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -88,12 +88,14 @@ function BlogCTA({
 }
 
 export default async function BlogPage() {
-  // Fetch blog posts (keep existing behaviour)
-  const res = await getBlogPosts();
+  const [res, pageRes, newsletterFormRes] = await Promise.all([
+    getBlogPosts(),
+    getPage("blog"),
+    getForm("newsletter").catch(() => null),
+  ]);
   const cmsPosts = res?.data ?? [];
+  const newsletterFormAttrs = newsletterFormRes?.data?.attributes ?? null;
 
-  // Fetch page CMS data for hero + cta_banner
-  const pageRes = await getPage("blog");
   const blocks: Array<{ type: string; data: Record<string, unknown> }> =
     (pageRes?.data?.attributes?.content as Array<{ type: string; data: Record<string, unknown> }>) ?? [];
 
@@ -128,7 +130,7 @@ export default async function BlogPage() {
           eyebrow={heroEyebrow}
         />
         <BlogGrid cmsPosts={cmsPosts.length > 0 ? cmsPosts : undefined} />
-        <BlogNewsletter />
+        <BlogNewsletter formAttrs={newsletterFormAttrs} />
         <BlogCTA
           headline={ctaHeadline}
           subhead={ctaSubhead}
