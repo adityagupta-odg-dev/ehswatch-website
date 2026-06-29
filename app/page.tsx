@@ -12,8 +12,11 @@ import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
 import { findBlock, ctaHref } from "@/lib/blocks";
+<<<<<<< HEAD
+=======
 
 export const dynamic = "force-dynamic";
+>>>>>>> server/feature/iris-scroll-fix
 
 export default async function HomePage() {
   const [testimonialsRes, logosRes, homePageRes] = await Promise.all([
@@ -23,6 +26,7 @@ export default async function HomePage() {
   ]);
   const cmsTestimonials = testimonialsRes?.data ?? [];
   const cmsLogos = logosRes?.data ?? [];
+<<<<<<< HEAD
 
   const blocks = homePageRes?.data?.attributes?.content ?? [];
 
@@ -45,6 +49,10 @@ export default async function HomePage() {
   }>(blocks, "pain_points");
 
   // cta_banner block
+=======
+  const blocks = homePageRes?.data?.attributes?.content ?? [];
+
+>>>>>>> server/feature/iris-scroll-fix
   const ctaBlock = findBlock<{
     headline?: string;
     subheadline?: string;
@@ -79,6 +87,7 @@ export default async function HomePage() {
         <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
         <Blogs />
         <CTABanner
+<<<<<<< HEAD
           cmsHeadline={ctaBlock?.headline}
           cmsSubhead={ctaBlock?.subheadline}
           cmsPrimaryCta={
@@ -89,6 +98,18 @@ export default async function HomePage() {
           cmsSecondaryCta={
             ctaBlock?.secondary_cta
               ? { label: ctaBlock.secondary_cta.label ?? "", url: ctaHref(ctaBlock.secondary_cta) }
+=======
+          cmsHeadline={ctaBlock?.headline || undefined}
+          cmsSubhead={ctaBlock?.subheadline || undefined}
+          cmsPrimaryCta={
+            ctaBlock?.primary_cta?.label
+              ? { label: ctaBlock.primary_cta.label, url: ctaHref(ctaBlock.primary_cta) }
+              : undefined
+          }
+          cmsSecondaryCta={
+            ctaBlock?.secondary_cta?.label
+              ? { label: ctaBlock.secondary_cta.label, url: ctaHref(ctaBlock.secondary_cta) }
+>>>>>>> server/feature/iris-scroll-fix
               : undefined
           }
         />
