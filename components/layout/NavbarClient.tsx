@@ -48,7 +48,7 @@ export default function NavbarClient({
   cmsNav?: CmsNavItem[];
   cmsCta?: { label: string; href: string };
 }) {
-  const nav = cmsNav && cmsNav.length > 0 ? cmsNav : ALL_NAV;
+  const navItems = cmsNav && cmsNav.length > 0 ? cmsNav : ALL_NAV;
   const ctaLabel = cmsCta?.label || "Book Demo";
   const ctaHref  = cmsCta?.href  || "#";
   const [open, setOpen] = useState(false);
@@ -119,7 +119,7 @@ export default function NavbarClient({
 
       linkRefs.current.forEach((el, i) => {
         if (!el) return;
-        const cfg = nav[i];
+        const cfg = navItems[i];
 
         el.style.color      = lColor;
         el.style.textShadow = lShadow;
@@ -219,7 +219,7 @@ export default function NavbarClient({
 
         {/* ── Desktop links ─────────────────────────────────── */}
         <div className="hidden lg:flex items-center justify-center flex-1">
-          {nav.map((link, i) =>
+          {navItems.map((link, i) =>
             link.hasDropdown ? (
               /* Resources — hover dropdown */
               <div
@@ -366,7 +366,7 @@ export default function NavbarClient({
           open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"
         }`}
       >
-        {nav.map((link) =>
+        {navItems.map((link) =>
           link.hasDropdown ? (
             <div key={link.label}>
               <button
