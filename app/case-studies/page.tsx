@@ -4,15 +4,14 @@ import CaseStudiesHero from "@/components/sections/CaseStudiesHero";
 import CaseStudiesGrid from "@/components/sections/CaseStudiesGrid";
 import CTABanner from "@/components/sections/CTABanner";
 import { getPage, getCaseStudies } from "@/lib/api";
-import { findBlock, ctaHref } from "@/lib/blocks";
+import { findBlock, resolveHref } from "@/lib/blocks";
 import type { Metadata } from "next";
-import { getCaseStudies, getPage } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const pageRes = await getPage("case-studies");
-  const meta = pageRes?.data?.attributes?.meta;
+  const meta = (pageRes?.data as any)?.attributes?.meta;
   return {
     title: meta?.meta_title || "Case Studies — EHSWatch",
     description:
@@ -27,41 +26,44 @@ export default async function CaseStudiesPage() {
     getCaseStudies(),
   ]);
 
-  const blocks = pageRes?.data?.attributes?.content ?? [];
+  const blocks = (pageRes?.data as any)?.attributes?.content ?? [];
 
-  // ── hero block ────────────────────────────────────────────────────────────
   const heroBlock = findBlock<{
+    eyebrow?: string;
     headline?: string;
     subheadline?: string;
     primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
   }>(blocks, "hero");
 
-  // ── cta_banner block ──────────────────────────────────────────────────────
   const ctaBlock = findBlock<{
     headline?: string;
-    subheadline?: string;
+    subhead?: string;
     primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
   }>(blocks, "cta_banner");
 
-  // ── case study items — prefer /case-studies endpoint; fall back to post_listing ──
   const cmsItems = caseStudiesRes?.data ?? [];
 
-export default async function CaseStudiesPage() {
-  const [caseStudiesRes] = await Promise.all([
-    getCaseStudies(),
-  ]);
-
-  const cmsStudies = caseStudiesRes?.data ?? [];
+  const ctaPrimaryHref = ctaBlock?.primary_cta ? resolveHref(ctaBlock.primary_cta) : undefined;
 
   return (
     <>
       <Navbar lightHero={true} />
       <main>
-        <CaseStudiesHero />
-        <CaseStudiesGrid cmsStudies={cmsStudies.length > 0 ? cmsStudies : undefined} />
-        <CaseStudiesCTA />
+        <CaseStudiesHero
+          cmsEyebrow={heroBlock?.eyebrow || undefined}
+          cmsHeadline={heroBlock?.headline || undefined}
+          cmsSubheadline={heroBlock?.subheadline || undefined}
+        />
+        <CaseStudiesGrid cmsStudies={cmsItems.length > 0 ? cmsItems : undefined} />
+        <CTABanner
+          cmsHeadline={ctaBlock?.headline || undefined}
+          cmsSubhead={ctaBlock?.subhead || undefined}
+          cmsPrimaryCta={
+            ctaBlock?.primary_cta?.label
+              ? { label: ctaBlock.primary_cta.label, url: ctaPrimaryHref || "#" }
+              : undefined
+          }
+        />
       </main>
       <Footer />
     </>
