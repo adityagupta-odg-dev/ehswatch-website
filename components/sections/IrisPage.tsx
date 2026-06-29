@@ -56,7 +56,7 @@ interface IrisCmsProps {
     eyebrow?: string;
     sub_items?: any[];
   }>;
-  cmsCtaBanner?: { headline?: string; subhead?: string; primary_cta?: any };
+  cmsCtaBanner?: { headline?: string; subhead?: string; primary_cta?: any; button?: { button?: { label?: string; url?: string } } };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
