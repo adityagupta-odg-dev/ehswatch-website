@@ -36,7 +36,7 @@ interface CmsNavItem {
   href: string;
   hideOnScroll?: boolean;
   hasDropdown: boolean;
-  children?: { label: string; href: string; desc?: string }[];
+  children?: { label: string; href: string; desc?: string; img?: string }[];
 }
 
 export default function NavbarClient({
