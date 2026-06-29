@@ -22,10 +22,11 @@ export function resolveHref(cta: unknown): string {
   return c.type === "anchor" ? (c.anchor as string) || "#" : (c.url as string) || "#";
 }
 
-// Aliases for backwards compatibility with existing components
+// Aliases used by page routes
 export function iconFeaturesToArray(
   items: Record<string, unknown> | unknown[] | null | undefined
 ): Array<{ icon?: string; title?: string; description?: string; link?: unknown }> {
   return normalizeArray<{ icon?: string; title?: string; description?: string; link?: unknown }>(items);
 }
 export const ctaHref = resolveHref;
+export type { CmsBlock } from "@/lib/types";

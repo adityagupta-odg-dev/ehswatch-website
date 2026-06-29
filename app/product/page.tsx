@@ -6,8 +6,8 @@ import ProductHowItWorks from "@/components/sections/ProductHowItWorks";
 import ProductModules from "@/components/sections/ProductModules";
 import Stats from "@/components/sections/Stats";
 import CTABanner from "@/components/sections/CTABanner";
-import { getPage, getProductModules } from "@/lib/api";
-import { findBlock } from "@/lib/blocks";
+import { getPage } from "@/lib/api";
+import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
 import type { Metadata } from "next";
 import type { StatsItem } from "@/components/sections/Stats";
 
@@ -19,50 +19,102 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductPage() {
-  const [pageRes, modulesRes] = await Promise.all([
-    getPage("product"),
-    getProductModules(),
-  ]);
-
+  const pageRes = await getPage("product");
   const blocks = pageRes?.data?.attributes?.content ?? [];
 
-  const heroBlock     = findBlock<Record<string, any>>(blocks, "hero");
-  const imageTextBlock = findBlock<Record<string, any>>(blocks, "image_text");
-  const statsRowBlock  = findBlock<{ items?: StatsItem[] }>(blocks, "stats_row");
-  const numberStepsBlock = findBlock<{ steps?: any[] }>(blocks, "number_steps");
-  const ctaBannerBlock = findBlock<Record<string, any>>(blocks, "cta_banner");
+  // ── hero block ─────────────────────────────────────────────────────────────
+  const heroBlock = findBlock<{
+    headline?: string;
+    subheadline?: string;
+    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+  }>(blocks, "hero");
 
-  const cmsModules = modulesRes?.data ?? [];
+  // ── image_text block (ProductOverview) ────────────────────────────────────
+  const imageTextBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    body?: string;
+  }>(blocks, "image_text");
+
+  // ── number_steps block (ProductHowItWorks) ────────────────────────────────
+  const numberStepsBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    steps?: unknown;
+  }>(blocks, "number_steps");
+
+  const rawSteps = normalizeArray<{
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    icon?: string;
+    image?: { url?: string } | null;
+    sub_items?: Array<{ icon?: string; title?: string; description?: string }>;
+  }>(numberStepsBlock?.steps);
+
+  // ── product_modules block ─────────────────────────────────────────────────
+  const productModulesBlock = findBlock<{
+    heading?: string;
+    subheading?: string;
+    visible_count?: number;
+  }>(blocks, "product_modules");
+
+  // ── cta_banner block ──────────────────────────────────────────────────────
+  const ctaBlock = findBlock<{
+    headline?: string;
+    subhead?: string;
+    primary_cta?: Record<string, unknown>;
+    secondary_cta?: Record<string, unknown>;
+  }>(blocks, "cta_banner");
+
+  // Resolve nested CTA structure from CMS (primary_cta.cta or primary_cta directly)
+  const ctaPrimaryRaw = ctaBlock?.primary_cta as Record<string, unknown> | undefined;
+  const ctaPrimaryResolved =
+    (ctaPrimaryRaw?.cta as Record<string, unknown> | undefined) || ctaPrimaryRaw;
+
+  const ctaSecondaryRaw = ctaBlock?.secondary_cta as Record<string, unknown> | undefined;
+  const ctaSecondaryResolved =
+    (ctaSecondaryRaw?.secondary_cta as Record<string, unknown> | undefined) || ctaSecondaryRaw;
 
   return (
     <>
       <Navbar lightHero={true} />
       <main>
         <ProductHero
-          cmsHeading={heroBlock?.heading}
-          cmsSubheading={heroBlock?.subheading}
-          cmsCtaLabel={heroBlock?.cta?.label}
-          cmsCtaUrl={heroBlock?.cta?.url}
+          cmsHeadline={heroBlock?.headline || undefined}
+          cmsSubheadline={heroBlock?.subheadline || undefined}
+          cmsPrimaryCta={
+            heroBlock?.primary_cta?.label
+              ? { label: heroBlock.primary_cta.label, url: ctaHref(heroBlock.primary_cta) }
+              : undefined
+          }
         />
         <ProductOverview
-          cmsHeading={imageTextBlock?.heading}
-          cmsBody={imageTextBlock?.body}
-          cmsImage={imageTextBlock?.image}
+          cmsHeading={imageTextBlock?.heading || undefined}
+          cmsSubheading={imageTextBlock?.subheading || undefined}
+          cmsBody={imageTextBlock?.body || undefined}
         />
-        <Stats cmsItems={statsRowBlock?.items} />
-        <ProductHowItWorks cmsSteps={numberStepsBlock?.steps} />
-        <ProductModules cmsModules={cmsModules} />
+        <Stats />
+        <ProductHowItWorks
+          cmsHeading={numberStepsBlock?.heading || undefined}
+          cmsSubheading={numberStepsBlock?.subheading || undefined}
+          cmsSteps={rawSteps.length > 0 ? rawSteps : undefined}
+        />
+        <ProductModules
+          cmsHeading={productModulesBlock?.heading || undefined}
+          cmsSubheading={productModulesBlock?.subheading || undefined}
+        />
         <CTABanner
-          cmsHeadline={ctaBannerBlock?.heading}
-          cmsSubhead={ctaBannerBlock?.subheading}
+          cmsHeadline={ctaBlock?.headline || undefined}
+          cmsSubhead={ctaBlock?.subhead || undefined}
           cmsPrimaryCta={
-            ctaBannerBlock?.primary_cta
-              ? { label: ctaBannerBlock.primary_cta.label, url: ctaBannerBlock.primary_cta.url ?? "#" }
+            ctaPrimaryResolved && (ctaPrimaryResolved.label as string)
+              ? { label: ctaPrimaryResolved.label as string, url: ctaHref(ctaPrimaryResolved) }
               : undefined
           }
           cmsSecondaryCta={
-            ctaBannerBlock?.secondary_cta
-              ? { label: ctaBannerBlock.secondary_cta.label, url: ctaBannerBlock.secondary_cta.url ?? "#" }
+            ctaSecondaryResolved && (ctaSecondaryResolved.label as string)
+              ? { label: ctaSecondaryResolved.label as string, url: ctaHref(ctaSecondaryResolved) }
               : undefined
           }
         />

@@ -1,6 +1,28 @@
 "use client";
 
-export default function BlogHero() {
+interface BlogHeroProps {
+  headline?: string;
+  subheadline?: string;
+  eyebrow?: string;
+}
+
+export default function BlogHero({ headline, subheadline, eyebrow }: BlogHeroProps) {
+  // Parse headline HTML: CMS wraps the coloured part in <span>
+  // We render as dangerouslySetInnerHTML only for the headline span
+  const headlineHtml =
+    headline ||
+    'EHSQ Insights, <span style="color:#1d4ed8">Beyond The Dashboard</span>';
+
+  // Strip any inline color from CMS <span> and apply our brand blue
+  const styledHeadline = headlineHtml.replace(
+    /<span>/gi,
+    '<span style="color:#1d4ed8">'
+  );
+
+  const subheadlineText =
+    subheadline ||
+    "Practical guidance, regulatory updates and operational insights for EHSQ professionals who need more than theory. Written by safety practitioners, for safety practitioners.";
+
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-6 pt-[148px] pb-[72px]"
@@ -47,19 +69,24 @@ export default function BlogHero() {
       </div>
 
       <div className="relative z-20 max-w-[700px] w-full mx-auto text-center flex flex-col items-center gap-4">
+        {eyebrow && (
+          <p
+            className="font-[family-name:var(--font-inter)] text-[13px] font-semibold uppercase tracking-widest animate-hero-rise"
+            style={{ color: "#1d4ed8", animationDelay: "0ms" }}
+          >
+            {eyebrow}
+          </p>
+        )}
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[32px] sm:text-[46px] md:text-[56px] leading-[1.06] tracking-normal animate-hero-rise"
           style={{ color: "#0a1628", animationDelay: "80ms" }}
-        >
-          EHSQ Insights,{" "}
-          <span style={{ color: "#1d4ed8" }}>Beyond The Dashboard</span>
-        </h1>
+          dangerouslySetInnerHTML={{ __html: styledHeadline }}
+        />
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] max-w-[540px] animate-hero-rise"
           style={{ color: "#6b7280", animationDelay: "200ms" }}
         >
-          Practical guidance, regulatory updates and operational insights for EHSQ professionals
-          who need more than theory. Written by safety practitioners, for safety practitioners.
+          {subheadlineText}
         </p>
       </div>
     </section>

@@ -6,14 +6,20 @@ import CTABanner from "@/components/sections/CTABanner";
 import { getPage, getCaseStudies } from "@/lib/api";
 import { findBlock, ctaHref } from "@/lib/blocks";
 import type { Metadata } from "next";
+import { getCaseStudies, getPage } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Case Studies — EHSWatch",
-  description:
-    "See how EHSQ teams across construction, energy, manufacturing and logistics use EHSWatch to cut reporting time, accelerate audits and gain full visibility into risk.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageRes = await getPage("case-studies");
+  const meta = pageRes?.data?.attributes?.meta;
+  return {
+    title: meta?.meta_title || "Case Studies — EHSWatch",
+    description:
+      meta?.meta_description ||
+      "See how EHSQ teams across construction, energy, manufacturing and logistics use EHSWatch to cut reporting time, accelerate audits and gain full visibility into risk.",
+  };
+}
 
 export default async function CaseStudiesPage() {
   const [pageRes, caseStudiesRes] = await Promise.all([
@@ -42,39 +48,20 @@ export default async function CaseStudiesPage() {
   // ── case study items — prefer /case-studies endpoint; fall back to post_listing ──
   const cmsItems = caseStudiesRes?.data ?? [];
 
+export default async function CaseStudiesPage() {
+  const [caseStudiesRes] = await Promise.all([
+    getCaseStudies(),
+  ]);
+
+  const cmsStudies = caseStudiesRes?.data ?? [];
+
   return (
     <>
       <Navbar lightHero={true} />
       <main>
-        <CaseStudiesHero
-          cmsHeadline={heroBlock?.headline}
-          cmsSubheadline={heroBlock?.subheadline}
-          cmsPrimaryCta={
-            heroBlock?.primary_cta
-              ? { label: heroBlock.primary_cta.label ?? "", url: ctaHref(heroBlock.primary_cta) }
-              : undefined
-          }
-          cmsSecondaryCta={
-            heroBlock?.secondary_cta
-              ? { label: heroBlock.secondary_cta.label ?? "", url: ctaHref(heroBlock.secondary_cta) }
-              : undefined
-          }
-        />
-        <CaseStudiesGrid cmsItems={cmsItems.length > 0 ? cmsItems : undefined} />
-        <CTABanner
-          cmsHeadline={ctaBlock?.headline}
-          cmsSubhead={ctaBlock?.subheadline}
-          cmsPrimaryCta={
-            ctaBlock?.primary_cta
-              ? { label: ctaBlock.primary_cta.label ?? "", url: ctaHref(ctaBlock.primary_cta) }
-              : undefined
-          }
-          cmsSecondaryCta={
-            ctaBlock?.secondary_cta
-              ? { label: ctaBlock.secondary_cta.label ?? "", url: ctaHref(ctaBlock.secondary_cta) }
-              : undefined
-          }
-        />
+        <CaseStudiesHero />
+        <CaseStudiesGrid cmsStudies={cmsStudies.length > 0 ? cmsStudies : undefined} />
+        <CaseStudiesCTA />
       </main>
       <Footer />
     </>

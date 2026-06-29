@@ -2,17 +2,26 @@
 
 import GlareButton from "@/components/ui/GlareButton";
 
-interface AboutHeroCms {
-  headline?: string;
-  subheadline?: string;
-  primaryCta?: { label?: string; href?: string };
+interface AboutHeroCmsProps {
+  cmsHeadline?: string | undefined;
+  cmsSubheadline?: string | undefined;
+  cmsPrimaryCtaLabel?: string | undefined;
+  cmsPrimaryCtaUrl?: string | undefined;
 }
 
-interface AboutHeroProps {
-  cms?: AboutHeroCms;
-}
+export default function AboutHero({
+  cmsHeadline,
+  cmsSubheadline,
+  cmsPrimaryCtaLabel,
+  cmsPrimaryCtaUrl,
+}: AboutHeroCmsProps = {}) {
+  const headline = cmsHeadline || "Built to Simplify EHSQ. Designed to Protect.";
+  const subheadline =
+    cmsSubheadline ||
+    "The intelligent EHSQ platform trusted by 25K+ teams — making safety faster, simpler and more visible.";
+  const ctaLabel = cmsPrimaryCtaLabel || "Book a Free Demo";
+  const ctaHref = cmsPrimaryCtaUrl || "#";
 
-export default function AboutHero({ cms }: AboutHeroProps = {}) {
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-4 sm:px-6 pt-[90px] sm:pt-[120px] md:pt-[148px] pb-[60px] sm:pb-[80px] md:pb-[100px]"
@@ -82,25 +91,18 @@ export default function AboutHero({ cms }: AboutHeroProps = {}) {
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[34px] sm:text-[48px] md:text-[58px] leading-[1.08] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
-        >
-          {cms?.headline ?? (
-            <>
-              Built to Simplify EHSQ.
-              <br className="hidden sm:block" />
-              <span style={{ color: "#1d4ed8" }}> Designed to Protect.</span>
-            </>
-          )}
-        </h1>
+          dangerouslySetInnerHTML={{ __html: headline }}
+        />
 
         <p
           className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] md:text-[18px] text-gray-700 leading-[1.75] max-w-[460px] animate-hero-rise text-pretty"
           style={{ animationDelay: "200ms" }}
         >
-          {cms?.subheadline ?? "The intelligent EHSQ platform trusted by 25K+ teams — making safety faster, simpler and more visible."}
+          {subheadline}
         </p>
 
         <GlareButton
-          href={cms?.primaryCta?.href ?? "#"}
+          href={ctaHref}
           className="gap-2 px-8 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white animate-hero-rise hover:shadow-lg"
           style={{
             animationDelay: "320ms",
@@ -108,7 +110,7 @@ export default function AboutHero({ cms }: AboutHeroProps = {}) {
             boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
           }}
         >
-          {cms?.primaryCta?.label ?? "Book a Free Demo"}
+          {ctaLabel}
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

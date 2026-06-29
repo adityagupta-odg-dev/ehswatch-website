@@ -7,7 +7,7 @@ import Stats from "@/components/sections/Stats";
 import CTABanner from "@/components/sections/CTABanner";
 import type { Metadata } from "next";
 import { getPage } from "@/lib/api";
-import { findBlock, findBlocks, iconFeaturesToArray, ctaHref } from "@/lib/blocks";
+import { findBlock, findBlocks, normalizeArray } from "@/lib/blocks";
 
 export const dynamic = "force-dynamic";
 
@@ -17,116 +17,94 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  // Fetch CMS data — falls back gracefully if null
   const pageData = await getPage("about");
   const blocks = pageData?.data?.attributes?.content ?? [];
 
-  // hero block
-  const heroBlock = findBlock<{
-    headline?: string;
-    subheadline?: string;
-    primary_cta?: { label?: string; type?: string; url?: string; anchor?: string };
+  // ── hero block ──────────────────────────────────────────────────────────────
+  const heroData = findBlock<{
+    headline?: string | null;
+    subheadline?: string | null;
+    primary_cta?: { label?: string | null; url?: string | null; anchor?: string | null; type?: string | null } | null;
   }>(blocks, "hero");
 
-  // image_text block (About story)
-  const imageTextBlock = findBlock<{
-    heading?: string;
-    body?: string;
+  const heroHeadline = heroData?.headline || undefined;
+  const heroSubheadline = heroData?.subheadline || undefined;
+  const heroCtaRaw = heroData?.primary_cta;
+  const heroCtaLabel = heroCtaRaw?.label || undefined;
+  const heroCtaUrl =
+    (heroCtaRaw?.type === "anchor" ? heroCtaRaw?.anchor : heroCtaRaw?.url) || undefined;
+
+  // ── image_text block (AboutStory) ───────────────────────────────────────────
+  const imageTextData = findBlock<{
+    heading?: string | null;
+    body?: string | null;
   }>(blocks, "image_text");
 
-  // icon_features blocks — first is Mission/Vision (AboutDrives), second is "What drives us"
-  const iconFeaturesBlocks = findBlocks<{
-    heading?: string;
-    subheading?: string;
-    items?: Record<string, { icon?: string; title?: string; description?: string }> | Array<{ icon?: string; title?: string; description?: string }>;
+  const storyHeading = imageTextData?.heading || undefined;
+  const storyBody = imageTextData?.body || undefined;
+
+  // ── icon_features[0] — "Purpose Behind Every Feature" (AboutDrives) ─────────
+  const iconFeaturesAll = findBlocks<{
+    heading?: string | null;
+    subheading?: string | null;
+    items?: unknown;
   }>(blocks, "icon_features");
 
-  const firstIconFeatures = iconFeaturesBlocks[0] ?? null;
-  const drivesItems = iconFeaturesToArray(firstIconFeatures?.items ?? null);
+  const drivesBlock = iconFeaturesAll[0] ?? null;
+  const drivesHeading = drivesBlock?.heading || undefined;
+  const drivesRawItems = normalizeArray<{
+    title?: string | null;
+    description?: string | null;
+    icon?: string | null;
+  }>(drivesBlock?.items);
+  const drivesItems =
+    drivesRawItems.length > 0
+      ? drivesRawItems.map((item) => ({
+          title: item.title || "",
+          description: item.description || "",
+        }))
+      : undefined;
 
-  // stats_row block
-  const statsBlock = findBlock<{
-    items?: Array<{ label: string; value: string; suffix?: string | null; icon?: string }>;
+  // ── stats_row block ─────────────────────────────────────────────────────────
+  const statsData = findBlock<{
+    heading?: string | null;
+    items?: unknown;
   }>(blocks, "stats_row");
 
-  // cta_banner block (may not be present in response)
-  const ctaBannerBlock = findBlock<{
-    headline?: string;
-    subhead?: string;
-    subheadline?: string;
-    primary_cta?: { label?: string; type?: string; url?: string; anchor?: string };
-    secondary_cta?: { label?: string; type?: string; url?: string; anchor?: string };
-  }>(blocks, "cta_banner");
+  const statsRawItems = normalizeArray<{
+    value?: string | null;
+    suffix?: string | null;
+    label?: string | null;
+  }>(statsData?.items);
+  const statsItems =
+    statsRawItems.length > 0
+      ? statsRawItems.map((item) => ({
+          value: item.value || "0",
+          suffix: item.suffix || null,
+          label: item.label || "",
+        }))
+      : undefined;
 
   return (
     <>
       <Navbar lightHero={true} />
       <main>
         <AboutHero
-          cms={
-            heroBlock
-              ? {
-                  headline: heroBlock.headline,
-                  subheadline: heroBlock.subheadline,
-                  primaryCta: heroBlock.primary_cta
-                    ? {
-                        label: heroBlock.primary_cta.label,
-                        href: ctaHref(heroBlock.primary_cta),
-                      }
-                    : undefined,
-                }
-              : undefined
-          }
+          cmsHeadline={heroHeadline}
+          cmsSubheadline={heroSubheadline}
+          cmsPrimaryCtaLabel={heroCtaLabel}
+          cmsPrimaryCtaUrl={heroCtaUrl}
         />
         <AboutStory
-          cms={
-            imageTextBlock
-              ? {
-                  heading: imageTextBlock.heading,
-                  body: imageTextBlock.body,
-                }
-              : undefined
-          }
+          cmsHeading={storyHeading}
+          cmsBody={storyBody}
         />
         <AboutDrives
-          cms={
-            drivesItems.length > 0
-              ? { items: drivesItems }
-              : undefined
-          }
+          cmsHeading={drivesHeading}
+          cmsItems={drivesItems}
         />
-        <Stats
-          cmsItems={
-            statsBlock?.items && statsBlock.items.length > 0
-              ? statsBlock.items.map((item) => ({
-                  value: item.value,
-                  suffix: item.suffix ?? undefined,
-                  label: item.label,
-                  icon: item.icon,
-                }))
-              : undefined
-          }
-        />
-        <CTABanner
-          cmsHeadline={ctaBannerBlock?.headline ?? undefined}
-          cmsSubhead={ctaBannerBlock?.subhead ?? ctaBannerBlock?.subheadline ?? undefined}
-          cmsPrimaryCta={
-            ctaBannerBlock?.primary_cta?.label
-              ? {
-                  label: ctaBannerBlock.primary_cta.label,
-                  url: ctaHref(ctaBannerBlock.primary_cta),
-                }
-              : undefined
-          }
-          cmsSecondaryCta={
-            ctaBannerBlock?.secondary_cta?.label
-              ? {
-                  label: ctaBannerBlock.secondary_cta.label,
-                  url: ctaHref(ctaBannerBlock.secondary_cta),
-                }
-              : undefined
-          }
-        />
+        <Stats cmsItems={statsItems} />
+        <CTABanner />
       </main>
       <Footer />
     </>

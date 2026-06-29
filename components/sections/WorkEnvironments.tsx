@@ -19,7 +19,19 @@ interface Card {
   imgSrc: string;
 }
 
-const CARDS: Card[] = [
+interface SolutionCarouselCard {
+  title: string;
+  subheading?: string;
+  description?: string;
+}
+
+interface WorkEnvironmentsProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsCards?: SolutionCarouselCard[];
+}
+
+const HARDCODED_CARDS: Card[] = [
   {
     key: "construction",
     title: "Construction & Infrastructure Projects",
@@ -63,6 +75,42 @@ const CARDS: Card[] = [
     imgSrc: panel("Facilities%20%26%20Property%20Management.png"),
   },
 ];
+
+// Layout metadata for up to 6 cards (positional display config)
+const CARD_LAYOUT: Omit<Card, "title" | "desc" | "imgSrc">[] = [
+  { key: "construction", tx: 4.8, ty: 6,    tw: 50, iw: 93.4, il: 10.1, idx: -5, noFade: true },
+  { key: "manufacturing",tx: 7.7, ty: 5.3,  tw: 50, iw: 89.5, il: 13.1, noFade: true },
+  { key: "oilgas",       tx: 3.2, ty: 13.4, tw: 49, iw: 90.1, il: 9.9  },
+  { key: "logistics",    tx: 7.3, ty: 13.4, tw: 67, iw: 92.2, il: 7.3  },
+  { key: "utilities",    tx: 1.3, ty: 10,   tw: 59, iw: 75.3, il: 11.8, noFade: true },
+  { key: "facilities",   tx: 4.8, ty: 11.3, tw: 58, iw: 91,   il: 2.7  },
+];
+
+// Map title keywords to panel image filenames
+function inferPanelImage(title: string): string {
+  const t = title.toLowerCase();
+  if (t.includes("construct")) return panel("Construction%20%26%20Infrastructure%20Projects.png");
+  if (t.includes("manufactur") || t.includes("engineer")) return panel("Manufacturing%20%26%20Engineering.png");
+  if (t.includes("oil") || t.includes("gas") || t.includes("energy")) return panel("Oil%2C%20Gas%20%26%20Energy.png");
+  if (t.includes("logistic") || t.includes("warehouse") || t.includes("transport")) return panel("Logistics%2C%20Warehousing%20%26%20Transport.png");
+  if (t.includes("utilit") || t.includes("public")) return panel("Utilities%20and%20Public%20Services.png");
+  if (t.includes("facilit") || t.includes("property")) return panel("Facilities%20%26%20Property%20Management.png");
+  return panel("Construction%20%26%20Infrastructure%20Projects.png");
+}
+
+function buildCards(cmsCards?: SolutionCarouselCard[]): Card[] {
+  if (!cmsCards || cmsCards.length === 0) return HARDCODED_CARDS;
+  return cmsCards.slice(0, 6).map((c, i) => {
+    const layout = CARD_LAYOUT[i] || CARD_LAYOUT[0];
+    const hardcoded = HARDCODED_CARDS[i];
+    return {
+      ...layout,
+      title: c.title || hardcoded.title,
+      desc:  c.subheading || hardcoded.desc,
+      imgSrc: inferPanelImage(c.title || hardcoded.title),
+    };
+  });
+}
 
 function IndustryCard({ card }: { card: Card }) {
   return (
@@ -113,8 +161,18 @@ function IndustryCard({ card }: { card: Card }) {
   );
 }
 
-export default function WorkEnvironments() {
-  const [construction, manufacturing, oilgas, logistics, utilities, facilities] = CARDS;
+export default function WorkEnvironments({ cmsHeading, cmsSubheading, cmsCards }: WorkEnvironmentsProps) {
+  const cards = buildCards(cmsCards);
+  const [construction, manufacturing, oilgas, logistics, utilities, facilities] = cards;
+
+  const heading    = cmsHeading    || "Built for High‑Risk, High‑Activity Work Environments";
+  const subheading = cmsSubheading || "EHSWatch brings all your EHSQ activities into a single, easy‑to‑use platform so everyone, from workers in the field to leadership, works from the same, up‑to‑date information.";
+
+  // Split heading to apply blue highlight to last two words
+  const headingWords = heading.split(" ");
+  const highlightCount = 2;
+  const headingMain  = headingWords.slice(0, -highlightCount).join(" ");
+  const headingBlue  = headingWords.slice(-highlightCount).join(" ");
 
   return (
     <section className="bg-[#f8fbff] pt-[60px] md:pt-[80px] lg:pt-[106px] pb-[60px] md:pb-[80px]">
@@ -122,16 +180,14 @@ export default function WorkEnvironments() {
 
         <div className="text-center max-w-[820px] mx-auto">
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[34px] md:text-[40px] lg:text-[44px] leading-[1.18] text-[#1b1b1b] text-balance">
-            Built for High‑Risk, High‑Activity{" "}
-            <span className="text-[#155eef]">Work Environments</span>
+            {headingMain}{" "}
+            <span className="text-[#155eef]">{headingBlue}</span>
           </h2>
           <p
             className="mt-[16px] font-[family-name:var(--font-dm-sans)] font-medium text-[13px] md:text-[15px] lg:text-[16px] text-[#727272] leading-[1.64] tracking-[-0.18px] max-w-[640px] mx-auto text-pretty"
             style={{ fontVariationSettings: "'opsz' 14" }}
           >
-            EHSWatch brings all your EHSQ activities into a single, easy‑to‑use platform so
-            everyone, from workers in the field to leadership, works from the same, up‑to‑date
-            information.
+            {subheading}
           </p>
         </div>
 
@@ -141,30 +197,30 @@ export default function WorkEnvironments() {
           {/* Row 1: Construction (603) | Manufacturing (665) */}
           <div className="flex flex-col sm:flex-row border-b border-[#e2e8f0]">
             <div className="sm:border-r border-[#e2e8f0] sm:[aspect-ratio:603/470]" style={{ flex: "603 603 0%" }}>
-              <IndustryCard card={construction} />
+              {construction && <IndustryCard card={construction} />}
             </div>
             <div className="sm:[aspect-ratio:665/470]" style={{ flex: "665 665 0%" }}>
-              <IndustryCard card={manufacturing} />
+              {manufacturing && <IndustryCard card={manufacturing} />}
             </div>
           </div>
 
           {/* Row 2: Oil Gas (665) | Logistics (603) */}
           <div className="flex flex-col sm:flex-row border-b border-[#e2e8f0]">
             <div className="sm:border-r border-[#e2e8f0] sm:[aspect-ratio:665/470]" style={{ flex: "665 665 0%" }}>
-              <IndustryCard card={oilgas} />
+              {oilgas && <IndustryCard card={oilgas} />}
             </div>
             <div className="sm:[aspect-ratio:603/470]" style={{ flex: "603 603 0%" }}>
-              <IndustryCard card={logistics} />
+              {logistics && <IndustryCard card={logistics} />}
             </div>
           </div>
 
           {/* Row 3: Utilities (603) | Facilities (665) */}
           <div className="flex flex-col sm:flex-row border-b border-[#e2e8f0]">
             <div className="sm:border-r border-[#e2e8f0] sm:[aspect-ratio:603/470]" style={{ flex: "603 603 0%" }}>
-              <IndustryCard card={utilities} />
+              {utilities && <IndustryCard card={utilities} />}
             </div>
             <div className="sm:[aspect-ratio:665/470]" style={{ flex: "665 665 0%" }}>
-              <IndustryCard card={facilities} />
+              {facilities && <IndustryCard card={facilities} />}
             </div>
           </div>
 

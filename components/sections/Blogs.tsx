@@ -6,7 +6,25 @@ import { useState } from "react";
 import Reveal from "@/components/ui/Reveal";
 import GlareButton from "@/components/ui/GlareButton";
 
-const BLOGS = [
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface BlogItem {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  category?: string;
+  published_at?: string;
+  featured_image_url?: string | null;
+}
+
+interface BlogsProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsPosts?: BlogItem[];
+}
+
+// ─── Hardcoded fallback posts ─────────────────────────────────────────────────
+const FALLBACK_BLOGS = [
   {
     img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
     category: "Risk & Analytics",
@@ -41,8 +59,42 @@ const BLOGS = [
   },
 ];
 
+// Category-to-placeholder image mapping
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Analytics":             "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+  "Operations":            "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=80",
+  "Compliance":            "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+  "Risk & Analytics":      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+  "Contractor Management": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+};
+
+const DEFAULT_IMG = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80";
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return iso;
+  }
+}
+
+// Normalise CMS items into the display shape
+function normalisePosts(cmsPosts: BlogItem[]) {
+  return cmsPosts.map((post, i) => ({
+    img:      post.featured_image_url
+                || CATEGORY_IMAGES[post.category || ""]
+                || FALLBACK_BLOGS[i % FALLBACK_BLOGS.length]?.img
+                || DEFAULT_IMG,
+    category: post.category || "EHS",
+    title:    post.title,
+    href:     `/blog/${post.slug}`,
+    readTime: "",   // not provided by blog_highlights block
+    date:     post.published_at ? formatDate(post.published_at) : "",
+  }));
+}
+
 /* ── Individual card — full-bleed image with overlay content ── */
-function BlogCard({ blog }: { blog: typeof BLOGS[0] }) {
+function BlogCard({ blog }: { blog: typeof FALLBACK_BLOGS[0] }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -88,11 +140,13 @@ function BlogCard({ blog }: { blog: typeof BLOGS[0] }) {
       {/* Bottom content */}
       <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-4 pt-6 flex flex-col gap-2">
         {/* Date + read time */}
-        <p className="font-[family-name:var(--font-dm-sans)] text-[10.5px] text-white/60">
-          {blog.date}
-          <span className="mx-1.5 text-white/30">•</span>
-          {blog.readTime}
-        </p>
+        {(blog.date || blog.readTime) && (
+          <p className="font-[family-name:var(--font-dm-sans)] text-[10.5px] text-white/60">
+            {blog.date}
+            {blog.date && blog.readTime && <span className="mx-1.5 text-white/30">•</span>}
+            {blog.readTime}
+          </p>
+        )}
 
         {/* Title */}
         <h3
@@ -127,7 +181,20 @@ function BlogCard({ blog }: { blog: typeof BLOGS[0] }) {
 }
 
 /* ── Section ── */
-export default function Blogs() {
+export default function Blogs({ cmsHeading, cmsPosts }: BlogsProps) {
+  const heading = cmsHeading || "From the EHSWatch Blog";
+
+  // Use CMS posts if we have them; otherwise fallback
+  const displayBlogs =
+    cmsPosts && cmsPosts.length > 0
+      ? normalisePosts(cmsPosts)
+      : FALLBACK_BLOGS;
+
+  // Split heading for blue highlight on "EHSWatch Blog" portion
+  const [headingStart, headingHighlight] = heading.includes("EHSWatch")
+    ? [heading.split("EHSWatch")[0], "EHSWatch" + heading.split("EHSWatch")[1]]
+    : [heading, ""];
+
   return (
     <section className="bg-[#f8fbff] py-14 md:py-[90px] px-4 md:px-6">
       <div className="max-w-[1200px] mx-auto">
@@ -136,15 +203,17 @@ export default function Blogs() {
         <Reveal variant="fade-up" duration={700}>
           <div className="text-center mb-10 md:mb-12">
             <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-[1.1] text-[#0f1728]">
-              From the{" "}
-              <span className="text-[#155eef]">EHSWatch</span> Blog
+              {headingStart}
+              {headingHighlight && (
+                <span className="text-[#155eef]">{headingHighlight}</span>
+              )}
             </h2>
           </div>
         </Reveal>
 
         {/* 4-column card grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-          {BLOGS.map((blog, i) => (
+          {displayBlogs.map((blog, i) => (
             <Reveal key={blog.title + i} variant="soft-up" delay={i * 90} duration={800}>
               <BlogCard blog={blog} />
             </Reveal>

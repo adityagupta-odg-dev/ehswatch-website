@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 
-const FALLBACK_FAQS = [
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+const DEFAULT_FAQS: FaqItem[] = [
   {
     question: "Are there hidden fees or setup costs?",
     answer: "No hidden fees. Pricing is based only on the applications you choose, with unlimited users included.",
@@ -21,22 +26,16 @@ const FALLBACK_FAQS = [
   },
 ];
 
-interface FaqItem {
-  question: string;
-  answer: string;
-}
-
 interface PricingFAQProps {
-  cmsHeading?: string;
-  cmsSubheading?: string;
-  cmsItems?: FaqItem[];
+  heading?: string;
+  items?: FaqItem[];
 }
 
 export default function PricingFAQ({
-  cmsHeading,
-  cmsSubheading,
-  cmsItems,
+  heading = "Frequently Asked Questions",
+  items,
 }: PricingFAQProps = {}) {
+  const faqs = items && items.length > 0 ? items : DEFAULT_FAQS;
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const faqs = cmsItems && cmsItems.length > 0 ? cmsItems : FALLBACK_FAQS;
 
@@ -45,7 +44,7 @@ export default function PricingFAQ({
       <div className="max-w-[760px] mx-auto flex flex-col gap-8">
         <div className="text-center">
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[32px] md:text-[38px] leading-tight tracking-[-0.025em] text-[#0a0f1e]">
-            {cmsHeading ?? "Frequently Asked Questions"}
+            {heading}
           </h2>
           {cmsSubheading && (
             <p className="font-[family-name:var(--font-dm-sans)] text-[15px] text-[#6b7280] mt-3 text-pretty">

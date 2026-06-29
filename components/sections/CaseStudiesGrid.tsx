@@ -3,57 +3,54 @@
 import React, { useState } from "react";
 import type { CmsCaseStudy } from "@/lib/types";
 
-const UNSPLASH = "https://images.unsplash.com";
-
 /* ═══════════════════════════════════════════════════════
-   DATA
+   TYPES
 ═══════════════════════════════════════════════════════ */
 interface Card {
   slug: string;
   title: string;
   body: string;
-  img: string;
+  img: string | null;
 }
+
+/* ═══════════════════════════════════════════════════════
+   FALLBACK DATA
+═══════════════════════════════════════════════════════ */
+const UNSPLASH = "https://images.unsplash.com";
 
 const FALLBACK_CARDS: Card[] = [
   {
     slug: "construction",
     title: "42% faster incident reporting across 18 active construction sites.",
     body: "Al Masood Infrastructure replaced paper forms and email chains with EHSWatch. Safety managers now receive incident reports in minutes — not days — across every site, every shift.",
-    // Safety officer with hard hat and clipboard on construction site
     img: UNSPLASH + "/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=700&h=400&q=75",
   },
   {
     slug: "oil-gas",
     title: "Zero missed permit closures across a multi-rig offshore operation.",
     body: "Gulf Energy Services digitised their entire permit-to-work workflow. Every permit is now issued, tracked, and formally closed in real time — with no slippage, no paper, no gaps.",
-    // Workers in PPE at industrial oil/gas facility
     img: UNSPLASH + "/photo-1548337138-e87d889cc369?auto=format&fit=crop&w=700&h=400&q=75",
   },
   {
     slug: "utilities",
     title: "Full site risk visibility achieved in under 8 weeks.",
     body: "National Grid Services deployed EHSWatch enterprise-wide across multiple regions in eight weeks, giving leadership a live risk dashboard across every field team and open action.",
-    // Utility / electrical workers on site
     img: UNSPLASH + "/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&h=400&q=75",
   },
   {
     slug: "manufacturing",
     title: "Audit cycles cut by 60% — and the team is audit-ready every day.",
     body: "Apex Industrial Group moved from weeks of manual prep to on-demand compliance. Inspection checklists, corrective actions, and audit records are all captured digitally and available instantly.",
-    // Safety audit / inspector with clipboard in factory
     img: UNSPLASH + "/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=700&h=400&q=75",
   },
 ];
 
-/** Map a CMS case study item to the internal Card shape. */
-function cmsToCard(item: CmsCaseStudy): Card {
-  const a = item.attributes;
+function cmsToCard(cs: CmsCaseStudy): Card {
   return {
-    slug: a.slug,
-    title: a.title,
-    body: a.summary ?? "",
-    img: a.cover?.url ?? UNSPLASH + "/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=700&h=400&q=75",
+    slug: cs.attributes.slug,
+    title: cs.attributes.title,
+    body: cs.attributes.summary || "",
+    img: cs.attributes.cover?.url ?? null,
   };
 }
 
@@ -77,7 +74,9 @@ function KnowMore({ hovered }: { hovered: boolean }) {
 /* ═══════════════════════════════════════════════════════
    WIDE CARD
 ═══════════════════════════════════════════════════════ */
-function WideCard({ card }: { card: Card }) {
+const PLACEHOLDER_COLORS = ["#EFF6FF", "#DBEAFE", "#E0F2FE", "#F0FDF4"];
+
+function WideCard({ card, index }: { card: Card; index: number }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
@@ -111,21 +110,41 @@ function WideCard({ card }: { card: Card }) {
       </div>
 
       {/* Image */}
-      <div className="flex-1 overflow-hidden" style={{ minHeight: 220, maxHeight: 280 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={card.img}
-          alt={card.title}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-            transform: hovered ? "scale(1.04)" : "scale(1)",
-            transition: "transform 0.5s ease",
-          }}
-        />
+      <div
+        className="flex-1 overflow-hidden"
+        style={{
+          minHeight: 220,
+          maxHeight: 280,
+          background: card.img ? undefined : PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length],
+        }}
+      >
+        {card.img ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={card.img}
+            alt={card.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+              transform: hovered ? "scale(1.04)" : "scale(1)",
+              transition: "transform 0.5s ease",
+            }}
+          />
+        ) : (
+          <div
+            style={{ width: "100%", height: "100%", minHeight: 220 }}
+            className="flex items-center justify-center"
+          >
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" opacity="0.25">
+              <rect x="6" y="10" width="36" height="28" rx="4" stroke="#1d4ed8" strokeWidth="2"/>
+              <circle cx="17" cy="20" r="4" stroke="#1d4ed8" strokeWidth="2"/>
+              <path d="M6 32l10-8 8 6 6-5 12 9" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        )}
       </div>
     </a>
   );
@@ -134,7 +153,7 @@ function WideCard({ card }: { card: Card }) {
 /* ═══════════════════════════════════════════════════════
    SQUARE CARD
 ═══════════════════════════════════════════════════════ */
-function SquareCard({ card }: { card: Card }) {
+function SquareCard({ card, index }: { card: Card; index: number }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
@@ -150,21 +169,37 @@ function SquareCard({ card }: { card: Card }) {
       onMouseLeave={() => setHovered(false)}
     >
       {/* Image */}
-      <div className="overflow-hidden flex-shrink-0" style={{ height: 180 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={card.img}
-          alt={card.title}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-            transform: hovered ? "scale(1.04)" : "scale(1)",
-            transition: "transform 0.5s ease",
-          }}
-        />
+      <div
+        className="overflow-hidden flex-shrink-0"
+        style={{
+          height: 180,
+          background: card.img ? undefined : PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length],
+        }}
+      >
+        {card.img ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={card.img}
+            alt={card.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+              transform: hovered ? "scale(1.04)" : "scale(1)",
+              transition: "transform 0.5s ease",
+            }}
+          />
+        ) : (
+          <div style={{ width: "100%", height: "100%" }} className="flex items-center justify-center">
+            <svg width="40" height="40" viewBox="0 0 48 48" fill="none" opacity="0.25">
+              <rect x="6" y="10" width="36" height="28" rx="4" stroke="#1d4ed8" strokeWidth="2"/>
+              <circle cx="17" cy="20" r="4" stroke="#1d4ed8" strokeWidth="2"/>
+              <path d="M6 32l10-8 8 6 6-5 12 9" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* Text */}
@@ -192,54 +227,41 @@ function SquareCard({ card }: { card: Card }) {
    SECTION
 ═══════════════════════════════════════════════════════ */
 interface CaseStudiesGridProps {
-  /** Live case study items from the CMS /case-studies endpoint.
-   *  When omitted the component renders the built-in fallback cards. */
-  cmsItems?: CmsCaseStudy[];
+  cmsStudies?: CmsCaseStudy[];
 }
 
-export default function CaseStudiesGrid({ cmsItems }: CaseStudiesGridProps = {}) {
-  // Map CMS items to internal Card shape; fall back to hardcoded data.
+export default function CaseStudiesGrid({ cmsStudies }: CaseStudiesGridProps) {
   const cards: Card[] =
-    cmsItems && cmsItems.length > 0
-      ? cmsItems.map(cmsToCard)
+    cmsStudies && cmsStudies.length > 0
+      ? cmsStudies.map(cmsToCard)
       : FALLBACK_CARDS;
 
-  // Layout: first card wide, next pair side-by-side, remaining cards alternate
-  // wide / square-pair to handle any number of items from the CMS.
-  const [first, ...rest] = cards;
-  const pairs: Card[][] = [];
-  const wideExtra: Card[] = [];
-
-  for (let i = 0; i < rest.length; i += 3) {
-    const chunk = rest.slice(i, i + 3);
-    if (chunk.length === 1) {
-      // Single remaining card — render wide
-      wideExtra.push(chunk[0]);
-    } else {
-      // Two square cards + optional third wide
-      pairs.push(chunk);
-    }
-  }
+  // Layout: first card wide, middle pair square, rest wide; last 2 in another pair
+  const [first, second, third, ...rest] = cards;
 
   return (
     <section id="case-studies" className="pt-10 pb-16 px-5 md:px-8 lg:px-12" style={{ background: "#FFFFFF" }}>
       <div className="max-w-[1200px] mx-auto flex flex-col gap-4">
 
-        {first && <WideCard card={first} />}
+        {first && <WideCard card={first} index={0} />}
 
-        {pairs.map((chunk, idx) => (
-          <React.Fragment key={idx}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SquareCard card={chunk[0]} />
-              {chunk[1] && <SquareCard card={chunk[1]} />}
+        {(second || third) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {second && <SquareCard card={second} index={1} />}
+            {third && <SquareCard card={third} index={2} />}
+          </div>
+        )}
+
+        {rest.map((card, i) =>
+          i % 3 === 0 ? (
+            <WideCard key={card.slug} card={card} index={i + 3} />
+          ) : (
+            <div key={card.slug} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SquareCard card={card} index={i + 3} />
+              {rest[i + 1] && <SquareCard card={rest[i + 1]} index={i + 4} />}
             </div>
-            {chunk[2] && <WideCard card={chunk[2]} />}
-          </React.Fragment>
-        ))}
-
-        {wideExtra.map((card) => (
-          <WideCard key={card.slug} card={card} />
-        ))}
+          )
+        )}
 
         {/* View more */}
         <div className="flex justify-center pt-4">
@@ -247,12 +269,8 @@ export default function CaseStudiesGrid({ cmsItems }: CaseStudiesGridProps = {})
             href="#"
             className="inline-flex items-center gap-2 font-[family-name:var(--font-dm-sans)] text-[14px] font-semibold px-7 py-[11px] rounded-full border transition-colors"
             style={{ color: "#111827", borderColor: "#E5E7EB" }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "#111827";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "#E5E7EB";
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#111827"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#E5E7EB"; }}
           >
             View more case studies
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none">

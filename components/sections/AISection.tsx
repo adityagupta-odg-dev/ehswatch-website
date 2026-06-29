@@ -38,6 +38,13 @@ const CHAT = [
 const LOOP_RESET = 9500;
 const MAX_VISIBLE = 3;
 
+interface AISectionProps {
+  cmsHeading?: string;
+  cmsBody?: string;
+  cmsCtaLabel?: string;
+  cmsCtaUrl?: string;
+}
+
 // ─── IRIS Chat widget ─────────────────────────────────────────────────────────
 function IrisChat({ active }: { active: boolean }) {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -177,8 +184,27 @@ function IrisChat({ active }: { active: boolean }) {
   );
 }
 
+// ─── Fallback feature bullets ─────────────────────────────────────────────────
+const FALLBACK_FEATURES = [
+  { label: "AI-Driven Incident Intelligence", color: "#155eef" },
+  { label: "Predictive Risk Intelligence",   color: "#7c3aed" },
+  { label: "Vision-Based Hazard Detection",  color: "#0891b2" },
+  { label: "Smart Workflow Automation",      color: "#f97316" },
+];
+
+// ─── Parse <li><strong>X</strong> — rest</li> from CMS body HTML ─────────────
+function parseFeatures(html: string): Array<{ label: string; color: string }> {
+  const colors = ["#155eef", "#7c3aed", "#0891b2", "#f97316"];
+  const liMatches = html.match(/<li>[\s\S]*?<\/li>/g) || [];
+  return liMatches.slice(0, 4).map((li, i) => {
+    const strongMatch = li.match(/<strong>(.*?)<\/strong>/);
+    const label = strongMatch ? strongMatch[1] : li.replace(/<[^>]+>/g, "").trim();
+    return { label, color: colors[i % colors.length] };
+  });
+}
+
 // ─── Section ──────────────────────────────────────────────────────────────────
-export default function AISection() {
+export default function AISection({ cmsHeading, cmsBody, cmsCtaLabel, cmsCtaUrl }: AISectionProps) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.15 });
   const [active, setActive] = useState(false);
 
@@ -196,6 +222,24 @@ export default function AISection() {
     };
   }, [inView]);
 
+  // Heading
+  const headingText = cmsHeading || "AI That Works for Your Safety Team";
+
+  // Features from CMS body or fallback
+  const features = (cmsBody && cmsBody.includes("<li>"))
+    ? parseFeatures(cmsBody)
+    : FALLBACK_FEATURES;
+  if (features.length === 0) features.push(...FALLBACK_FEATURES);
+
+  // Intro paragraph: first <p> tag content from CMS body, or fallback
+  const introMatch = cmsBody ? cmsBody.match(/<p>(.*?)<\/p>/) : null;
+  const introParagraph = introMatch
+    ? introMatch[1].replace(/<[^>]+>/g, "")
+    : "Leverage IRIS, our built-in Intelligent Risk & Insight System, to transform raw data into proactive safety leadership. IRIS automates the heavy lifting of data analysis, allowing your team to focus on intervention rather than administration.";
+
+  const ctaLabel = cmsCtaLabel || "Explore AI Modules →";
+  const ctaUrl   = cmsCtaUrl   || "#";
+
   return (
     <section ref={ref} className="bg-white py-12 md:py-[80px] px-4 md:px-6 overflow-hidden">
       <div className="max-w-[1100px] mx-auto">
@@ -205,19 +249,21 @@ export default function AISection() {
           <Reveal variant="slide-right" duration={750} className="flex flex-col gap-4 md:gap-[18px] w-full md:max-w-[480px] min-w-0">
             <div className="flex flex-col gap-4 md:gap-[18px]">
             <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[40px] lg:text-[46px] leading-tight md:leading-[1.3] text-[#1b1b1b]">
-              AI That Works for<br />
-              Your <span className="text-[#155eef]">Safety Team</span>
+              {headingText.includes("Safety Team") ? (
+                <>
+                  {headingText.split("Safety Team")[0]}
+                  <span className="text-[#155eef]">Safety Team</span>
+                  {headingText.split("Safety Team")[1]}
+                </>
+              ) : (
+                headingText
+              )}
             </h2>
             <p className="font-[family-name:var(--font-dm-sans)] text-[14px] md:text-[16px] lg:text-[17px] leading-relaxed text-[#727272] tracking-[-0.18px]">
-              Leverage IRIS, our built-in Intelligent Risk &amp; Insight System, to transform raw data into proactive safety leadership. IRIS automates the heavy lifting of data analysis, allowing your team to focus on intervention rather than administration.
+              {introParagraph}
             </p>
             <div className="grid grid-cols-2 gap-x-5 gap-y-3 mt-2">
-              {[
-                { label: "AI-Driven Incident Intelligence", color: "#155eef" },
-                { label: "Predictive Risk Intelligence",   color: "#7c3aed" },
-                { label: "Vision-Based Hazard Detection",  color: "#0891b2" },
-                { label: "Smart Workflow Automation",      color: "#f97316" },
-              ].map(({ label, color }) => (
+              {features.map(({ label, color }) => (
                 <div key={label} className="flex items-start gap-2.5">
                   <span
                     className="shrink-0 rounded-full mt-[5px]"
@@ -230,10 +276,10 @@ export default function AISection() {
               ))}
             </div>
             <a
-              href="#"
+              href={ctaUrl}
               className="self-start mt-1 font-[family-name:var(--font-dm-sans)] text-[13px] md:text-[14px] font-semibold text-[#f97316] hover:text-[#ea6c00] transition-colors"
             >
-              Explore AI Modules →
+              {ctaLabel}
             </a>
             </div>
           </Reveal>
