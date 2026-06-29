@@ -3,17 +3,10 @@ import { basePath } from "@/lib/basePath";
 import GlareButton from "@/components/ui/GlareButton";
 
 interface CTABannerProps {
-<<<<<<< HEAD
-  cmsHeadline?: string
-  cmsSubhead?: string
-  cmsPrimaryCta?: { label: string; url: string }
-  cmsSecondaryCta?: { label: string; url: string }
-=======
   cmsHeadline?: string;
   cmsSubhead?: string;
   cmsPrimaryCta?: { label: string; url: string };
   cmsSecondaryCta?: { label: string; url: string };
->>>>>>> server/feature/iris-scroll-fix
 }
 
 export default function CTABanner({
@@ -22,21 +15,12 @@ export default function CTABanner({
   cmsPrimaryCta,
   cmsSecondaryCta,
 }: CTABannerProps = {}) {
-<<<<<<< HEAD
-  const headline = cmsHeadline ?? "Ready to See EHSWatch in Action?"
-  const subhead = cmsSubhead ?? "Give your teams a simple way to report, respond, and prevent incidents — all from one platform."
-  const primaryLabel = cmsPrimaryCta?.label ?? "Book Your Free Demo"
-  const primaryHref = cmsPrimaryCta?.url ?? "#"
-  const secondaryLabel = cmsSecondaryCta?.label ?? "View Pricing"
-  const secondaryHref = cmsSecondaryCta?.url ?? "#"
-=======
   const headline = cmsHeadline || "Ready to See EHSWatch in Action?";
   const subhead = cmsSubhead || "Give your teams a simple way to report, respond, and prevent incidents — all from one platform.";
   const primaryLabel = cmsPrimaryCta?.label || "Book Your Free Demo";
   const primaryHref = cmsPrimaryCta?.url || "#";
   const secondaryLabel = cmsSecondaryCta?.label || "View Pricing";
   const secondaryHref = cmsSecondaryCta?.url || "#";
->>>>>>> server/feature/iris-scroll-fix
 
   return (
     <section
