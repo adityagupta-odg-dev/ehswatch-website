@@ -19,8 +19,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/solutions", destination: "/industries", permanent: true },
       { source: "/solutions/", destination: "/industries/", permanent: true },
-      { source: "/solutions-v2", destination: "/industries", permanent: true },
-      { source: "/solutions-v2/", destination: "/industries/", permanent: true },
     ];
   },
   images: {

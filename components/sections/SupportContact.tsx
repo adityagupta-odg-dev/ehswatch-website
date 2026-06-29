@@ -41,6 +41,26 @@ const CONTACT_INFO = [
 /* ── Contact support form ── */
 function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    setSubmitting(true);
+    try {
+      const { submitForm } = await import("@/lib/api");
+      await submitForm("support", {
+        name: fd.get("name"),
+        email: fd.get("email"),
+        company: fd.get("company"),
+        topic: fd.get("topic"),
+        message: fd.get("message"),
+      });
+    } finally {
+      setSubmitting(false);
+      setSubmitted(true);
+    }
+  };
 
   if (submitted) {
     return (
@@ -62,25 +82,25 @@ function ContactForm() {
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Full Name <span className="text-[#e53e3e]">*</span></label>
-          <input required type="text" placeholder="Jane Smith" className={inputClass} />
+          <input required name="name" type="text" placeholder="Jane Smith" className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Email Address <span className="text-[#e53e3e]">*</span></label>
-          <input required type="email" placeholder="jane@company.com" className={inputClass} />
+          <input required name="email" type="email" placeholder="jane@company.com" className={inputClass} />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Company</label>
-          <input type="text" placeholder="Acme Corp" className={inputClass} />
+          <input name="company" type="text" placeholder="Acme Corp" className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Topic <span className="text-[#e53e3e]">*</span></label>
-          <select required defaultValue="" className={inputClass}>
+          <select required name="topic" defaultValue="" className={inputClass}>
             <option value="" disabled>Select a topic</option>
             <option>Technical Issue</option>
             <option>Billing & Pricing</option>
@@ -92,12 +112,12 @@ function ContactForm() {
       </div>
       <div className="flex flex-col gap-1.5">
         <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Message <span className="text-[#e53e3e]">*</span></label>
-        <textarea required rows={5} placeholder="Describe your issue or question in detail…" className={inputClass + " resize-none"} />
+        <textarea required name="message" rows={5} placeholder="Describe your issue or question in detail…" className={inputClass + " resize-none"} />
       </div>
       <div className="pt-1">
-        <GlareButton fillColor="#FFA660" hoverTextColor="#ffffff" type="submit" className="inline-flex items-center gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-[#ff7812] border border-[#ff7812] bg-transparent cursor-pointer">
-          Send Message
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#ff7812" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <GlareButton fillColor="#FFA660" hoverTextColor="#ffffff" type="submit" className="inline-flex items-center gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-[#ff7812] border border-[#ff7812] bg-transparent cursor-pointer" style={{ opacity: submitting ? 0.7 : 1 }}>
+          {submitting ? "Sending…" : "Send Message"}
+          {!submitting && <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#ff7812" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         </GlareButton>
       </div>
     </form>

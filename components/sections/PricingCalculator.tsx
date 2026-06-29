@@ -148,7 +148,21 @@ export default function PricingCalculator() {
     return true;
   };
 
-  const onSubmit = (_data: ProposalData) => setSubmitted(true);
+  const onSubmit = async (data: ProposalData) => {
+    try {
+      const { submitForm } = await import("@/lib/api");
+      await submitForm("contact", {
+        ...data,
+        selected_apps: Array.from(selectedApps),
+        selected_addons: Array.from(selectedAddons),
+        employees: org.employees,
+        sites: org.sites,
+        industry: org.industry,
+      });
+    } finally {
+      setSubmitted(true);
+    }
+  };
 
   return (
     <section id="calculator" className="py-[70px] md:py-[90px] px-4 md:px-6 bg-white">

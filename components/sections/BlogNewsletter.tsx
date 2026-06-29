@@ -11,10 +11,15 @@ export default function BlogNewsletter() {
   const [submitted, setSubmitted] = useState(false);
   const [hovered,   setHovered]   = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setSubmitted(true);
+    try {
+      const { submitForm } = await import("@/lib/api");
+      await submitForm("newsletter", { email });
+    } finally {
+      setSubmitted(true);
+    }
   };
 
   return (
