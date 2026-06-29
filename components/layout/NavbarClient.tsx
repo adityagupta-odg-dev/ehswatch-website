@@ -246,7 +246,7 @@ export default function NavbarClient({
                   {/* caret */}
                   <div className="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-[#f0f2f5] rotate-45" />
                   <div className="grid grid-cols-2 gap-3">
-                    {((link as any).children ?? RESOURCES_ITEMS).map((item) => (
+                    {((link as any).children ?? RESOURCES_ITEMS).map((item: { label: string; href: string; desc?: string; img?: string }) => (
                       <Link
                         key={item.label}
                         href={item.href}
@@ -384,7 +384,7 @@ export default function NavbarClient({
               </button>
               {resourcesOpen && (
                 <div className="pl-4 flex flex-col gap-0.5 mt-1">
-                  {((link as any).children ?? RESOURCES_ITEMS).map((item) => (
+                  {((link as any).children ?? RESOURCES_ITEMS).map((item: { label: string; href: string; desc?: string; img?: string }) => (
                     <Link key={item.label} href={item.href} onClick={() => { setOpen(false); setResourcesOpen(false); }}
                       className="px-4 py-2.5 text-[13.5px] font-medium text-[#64748b] rounded-lg hover:bg-gray-50 hover:text-[#155eef] font-[family-name:var(--font-dm-sans)]">
                       {item.label}
