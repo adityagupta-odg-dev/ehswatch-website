@@ -1,3 +1,4 @@
+import { getFooter } from "@/lib/api";
 import Link from "next/link";
 import { basePath } from "@/lib/basePath";
 
@@ -34,7 +35,28 @@ const MODULES_COL2: { label: string; href: string }[] = [
   { label: "Training Management",  href: "/product" },
 ];
 
-export default function Footer() {
+export default async function Footer() {
+  const footer = await getFooter();
+  const attrs = footer?.data?.attributes;
+
+  const tagline     = attrs?.brand?.tagline || "AI-powered EHS platform helping teams stay safe, compliant, and in control.";
+  const copyright   = attrs?.bottom?.copyright_text || "© 2026 EHSWatch. All rights reserved.";
+  const legalLinks  = (attrs?.bottom?.legal_links ?? []) as { label: string; url: string }[];
+  const ctaEyebrow  = attrs?.cta?.eyebrow  || "GET STARTED";
+  const ctaHeadline = attrs?.cta?.headline || "See how EHSWatch transforms safety management across your organisation.";
+  const ctaPrimaryLabel = attrs?.cta?.primary?.label || "Book a Demo";
+  const ctaPrimaryHref  = attrs?.cta?.primary?.url   || "#";
+
+  const columns = (attrs?.columns ?? []) as { heading: string; links: { label: string; url: string }[] }[];
+  const companyCol = columns.find((c) => c.heading?.toLowerCase().includes("company"));
+  const modulesCol = columns.find((c) => c.heading?.toLowerCase().includes("module"));
+
+  const companyLinks = companyCol?.links ?? COMPANY.map(l => ({ label: l.label, url: l.href }));
+  const allModules   = modulesCol?.links ?? [...MODULES_COL1, ...MODULES_COL2].map(l => ({ label: l.label, url: l.href }));
+  const mid          = Math.ceil(allModules.length / 2);
+  const modCol1      = allModules.slice(0, mid);
+  const modCol2      = allModules.slice(mid);
+
   return (
     <footer className="bg-[#0a1628] flex flex-col items-center pt-12 md:pt-[72px] relative isolate overflow-hidden">
 
@@ -48,7 +70,7 @@ export default function Footer() {
             <img src={imgEhsWatch} alt="EHSWatch" className="h-full w-auto object-contain" />
           </div>
           <p className="font-[family-name:var(--font-inter)] text-[13px] md:text-[14px] leading-relaxed md:leading-[24.5px] text-[rgba(255,255,255,0.6)] max-w-[240px]">
-            AI-powered EHS platform helping teams stay safe, compliant, and in control.
+            {tagline}
           </p>
           <div className="flex gap-[10px] pt-2 md:pt-[10px]">
             <Link href="#" className="w-[30px] h-[30px] rounded-full border border-[rgba(255,255,255,0.8)] flex items-center justify-center hover:bg-white/10 transition-colors">
@@ -77,10 +99,10 @@ export default function Footer() {
             COMPANY
           </p>
           <ul className="grid grid-cols-2 md:grid-cols-1 gap-x-6 gap-y-2 md:gap-[12px] w-full">
-            {COMPANY.map((link) => (
+            {companyLinks.map((link) => (
               <li key={link.label}>
                 <Link
-                  href={link.href}
+                  href={link.url || "#"}
                   className="font-[family-name:var(--font-inter)] text-[13px] md:text-[14px] text-white/70 hover:text-white transition-colors"
                 >
                   {link.label}
@@ -97,10 +119,10 @@ export default function Footer() {
           </p>
           <div className="grid grid-cols-2 gap-x-5 gap-y-[10px] w-full">
             <ul className="flex flex-col gap-[10px]">
-              {MODULES_COL1.map((mod) => (
+              {modCol1.map((mod) => (
                 <li key={mod.label}>
                   <Link
-                    href={mod.href}
+                    href={(mod as any).url || mod.href || "#"}
                     className="font-[family-name:var(--font-inter)] text-[12.5px] text-white/60 hover:text-white transition-colors leading-snug"
                   >
                     {mod.label}
@@ -109,10 +131,10 @@ export default function Footer() {
               ))}
             </ul>
             <ul className="flex flex-col gap-[10px]">
-              {MODULES_COL2.map((mod) => (
+              {modCol2.map((mod) => (
                 <li key={mod.label}>
                   <Link
-                    href={mod.href}
+                    href={(mod as any).url || mod.href || "#"}
                     className="font-[family-name:var(--font-inter)] text-[12.5px] text-white/60 hover:text-white transition-colors leading-snug"
                   >
                     {mod.label}
@@ -126,16 +148,16 @@ export default function Footer() {
         {/* ── CTA column ── */}
         <div className="flex flex-col items-start">
           <p className="font-[family-name:var(--font-inter)] font-semibold text-[11px] text-white tracking-[0.99px] uppercase mb-3 md:mb-[14px]">
-            GET STARTED
+            {ctaEyebrow}
           </p>
           <p className="font-[family-name:var(--font-inter)] font-medium text-[14px] md:text-[15px] leading-relaxed md:leading-[24px] text-[rgba(255,255,255,0.72)] max-w-[240px] mb-4 md:mb-[20px]">
-            See how EHSWatch transforms safety management across your organisation.
+            {ctaHeadline}
           </p>
           <Link
-            href="#"
+            href={ctaPrimaryHref}
             className="bg-white px-5 md:px-[24px] py-2.5 md:py-[12px] rounded-full font-[family-name:var(--font-inter)] font-medium text-[13px] md:text-[13.5px] text-[#071828] hover:bg-gray-100 transition-colors"
           >
-            Book a Demo →
+            {ctaPrimaryLabel} →
           </Link>
         </div>
 
@@ -153,7 +175,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-[rgba(255,255,255,0.06)] flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 pb-6 md:pb-[28px] pt-5 md:pt-[21px] w-full max-w-[1216px] px-6 md:px-8 z-[1]">
         <p className="font-[family-name:var(--font-inter)] text-[11px] md:text-[12px] text-[rgba(255,255,255,0.3)] text-center">
-          © 2026 EHSWatch. All rights reserved.
+          {copyright}
         </p>
         <div className="flex gap-4 md:gap-[20px] items-center flex-wrap justify-center">
           {["Privacy Policy", "Terms of Service", "Cookie Settings"].map((label) => (
