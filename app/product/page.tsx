@@ -9,7 +9,6 @@ import CTABanner from "@/components/sections/CTABanner";
 import { getPage } from "@/lib/api";
 import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
 import type { Metadata } from "next";
-import type { StatsItem } from "@/components/sections/Stats";
 
 export const dynamic = "force-dynamic";
 
