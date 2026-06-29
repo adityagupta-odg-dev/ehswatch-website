@@ -37,7 +37,6 @@ export default function PricingFAQ({
 }: PricingFAQProps = {}) {
   const faqs = items && items.length > 0 ? items : DEFAULT_FAQS;
   const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const faqs = cmsItems && cmsItems.length > 0 ? cmsItems : FALLBACK_FAQS;
 
   return (
     <section className="py-[60px] md:py-[80px] px-4 md:px-6 bg-white">
@@ -46,11 +45,6 @@ export default function PricingFAQ({
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[32px] md:text-[38px] leading-tight tracking-[-0.025em] text-[#0a0f1e]">
             {heading}
           </h2>
-          {cmsSubheading && (
-            <p className="font-[family-name:var(--font-dm-sans)] text-[15px] text-[#6b7280] mt-3 text-pretty">
-              {cmsSubheading}
-            </p>
-          )}
         </div>
         <div className="flex flex-col divide-y divide-[#e5eaf2]">
           {faqs.map((faq, i) => (

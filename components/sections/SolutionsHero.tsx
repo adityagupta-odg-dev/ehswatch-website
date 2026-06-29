@@ -1,40 +1,6 @@
 "use client";
 
 import GlareButton from "@/components/ui/GlareButton";
-import { ctaHref } from "@/lib/blocks";
-
-interface HeroBlock {
-  heading?: string;
-  subheading?: string;
-  eyebrow?: string;
-  primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-  secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-}
-
-// Hardcoded fallbacks
-const FALLBACK_HEADING = (
-  <>
-    Every Industry Has Different Risks.{" "}
-    <span style={{ color: "#1d4ed8" }}>Your EHS Platform Should Know the Difference.</span>
-  </>
-);
-const FALLBACK_PRIMARY_LABEL  = "Book a Demo";
-const FALLBACK_SECONDARY_LABEL = "Explore Industries";
-const FALLBACK_SECONDARY_HREF  = "#industries";
-
-export default function SolutionsHero({ heroBlock }: { heroBlock?: Record<string, unknown> | null }) {
-  const block = heroBlock as HeroBlock | null | undefined;
-
-  const primaryLabel   = block?.primary_cta?.label   ?? FALLBACK_PRIMARY_LABEL;
-  const primaryHref    = block?.primary_cta           ? ctaHref(block.primary_cta as Parameters<typeof ctaHref>[0]) : "#";
-  const secondaryLabel = block?.secondary_cta?.label  ?? FALLBACK_SECONDARY_LABEL;
-  const secondaryHref  = block?.secondary_cta         ? ctaHref(block.secondary_cta as Parameters<typeof ctaHref>[0]) : FALLBACK_SECONDARY_HREF;
-
-  // If CMS supplies a heading, render it as a plain string; otherwise use the
-  // hardcoded JSX with the blue highlight span.
-  const headingNode = block?.heading
-    ? <>{block.heading}</>
-    : FALLBACK_HEADING;
 
 interface SolutionsHeroProps {
   cmsHeadline?: string;
