@@ -45,6 +45,8 @@ interface IrisCmsProps {
   cmsTextCta?: {
     heading?: string;
     subheading?: string;
+    title?: string;
+    description?: string;
     cta?: any;
   };
   cmsProblems?: Array<{ title?: string; description?: string; icon?: string }>;
