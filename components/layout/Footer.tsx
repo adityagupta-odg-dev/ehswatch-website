@@ -122,7 +122,7 @@ export default async function Footer() {
               {modCol1.map((mod) => (
                 <li key={mod.label}>
                   <Link
-                    href={(mod as any).url || mod.href || "#"}
+                    href={(mod as any).url || (mod as any).href || "#"}
                     className="font-[family-name:var(--font-inter)] text-[12.5px] text-white/60 hover:text-white transition-colors leading-snug"
                   >
                     {mod.label}
@@ -134,7 +134,7 @@ export default async function Footer() {
               {modCol2.map((mod) => (
                 <li key={mod.label}>
                   <Link
-                    href={(mod as any).url || mod.href || "#"}
+                    href={(mod as any).url || (mod as any).href || "#"}
                     className="font-[family-name:var(--font-inter)] text-[12.5px] text-white/60 hover:text-white transition-colors leading-snug"
                   >
                     {mod.label}
