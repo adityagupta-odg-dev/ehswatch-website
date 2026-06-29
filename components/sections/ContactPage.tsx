@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import TurnstileField from "@/components/ui/TurnstileField";
 
 /* ── CMS prop types ── */
 export interface ContactOfficeItem {
@@ -76,6 +77,7 @@ export default function ContactPage({
 }: ContactPageProps = {}) {
   const resolvedOfficeItems = officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
   const [submitted, setSubmitted] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const {
     register,
@@ -92,7 +94,10 @@ export default function ContactPage({
 
   const onSubmit = async (data: FormData) => {
     const { submitForm } = await import("@/lib/api");
-    await submitForm("contact", data as unknown as Record<string, unknown>);
+    await submitForm("contact", {
+      ...(data as unknown as Record<string, unknown>),
+      cf_turnstile_response: captchaToken ?? "",
+    });
     setSubmitted(true);
   };
 
@@ -280,11 +285,14 @@ export default function ContactPage({
                   <FieldError message={errors.message?.message} />
                 </div>
 
+                {/* Captcha */}
+                <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
+
                 {/* Submit */}
                 <div>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !captchaToken}
                     className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full font-[family-name:var(--font-dm-sans)] font-semibold text-[14px] text-white transition-all duration-200"
                     style={{
                       backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",

@@ -2,21 +2,23 @@
 
 import { useState } from "react";
 import { basePath } from "@/lib/basePath";
+import TurnstileField from "@/components/ui/TurnstileField";
 
 const DARK = "#1B1B1B";
 const DARK_MID = "rgba(27,27,27,0.8)";
 
 export default function BlogNewsletter() {
-  const [email,     setEmail]     = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [hovered,   setHovered]   = useState(false);
+  const [email,        setEmail]        = useState("");
+  const [submitted,    setSubmitted]    = useState(false);
+  const [hovered,      setHovered]      = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !captchaToken) return;
     try {
       const { submitForm } = await import("@/lib/api");
-      await submitForm("newsletter", { email });
+      await submitForm("newsletter", { email, cf_turnstile_response: captchaToken });
     } finally {
       setSubmitted(true);
     }
@@ -106,9 +108,13 @@ export default function BlogNewsletter() {
                 </p>
               </div>
 
+              {/* Turnstile */}
+              <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
+
               {/* Subscribe button */}
               <button
                 type="submit"
+                disabled={!captchaToken}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 className="shrink-0 flex items-center gap-2 px-6 font-[family-name:var(--font-dm-sans)] font-semibold text-[14px] transition-all duration-200"
@@ -120,6 +126,7 @@ export default function BlogNewsletter() {
                     ? "linear-gradient(102.8deg, #ff8e37 0%, #ff6d00 100%)"
                     : "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
                   color: "#ffffff",
+                  opacity: !captchaToken ? 0.7 : 1,
                 }}
               >
                 Subscribe

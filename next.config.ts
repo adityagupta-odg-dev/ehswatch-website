@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   basePath: BASE_PATH,
   assetPrefix: BASE_PATH,
-  env: { NEXT_PUBLIC_BASE_PATH: BASE_PATH },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: BASE_PATH,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+  },
   experimental: {
     staleTimes: {
       dynamic: 0,

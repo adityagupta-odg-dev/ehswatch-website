@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import TurnstileField from "@/components/ui/TurnstileField";
 import { z } from "zod";
 
 /* ── Proposal form schema ── */
@@ -128,6 +129,7 @@ export default function PricingCalculator() {
   const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set());
   const [org, setOrg] = useState({ employees: "", sites: "", industry: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const {
     register,
@@ -158,6 +160,7 @@ export default function PricingCalculator() {
         employees: org.employees,
         sites: org.sites,
         industry: org.industry,
+        cf_turnstile_response: captchaToken ?? "",
       });
     } finally {
       setSubmitted(true);
@@ -470,15 +473,16 @@ export default function PricingCalculator() {
                       )}
                     </div>
                   ))}
+                  <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !captchaToken}
                     className="mt-2 w-full py-[13px] rounded-full font-[family-name:var(--font-dm-sans)] font-semibold text-[15px] text-white transition-all duration-300"
                     style={{
                       backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
                       boxShadow: "0 4px 20px rgba(249,115,22,0.35)",
-                      opacity: isSubmitting ? 0.7 : 1,
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
+                      opacity: (isSubmitting || !captchaToken) ? 0.7 : 1,
+                      cursor: (isSubmitting || !captchaToken) ? "not-allowed" : "pointer",
                     }}
                   >
                     {isSubmitting ? "Sending..." : "Get My EHSWatch Proposal →"}

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import GlareButton from "@/components/ui/GlareButton";
+import TurnstileField from "@/components/ui/TurnstileField";
 
 /* ── shared input style ── */
 const inputClass =
@@ -42,6 +43,7 @@ const CONTACT_INFO = [
 function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +57,7 @@ function ContactForm() {
         company: fd.get("company"),
         topic: fd.get("topic"),
         message: fd.get("message"),
+        cf_turnstile_response: captchaToken ?? "",
       });
     } finally {
       setSubmitting(false);
@@ -114,8 +117,9 @@ function ContactForm() {
         <label className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold text-[#374151] tracking-wide uppercase">Message <span className="text-[#e53e3e]">*</span></label>
         <textarea required name="message" rows={5} placeholder="Describe your issue or question in detail…" className={inputClass + " resize-none"} />
       </div>
+      <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
       <div className="pt-1">
-        <GlareButton fillColor="#FFA660" hoverTextColor="#ffffff" type="submit" className="inline-flex items-center gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-[#ff7812] border border-[#ff7812] bg-transparent cursor-pointer" style={{ opacity: submitting ? 0.7 : 1 }}>
+        <GlareButton fillColor="#FFA660" hoverTextColor="#ffffff" type="submit" className="inline-flex items-center gap-2 px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-[#ff7812] border border-[#ff7812] bg-transparent cursor-pointer" style={{ opacity: (submitting || !captchaToken) ? 0.7 : 1, pointerEvents: !captchaToken ? "none" : "auto" }}>
           {submitting ? "Sending…" : "Send Message"}
           {!submitting && <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#ff7812" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         </GlareButton>
