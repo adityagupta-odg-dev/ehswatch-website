@@ -12,11 +12,8 @@ import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
 import { findBlock, ctaHref } from "@/lib/blocks";
-<<<<<<< HEAD
-=======
 
 export const dynamic = "force-dynamic";
->>>>>>> server/feature/iris-scroll-fix
 
 export default async function HomePage() {
   const [testimonialsRes, logosRes, homePageRes] = await Promise.all([
@@ -26,33 +23,8 @@ export default async function HomePage() {
   ]);
   const cmsTestimonials = testimonialsRes?.data ?? [];
   const cmsLogos = logosRes?.data ?? [];
-<<<<<<< HEAD
-
   const blocks = homePageRes?.data?.attributes?.content ?? [];
 
-  // hero block
-  const heroBlock = findBlock<{
-    headline?: string;
-    subheadline?: string;
-    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-  }>(blocks, "hero");
-
-  // stats_row block
-  const statsBlock = findBlock<{
-    items?: { value: string; suffix?: string; label: string; icon?: string }[];
-  }>(blocks, "stats_row");
-
-  // pain_points block
-  const painBlock = findBlock<{
-    items?: { label: string; description?: string; icon?: string }[];
-  }>(blocks, "pain_points");
-
-  // cta_banner block
-=======
-  const blocks = homePageRes?.data?.attributes?.content ?? [];
-
->>>>>>> server/feature/iris-scroll-fix
   const ctaBlock = findBlock<{
     headline?: string;
     subheadline?: string;
@@ -64,41 +36,16 @@ export default async function HomePage() {
     <>
       <Navbar lightHero />
       <main>
-        <Hero
-          cmsHeadline={heroBlock?.headline}
-          cmsSubheadline={heroBlock?.subheadline}
-          cmsPrimaryCta={
-            heroBlock?.primary_cta
-              ? { label: heroBlock.primary_cta.label ?? "", url: ctaHref(heroBlock.primary_cta) }
-              : undefined
-          }
-          cmsSecondaryCta={
-            heroBlock?.secondary_cta
-              ? { label: heroBlock.secondary_cta.label ?? "", url: ctaHref(heroBlock.secondary_cta) }
-              : undefined
-          }
-        />
+        <Hero />
         <TrustedLogos cmsLogos={cmsLogos.length > 0 ? cmsLogos : undefined} />
-        <Stats cmsItems={statsBlock?.items && statsBlock.items.length > 0 ? statsBlock.items : undefined} />
-        <PainPoints cmsItems={painBlock?.items && painBlock.items.length > 0 ? painBlock.items : undefined} />
+        <Stats />
+        <PainPoints />
         <OnePlatform />
         <AISection />
         <WorkEnvironments />
         <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
         <Blogs />
         <CTABanner
-<<<<<<< HEAD
-          cmsHeadline={ctaBlock?.headline}
-          cmsSubhead={ctaBlock?.subheadline}
-          cmsPrimaryCta={
-            ctaBlock?.primary_cta
-              ? { label: ctaBlock.primary_cta.label ?? "", url: ctaHref(ctaBlock.primary_cta) }
-              : undefined
-          }
-          cmsSecondaryCta={
-            ctaBlock?.secondary_cta
-              ? { label: ctaBlock.secondary_cta.label ?? "", url: ctaHref(ctaBlock.secondary_cta) }
-=======
           cmsHeadline={ctaBlock?.headline || undefined}
           cmsSubhead={ctaBlock?.subheadline || undefined}
           cmsPrimaryCta={
@@ -109,7 +56,6 @@ export default async function HomePage() {
           cmsSecondaryCta={
             ctaBlock?.secondary_cta?.label
               ? { label: ctaBlock.secondary_cta.label, url: ctaHref(ctaBlock.secondary_cta) }
->>>>>>> server/feature/iris-scroll-fix
               : undefined
           }
         />
