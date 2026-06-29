@@ -10,17 +10,28 @@ import WorkEnvironments from "@/components/sections/WorkEnvironments";
 import Testimonials from "@/components/sections/Testimonials";
 import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
-import { getTestimonials, getClientLogos } from "@/lib/api";
+import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
+import { findBlock, ctaHref } from "@/lib/blocks";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [testimonialsRes, logosRes] = await Promise.all([
+  const [testimonialsRes, logosRes, homePageRes] = await Promise.all([
     getTestimonials(),
     getClientLogos(),
+    getPage("home"),
   ]);
   const cmsTestimonials = testimonialsRes?.data ?? [];
   const cmsLogos = logosRes?.data ?? [];
+  const blocks = homePageRes?.data?.attributes?.content ?? [];
+
+  const ctaBlock = findBlock<{
+    headline?: string;
+    subheadline?: string;
+    primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
+  }>(blocks, "cta_banner");
+
   return (
     <>
       <Navbar lightHero />
@@ -34,7 +45,20 @@ export default async function HomePage() {
         <WorkEnvironments />
         <Testimonials cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
         <Blogs />
-        <CTABanner />
+        <CTABanner
+          cmsHeadline={ctaBlock?.headline || undefined}
+          cmsSubhead={ctaBlock?.subheadline || undefined}
+          cmsPrimaryCta={
+            ctaBlock?.primary_cta?.label
+              ? { label: ctaBlock.primary_cta.label, url: ctaHref(ctaBlock.primary_cta) }
+              : undefined
+          }
+          cmsSecondaryCta={
+            ctaBlock?.secondary_cta?.label
+              ? { label: ctaBlock.secondary_cta.label, url: ctaHref(ctaBlock.secondary_cta) }
+              : undefined
+          }
+        />
       </main>
       <Footer />
     </>
