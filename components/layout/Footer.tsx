@@ -37,19 +37,19 @@ const MODULES_COL2: { label: string; href: string }[] = [
 
 export default async function Footer() {
   const footer = await getFooter();
-  const attrs = footer?.data?.attributes;
+  const attrs = (footer?.data as any)?.attributes;
 
   const tagline     = attrs?.brand?.tagline || "AI-powered EHS platform helping teams stay safe, compliant, and in control.";
   const copyright   = attrs?.bottom?.copyright_text || "© 2026 EHSWatch. All rights reserved.";
   const legalLinks  = (attrs?.bottom?.legal_links ?? []) as { label: string; url: string }[];
   const ctaEyebrow  = attrs?.cta?.eyebrow  || "GET STARTED";
   const ctaHeadline = attrs?.cta?.headline || "See how EHSWatch transforms safety management across your organisation.";
-  const ctaPrimaryLabel = attrs?.cta?.primary?.label || "Book a Demo";
-  const ctaPrimaryHref  = attrs?.cta?.primary?.url   || "#";
+  const ctaPrimaryLabel = (attrs?.cta?.primary?.label) || (attrs?.cta?.primary_cta?.label) || "Book a Demo";
+  const ctaPrimaryHref  = (attrs?.cta?.primary?.url) || (attrs?.cta?.primary_cta?.url) || "#";
 
   const columns = (attrs?.columns ?? []) as { heading: string; links: { label: string; url: string }[] }[];
-  const companyCol = columns.find((c) => c.heading?.toLowerCase().includes("company"));
-  const modulesCol = columns.find((c) => c.heading?.toLowerCase().includes("module"));
+  const companyCol = columns.find((c) => (c.heading || (c as any).title || "").toLowerCase().includes("company"));
+  const modulesCol = columns.find((c) => (c.heading || (c as any).title || "").toLowerCase().includes("module"));
 
   const companyLinks = companyCol?.links ?? COMPANY.map(l => ({ label: l.label, url: l.href }));
   const allModules   = modulesCol?.links ?? [...MODULES_COL1, ...MODULES_COL2].map(l => ({ label: l.label, url: l.href }));
