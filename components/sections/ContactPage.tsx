@@ -96,7 +96,7 @@ export default function ContactPage({
     const { submitForm } = await import("@/lib/api");
     await submitForm("contact", {
       ...(data as unknown as Record<string, unknown>),
-      cf_turnstile_response: captchaToken ?? "",
+      captcha_token: captchaToken ?? "",
     });
     setSubmitted(true);
   };

@@ -160,7 +160,7 @@ export default function PricingCalculator() {
         employees: org.employees,
         sites: org.sites,
         industry: org.industry,
-        cf_turnstile_response: captchaToken ?? "",
+        captcha_token: captchaToken ?? "",
       });
     } finally {
       setSubmitted(true);

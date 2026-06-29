@@ -18,7 +18,7 @@ export default function BlogNewsletter() {
     if (!email || !captchaToken) return;
     try {
       const { submitForm } = await import("@/lib/api");
-      await submitForm("newsletter", { email, cf_turnstile_response: captchaToken });
+      await submitForm("newsletter", { email, captcha_token: captchaToken });
     } finally {
       setSubmitted(true);
     }

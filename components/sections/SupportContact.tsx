@@ -57,7 +57,7 @@ function ContactForm() {
         company: fd.get("company"),
         topic: fd.get("topic"),
         message: fd.get("message"),
-        cf_turnstile_response: captchaToken ?? "",
+        captcha_token: captchaToken ?? "",
       });
     } finally {
       setSubmitting(false);
