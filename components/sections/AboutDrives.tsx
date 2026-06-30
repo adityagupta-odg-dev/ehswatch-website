@@ -9,6 +9,7 @@ interface DriveItem {
 
 interface AboutDrivesCmsProps {
   cmsHeading?: string | undefined;
+  cmsSubheading?: string | undefined;
   cmsItems?: DriveItem[] | undefined;
 }
 
@@ -65,6 +66,7 @@ function TabShape({ label, color }: { label: string; color: string }) {
 
 export default function AboutDrives({
   cmsHeading,
+  cmsSubheading,
   cmsItems,
 }: AboutDrivesCmsProps = {}) {
   const heading = cmsHeading || "Purpose Behind <span class=\"text-[#155eef]\">Every Feature</span>";
@@ -92,6 +94,11 @@ export default function AboutDrives({
               className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b] tracking-[-0.025em]"
               dangerouslySetInnerHTML={{ __html: heading }}
             />
+            {cmsSubheading && (
+              <p className="mt-4 font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] text-[#6b7280] leading-relaxed max-w-[480px] mx-auto">
+                {cmsSubheading}
+              </p>
+            )}
           </div>
         </Reveal>
 

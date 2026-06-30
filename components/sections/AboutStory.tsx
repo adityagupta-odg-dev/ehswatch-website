@@ -5,11 +5,15 @@ import { useEffect, useRef } from "react";
 interface AboutStoryCmsProps {
   cmsHeading?: string | undefined;
   cmsBody?: string | undefined;
+  cmsImageUrl?: string | undefined;
+  cmsImageAlt?: string | undefined;
 }
 
 export default function AboutStory({
   cmsHeading,
   cmsBody,
+  cmsImageUrl,
+  cmsImageAlt,
 }: AboutStoryCmsProps = {}) {
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +90,15 @@ export default function AboutStory({
           <p className="mt-4 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#9ca3af] leading-relaxed max-w-[260px]">
             Two decades of building better safety.
           </p>
+          {cmsImageUrl && (
+            <div className="mt-8 rounded-[16px] overflow-hidden">
+              <img
+                src={cmsImageUrl}
+                alt={cmsImageAlt || ""}
+                className="w-full object-cover rounded-[16px]"
+              />
+            </div>
+          )}
         </div>
 
         {/* Scroll-reveal body */}
