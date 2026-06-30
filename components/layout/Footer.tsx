@@ -238,10 +238,14 @@ export default async function Footer() {
                   {link.label}
                 </Link>
               ))
-            : ["Privacy Policy", "Terms of Service", "Cookie Settings"].map((label) => (
+            : ([
+                { label: "Privacy Policy",  href: "/privacy-policy" },
+                { label: "Terms of Service", href: "#" },
+                { label: "Cookie Settings",  href: "#" },
+              ] as { label: string; href: string }[]).map(({ label, href }) => (
                 <Link
                   key={label}
-                  href="#"
+                  href={href}
                   className="font-[family-name:var(--font-inter)] text-[11px] md:text-[12px] text-[rgba(255,255,255,0.3)] hover:text-white/60 transition-colors"
                 >
                   {label}
