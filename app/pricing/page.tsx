@@ -49,10 +49,10 @@ export default async function PricingPage() {
   const overviewBody             = overviewBlock?.body || undefined;
   const overviewChecklistHeading = overviewBlock?.checklist_heading || undefined;
   const rawChecklistItems        = overviewBlock?.checklist_items;
-  const overviewChecklistItems: string[] = rawChecklistItems
-    ? normalizeArray<{ text?: string }>(rawChecklistItems)
-        .map((item) => item?.text || "")
-        .filter(Boolean)
+  const overviewChecklistItems: Array<{ icon?: string; text: string }> = rawChecklistItems
+    ? normalizeArray<{ icon?: string; text?: string }>(rawChecklistItems)
+        .filter((item) => item?.text)
+        .map((item) => ({ icon: item.icon || undefined, text: item.text! }))
     : [];
 
   // ── faq_accordion block ─────────────────────────────────────────────────────
