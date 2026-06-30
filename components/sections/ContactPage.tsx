@@ -13,6 +13,7 @@ interface CmsOfficeItem {
 
 export interface ContactPageProps {
   formAttrs: CmsForm["attributes"];
+  formSlug?: string;
   heroEyebrow?: string;
   heroHeadline?: string;
   heroSubheadline?: string;
@@ -58,6 +59,7 @@ const DEFAULT_OFFICE_ITEMS: CmsOfficeItem[] = [
 
 export default function ContactPage({
   formAttrs,
+  formSlug = "contact",
   heroEyebrow,
   heroHeadline,
   heroSubheadline,
@@ -197,8 +199,8 @@ export default function ContactPage({
               ))}
             </div>
 
-            {/* ── Right: dynamic CMS form ── */}
-            <DynamicCmsForm formAttrs={formAttrs} slug="contact" variant="contact" />
+            {/* ── Right: dynamic CMS form — slug comes from CMS form_embed block ── */}
+            <DynamicCmsForm formAttrs={formAttrs} slug={formSlug} variant="contact" />
           </div>
         </div>
       </section>

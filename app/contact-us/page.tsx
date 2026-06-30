@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/* Fallback used only when the CMS form hasn't been created yet */
 const CONTACT_FALLBACK: CmsForm["attributes"] = {
   slug: "contact",
   name: "Contact",
@@ -30,21 +31,18 @@ const CONTACT_FALLBACK: CmsForm["attributes"] = {
   redirect_url: null,
   captcha: { provider: "turnstile", site_key: "1x00000000000000000000AA" },
   fields: [
-    { key: "name",    label: "Full Name",      field_type: "text",     required: true,  placeholder: "Enter your name", help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "email",   label: "Email Address",  field_type: "email",    required: true,  placeholder: "Email address",  help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "company", label: "Company",        field_type: "text",     required: false, placeholder: "Company name",   help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "name",    label: "Full Name",      field_type: "text",     required: true,  placeholder: "Enter your name",  help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "email",   label: "Email Address",  field_type: "email",    required: true,  placeholder: "Email address",    help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "phone",   label: "Phone",          field_type: "phone",    required: false, placeholder: "Phone number",     help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "company", label: "Company",        field_type: "text",     required: false, placeholder: "Company name",     help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
     { key: "message", label: "Message",        field_type: "textarea", required: false, placeholder: "How can we help?", help_text: null, options: null, default_value: null, full_width: true,  catalogue_slug: null },
   ],
 };
 
 export default async function ContactUsPage() {
-  const [pageRes, formRes] = await Promise.all([
-    getPage("contact-us").catch(() => null),
-    getForm("contact").catch(() => null),
-  ]);
-
+  /* Step 1: fetch the page to read the CMS-configured form slug */
+  const pageRes = await getPage("contact-us").catch(() => null);
   const blocks: any[] = (pageRes?.data as any)?.attributes?.content ?? [];
-  const formAttrs = formRes?.data?.attributes ?? CONTACT_FALLBACK;
 
   /* ── hero block ── */
   const heroBlock = findBlock<{
@@ -53,12 +51,18 @@ export default async function ContactUsPage() {
     subheadline?: string;
   }>(blocks, "hero");
 
-  /* ── form_embed block ── */
+  /* ── form_embed block — contains the form_slug the CMS admin chose ── */
   const formEmbed = findBlock<{
     heading?: string;
     subheading?: string;
     description?: string;
+    form_slug?: string;
   }>(blocks, "form_embed");
+
+  /* Step 2: fetch the form schema using the CMS-defined slug */
+  const formSlug = formEmbed?.form_slug ?? "contact";
+  const formRes = await getForm(formSlug).catch(() => null);
+  const formAttrs = formRes?.data?.attributes ?? CONTACT_FALLBACK;
 
   /* ── icon_features block (offices) ── */
   const officesBlock = findBlock<{
@@ -90,6 +94,7 @@ export default async function ContactUsPage() {
       <main>
         <ContactPage
           formAttrs={formAttrs}
+          formSlug={formSlug}
           heroEyebrow={heroBlock?.eyebrow || undefined}
           heroHeadline={heroBlock?.headline || undefined}
           heroSubheadline={heroBlock?.subheadline || undefined}
