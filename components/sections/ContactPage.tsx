@@ -17,8 +17,11 @@ export interface ContactPageProps {
   heroEyebrow?: string;
   heroHeadline?: string;
   heroSubheadline?: string;
+  heroPrimaryCtaLabel?: string;
+  heroPrimaryCtaHref?: string;
   formHeading?: string;
   formSubheading?: string;
+  officesHeading?: string;
   officeItems?: CmsOfficeItem[] | null;
 }
 
@@ -63,8 +66,11 @@ export default function ContactPage({
   heroEyebrow,
   heroHeadline,
   heroSubheadline,
+  heroPrimaryCtaLabel,
+  heroPrimaryCtaHref,
   formHeading,
   formSubheading,
+  officesHeading,
   officeItems,
 }: ContactPageProps) {
   const resolvedOfficeItems = officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
@@ -139,6 +145,24 @@ export default function ContactPage({
           >
             {heroSubheadline ?? "Reach out for demos, onboarding support, or to discuss how EHSWatch fits your organisation."}
           </p>
+
+          {/* Primary CTA — only rendered when CMS provides one */}
+          {heroPrimaryCtaLabel && heroPrimaryCtaHref && (
+            <div className="animate-hero-rise" style={{ animationDelay: "280ms" }}>
+              <a
+                href={heroPrimaryCtaHref}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[14px] text-white"
+                style={{
+                  background: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
+                }}
+              >
+                {heroPrimaryCtaLabel}
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -167,6 +191,12 @@ export default function ContactPage({
 
             {/* ── Left: office items from icon_features block ── */}
             <div className="flex flex-col gap-8">
+              {/* Section label from icon_features.heading */}
+              {officesHeading && (
+                <p className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9ca3af]">
+                  {officesHeading}
+                </p>
+              )}
               {resolvedOfficeItems.map((item, idx) => (
                 <div key={idx} className="flex items-start gap-4">
                   {/* Icon chip */}

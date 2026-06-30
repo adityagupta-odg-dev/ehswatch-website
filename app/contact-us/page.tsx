@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ContactPage from "@/components/sections/ContactPage";
 import { getForm, getPage } from "@/lib/api";
-import { findBlock, normalizeArray } from "@/lib/blocks";
+import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
 import type { CmsForm } from "@/lib/types";
 import type { Metadata } from "next";
 
@@ -49,7 +49,11 @@ export default async function ContactUsPage() {
     eyebrow?: string;
     headline?: string;
     subheadline?: string;
+    primary_cta?: unknown;
   }>(blocks, "hero");
+
+  const heroPrimaryCtaLabel = (heroBlock?.primary_cta as any)?.label as string | undefined;
+  const heroPrimaryCtaHref  = heroBlock?.primary_cta ? ctaHref(heroBlock.primary_cta) : undefined;
 
   /* ── form_embed block — contains the form_slug the CMS admin chose ── */
   const formEmbed = findBlock<{
@@ -98,8 +102,11 @@ export default async function ContactUsPage() {
           heroEyebrow={heroBlock?.eyebrow || undefined}
           heroHeadline={heroBlock?.headline || undefined}
           heroSubheadline={heroBlock?.subheadline || undefined}
+          heroPrimaryCtaLabel={heroPrimaryCtaLabel || undefined}
+          heroPrimaryCtaHref={heroPrimaryCtaHref || undefined}
           formHeading={formEmbed?.heading || undefined}
           formSubheading={formEmbed?.subheading || undefined}
+          officesHeading={officesBlock?.heading || undefined}
           officeItems={officeItems}
         />
       </main>
