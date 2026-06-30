@@ -134,7 +134,13 @@ function cmsCardToIndustry(card: CmsCard, idx: number) {
   };
 }
 
-export default function SolutionsIndustries({ cmsCards }: { cmsCards?: CmsCard[] }) {
+interface SolutionsIndustriesProps {
+  cmsCards?: CmsCard[];
+  cmsHeading?: string;
+  cmsSubheading?: string;
+}
+
+export default function SolutionsIndustries({ cmsCards, cmsHeading, cmsSubheading }: SolutionsIndustriesProps) {
   // Use CMS data when provided; otherwise fall back to the hardcoded list
   const ACTIVE_INDUSTRIES =
     cmsCards && cmsCards.length > 0
@@ -206,10 +212,10 @@ export default function SolutionsIndustries({ cmsCards }: { cmsCards?: CmsCard[]
         {/* ── Heading ── */}
         <div className="text-center mb-10 md:mb-14">
           <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[32px] md:text-[38px] leading-[1.15] text-[#0f1728]">
-            Built for <span className="text-[#155eef]">Your Industry</span>
+            {cmsHeading || <>Built for <span className="text-[#155eef]">Your Industry</span></>}
           </h2>
           <p className="mt-2 font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] text-[#64748b] leading-[1.7] max-w-[600px] mx-auto">
-            EHSWatch adapts to the compliance requirements, workflows and hazard profiles of your sector — not retrofitted from a generic template.
+            {cmsSubheading || "EHSWatch adapts to the compliance requirements, workflows and hazard profiles of your sector — not retrofitted from a generic template."}
           </p>
         </div>
 
