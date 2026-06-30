@@ -1,5 +1,65 @@
 @import "tailwindcss";
 
+/* ── intl-tel-input: layout & variant overrides ── */
+
+/* Always stretch the .iti wrapper to fill its container.
+   Also override flag image paths at higher specificity than the
+   package's :root rule so they point to our public/ copies. */
+.iti-wrap { display: block; }
+.iti-wrap .iti {
+  width: 100%;
+  --iti-path-flags-1x: url('/ehswatch-stage/iti-img/flags.webp');
+  --iti-path-flags-2x: url('/ehswatch-stage/iti-img/flags@2x.webp');
+}
+
+/* contact variant: transparent/underline — input inherits parent border-b wrapper */
+.iti-contact .iti__phone-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #0a0f1e;
+  width: 100%;
+}
+.iti-contact .iti__selected-flag {
+  background: transparent;
+  padding-left: 0;
+}
+.iti-contact .iti__flag-container { background: transparent; }
+
+/* support variant: bordered container wraps flag + input */
+.iti-support .iti {
+  border: 1px solid #d1d9e6;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.iti-support .iti:focus-within {
+  border-color: #155eef;
+  box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.1);
+}
+.iti-support .iti__phone-input {
+  border: none;
+  outline: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #0f1728;
+  background: transparent;
+  width: 100%;
+}
+.iti-support .iti__selected-flag {
+  border-right: 1px solid #d1d9e6;
+  background: transparent;
+  border-radius: 8px 0 0 8px;
+}
+
+/* shared: placeholder colour */
+.iti-wrap .iti__phone-input::placeholder { color: #9ca3af; }
+
+/* shared: dropdown above inputs in modals */
+.iti__dropdown-content { z-index: 9999; }
+
 .orb-container {
   position: relative;
   z-index: 0;

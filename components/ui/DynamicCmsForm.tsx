@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import TurnstileField from "@/components/ui/TurnstileField";
+import PhoneInput from "@/components/ui/PhoneInput";
 import type { CmsForm, CmsFormField } from "@/lib/types";
 
 export type FormVariant = "contact" | "support";
@@ -155,10 +156,27 @@ function FieldWidget({ field, variant }: { field: CmsFormField; variant: FormVar
     );
   }
 
-  /* text, email, phone, tel, url, number */
+  /* phone / tel → intl-tel-input widget */
+  if (field.field_type === "phone" || field.field_type === "tel") {
+    return (
+      <div>
+        {label}
+        <div className={wrapClass}>
+          <PhoneInput
+            name={field.key}
+            required={field.required}
+            placeholder={placeholder}
+            variant={variant}
+          />
+        </div>
+        {helpText}
+      </div>
+    );
+  }
+
+  /* text, email, url, number */
   const htmlType =
     field.field_type === "email" ? "email"
-    : field.field_type === "phone" || field.field_type === "tel" ? "tel"
     : field.field_type === "url" ? "url"
     : field.field_type === "number" ? "number"
     : "text";
