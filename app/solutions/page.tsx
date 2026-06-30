@@ -30,9 +30,9 @@ export default async function SolutionsPage() {
 
   // ── hero block ──────────────────────────────────────────────────────────────
   const heroData = findBlock<{
+    eyebrow?: string;
     headline?: string;
     subheadline?: string;
-    eyebrow?: string;
     primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
     secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
   }>(blocks, "hero");
@@ -88,7 +88,9 @@ export default async function SolutionsPage() {
       <main>
         {/* 1. hero */}
         <SolutionsHero
+          cmsEyebrow={heroData?.eyebrow || undefined}
           cmsHeadline={heroData?.headline || undefined}
+          cmsSubheadline={heroData?.subheadline || undefined}
           cmsPrimaryCta={heroData?.primary_cta?.label ? { label: heroData.primary_cta.label, url: ctaHref(heroData.primary_cta) } : undefined}
           cmsSecondaryCta={heroData?.secondary_cta?.label ? { label: heroData.secondary_cta.label, url: ctaHref(heroData.secondary_cta) } : undefined}
         />

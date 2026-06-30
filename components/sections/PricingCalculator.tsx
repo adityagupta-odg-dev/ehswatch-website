@@ -123,7 +123,43 @@ function AddonIcon({ id }: { id: string }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function PricingCalculator() {
+interface PricingCalculatorProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsStepLabels?: string[];
+  cmsApplications?: Array<{ id: string; name: string; description: string; icon?: string; color?: string }>;
+  cmsAddons?: Array<{ id: string; name: string; description: string; color?: string }>;
+  cmsIndustries?: string[];
+  cmsSubmitLabel?: string;
+  cmsSuccessHeading?: string;
+  cmsSuccessBody?: string;
+}
+
+export default function PricingCalculator({
+  cmsHeading,
+  cmsSubheading,
+  cmsStepLabels,
+  cmsApplications,
+  cmsAddons,
+  cmsIndustries,
+  cmsSubmitLabel,
+  cmsSuccessHeading,
+  cmsSuccessBody,
+}: PricingCalculatorProps = {}) {
+  // Resolve CMS data — CMS takes precedence, fall back to hardcoded defaults
+  const heading    = cmsHeading    || "Build Your EHSWatch Package";
+  const subheading = cmsSubheading || "Select what you need and we’ll put together a tailored proposal.";
+  const steps      = (cmsStepLabels && cmsStepLabels.length === 4) ? cmsStepLabels : STEPS;
+  const apps       = (cmsApplications && cmsApplications.length > 0)
+    ? cmsApplications.map(a => ({ id: a.id, name: a.name, desc: a.description, icon: a.icon || "check-circle", color: a.color || "#155eef" }))
+    : APPS;
+  const addons     = (cmsAddons && cmsAddons.length > 0)
+    ? cmsAddons.map(a => ({ id: a.id, name: a.name, desc: a.description, color: a.color || "#6366f1" }))
+    : ADDONS;
+  const industries = (cmsIndustries && cmsIndustries.length > 0) ? cmsIndustries : INDUSTRIES;
+  const submitLabel     = cmsSubmitLabel     || "Get My EHSWatch Proposal →";
+  const successHeading  = cmsSuccessHeading  || "Proposal Request Sent!";
+
   const [step, setStep] = useState(0);
   const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
   const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set());
@@ -206,18 +242,19 @@ export default function PricingCalculator() {
       <div className="max-w-[1160px] mx-auto">
         {/* Section heading */}
         <div className="text-center mb-10 md:mb-14">
-          <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[34px] md:text-[42px] leading-tight tracking-[-0.025em] text-[#0a0f1e]">
-            Build Your <span style={{ color: "#1d4ed8" }}>EHSWatch</span> Package
-          </h2>
+          <h2
+            className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[34px] md:text-[42px] leading-tight tracking-[-0.025em] text-[#0a0f1e]"
+            dangerouslySetInnerHTML={{ __html: heading.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">') }}
+          />
           <p className="font-[family-name:var(--font-dm-sans)] text-[15px] text-[#6b7280] mt-3 max-w-[460px] mx-auto text-pretty">
-            Select what you need and we&apos;ll put together a tailored proposal.
+            {subheading}
           </p>
         </div>
 
         {/* Step indicator */}
         <div className="w-full max-w-[640px] mx-auto mb-10 md:mb-14">
           <div className="flex items-center">
-            {STEPS.map((label, i) => {
+            {steps.map((label, i) => {
               const done   = i < step;
               const active = i === step;
               return (
@@ -254,7 +291,7 @@ export default function PricingCalculator() {
                   </div>
 
                   {/* Connector line between circles */}
-                  {i < STEPS.length - 1 && (
+                  {i < steps.length - 1 && (
                     <div className="flex-1 h-[2px] mx-1 relative" style={{ background: "#e5e7eb", marginBottom: "20px" }}>
                       <div
                         className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
@@ -287,7 +324,7 @@ export default function PricingCalculator() {
                   Select the applications you need in your organisation
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                  {APPS.map((app) => {
+                  {apps.map((app) => {
                     const sel = selectedApps.has(app.id);
                     return (
                       <button
@@ -347,7 +384,7 @@ export default function PricingCalculator() {
                   Enhance your EHSWatch experience <span className="text-[#9ca3af]">(optional)</span>
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {ADDONS.map((addon) => {
+                  {addons.map((addon) => {
                     const sel = selectedAddons.has(addon.id);
                     return (
                       <button
@@ -420,7 +457,7 @@ export default function PricingCalculator() {
                     {
                       label: "Industry",
                       key: "industry",
-                      options: INDUSTRIES,
+                      options: industries,
                     },
                   ].map(({ label, key, options }) => (
                     <div key={key} className="flex flex-col gap-2">
@@ -485,7 +522,7 @@ export default function PricingCalculator() {
                       cursor: (isSubmitting || !captchaToken) ? "not-allowed" : "pointer",
                     }}
                   >
-                    {isSubmitting ? "Sending..." : "Get My EHSWatch Proposal →"}
+                    {isSubmitting ? "Sending..." : submitLabel}
                   </button>
                   <p className="font-[family-name:var(--font-dm-sans)] text-[12px] text-[#9ca3af] text-center text-pretty">
                     No commitment required. We&apos;ll follow up within 1 business day.
@@ -507,10 +544,13 @@ export default function PricingCalculator() {
                 </div>
                 <div>
                   <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[24px] text-[#0a0f1e] mb-2">
-                    Proposal Request Sent!
+                    {successHeading}
                   </h3>
                   <p className="font-[family-name:var(--font-dm-sans)] text-[15px] text-[#6b7280] leading-[1.75] text-pretty">
-                    Thanks {getValues("name").split(" ")[0]}! Our team will review your selections and send a tailored proposal to <strong>{getValues("email")}</strong> within 1 business day.
+                    {cmsSuccessBody
+                      ? cmsSuccessBody
+                      : <>Thanks {getValues("name").split(" ")[0]}! Our team will review your selections and send a tailored proposal to <strong>{getValues("email")}</strong> within 1 business day.</>
+                    }
                   </p>
                 </div>
               </div>
@@ -576,7 +616,7 @@ export default function PricingCalculator() {
                 </p>
               ) : (
                 <ul className="flex flex-col gap-2 max-h-[260px] overflow-y-auto pr-1">
-                  {APPS.filter((a) => selectedApps.has(a.id)).map((a) => (
+                  {apps.filter((a) => selectedApps.has(a.id)).map((a) => (
                     <li key={a.id} className="flex items-center gap-2.5">
                       <div
                         className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
@@ -597,7 +637,7 @@ export default function PricingCalculator() {
                   <div>
                     <p className="font-[family-name:var(--font-dm-sans)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2">Add-Ons</p>
                     <ul className="flex flex-col gap-2">
-                      {ADDONS.filter((a) => selectedAddons.has(a.id)).map((a) => (
+                      {addons.filter((a) => selectedAddons.has(a.id)).map((a) => (
                         <li key={a.id} className="flex items-center gap-2.5">
                           <div
                             className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"

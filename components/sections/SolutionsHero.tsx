@@ -3,13 +3,17 @@
 import GlareButton from "@/components/ui/GlareButton";
 
 interface SolutionsHeroProps {
+  cmsEyebrow?: string;
   cmsHeadline?: string;
+  cmsSubheadline?: string;
   cmsPrimaryCta?: { label: string; url: string };
   cmsSecondaryCta?: { label: string; url: string };
 }
 
 export default function SolutionsHero({
+  cmsEyebrow,
   cmsHeadline,
+  cmsSubheadline,
   cmsPrimaryCta,
   cmsSecondaryCta,
 }: SolutionsHeroProps = {}) {
@@ -81,6 +85,11 @@ export default function SolutionsHero({
 
       {/* Content */}
       <div className="relative z-20 max-w-[900px] w-full mx-auto text-center flex flex-col items-center gap-5 md:gap-6">
+        {cmsEyebrow && (
+          <span className="font-[family-name:var(--font-dm-sans)] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#1d4ed8] animate-hero-rise">
+            {cmsEyebrow}
+          </span>
+        )}
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[30px] sm:text-[42px] md:text-[54px] leading-[1.08] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
@@ -95,6 +104,14 @@ export default function SolutionsHero({
           )}
         </h1>
 
+        {cmsSubheadline && (
+          <p
+            className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] text-[#6b7280] max-w-[540px] text-pretty animate-hero-rise"
+            style={{ animationDelay: "180ms" }}
+          >
+            {cmsSubheadline}
+          </p>
+        )}
         <div className="flex flex-wrap gap-3 justify-center animate-hero-rise" style={{ animationDelay: "320ms" }}>
           <GlareButton
             href={primaryUrl}

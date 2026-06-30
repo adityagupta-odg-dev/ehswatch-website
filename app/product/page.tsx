@@ -55,6 +55,21 @@ export default async function ProductPage() {
     sub_items?: Array<{ icon?: string; title?: string; description?: string }>;
   }>(numberStepsBlock?.steps);
 
+  // ── stats_row block ───────────────────────────────────────────────────────
+  const statsBlock = findBlock<{
+    items?: unknown;
+  }>(blocks, "stats_row");
+
+  const rawStatItems = normalizeArray<{
+    value?: string | null;
+    suffix?: string | null;
+    label?: string | null;
+  }>(statsBlock?.items);
+
+  const cmsStats = rawStatItems.length > 0
+    ? rawStatItems.map((item) => ({ value: item.value || "0", suffix: item.suffix || null, label: item.label || "" }))
+    : undefined;
+
   // ── product_modules block ─────────────────────────────────────────────────
   const productModulesBlock = findBlock<{
     heading?: string;
@@ -108,7 +123,7 @@ export default async function ProductPage() {
           cmsSubheading={imageTextBlock?.subheading || undefined}
           cmsBody={imageTextBlock?.body || undefined}
         />
-        <Stats />
+        <Stats cmsItems={cmsStats} />
         <ProductHowItWorks
           cmsHeading={numberStepsBlock?.heading || undefined}
           cmsSubheading={numberStepsBlock?.subheading || undefined}
