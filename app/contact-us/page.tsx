@@ -92,6 +92,77 @@ export default async function ContactUsPage() {
       }))
     : null;
 
+  /* ── slider block ── */
+  const sliderBlock = findBlock<{
+    heading?: string | null;
+    subheading?: string | null;
+    autoplay?: boolean;
+    interval_ms?: number;
+    loop?: boolean;
+    show_arrows?: boolean;
+    show_dots?: boolean;
+    slides?: unknown;
+  }>(blocks, "slider");
+
+  const rawSlides = normalizeArray<{
+    image?: { url?: string } | null;
+    title?: string | null;
+    caption?: string | null;
+    cta?: { cta?: { label?: string | null; url?: string | null; type?: string | null; anchor?: string | null } } | null;
+  }>(sliderBlock?.slides);
+
+  const sliderSlides = rawSlides
+    .filter((s) => s.image?.url)
+    .map((s) => ({
+      imageUrl:  s.image!.url!,
+      title:     s.title ?? null,
+      caption:   s.caption ?? null,
+      ctaLabel:  s.cta?.cta?.label ?? null,
+      ctaUrl:    s.cta?.cta ? ctaHref(s.cta.cta) : null,
+    }));
+
+  const sliderData = sliderSlides.length > 0
+    ? {
+        heading:    sliderBlock?.heading    ?? null,
+        subheading: sliderBlock?.subheading ?? null,
+        autoplay:   sliderBlock?.autoplay   ?? true,
+        intervalMs: sliderBlock?.interval_ms ?? 5000,
+        loop:       sliderBlock?.loop       ?? true,
+        showArrows: sliderBlock?.show_arrows ?? true,
+        showDots:   sliderBlock?.show_dots  ?? true,
+        slides:     sliderSlides,
+      }
+    : null;
+
+  /* ── image_gallery block ── */
+  const galleryBlock = findBlock<{
+    heading?: string | null;
+    subheading?: string | null;
+    enable_lightbox?: boolean;
+    images?: unknown;
+  }>(blocks, "image_gallery");
+
+  const rawGalleryImages = normalizeArray<{
+    image?: { url?: string } | null;
+    caption?: string | null;
+  }>(galleryBlock?.images);
+
+  const galleryImages = rawGalleryImages
+    .filter((img) => img.image?.url)
+    .map((img) => ({
+      imageUrl: img.image!.url!,
+      caption:  img.caption ?? null,
+    }));
+
+  const galleryData = galleryImages.length > 0
+    ? {
+        heading:         galleryBlock?.heading    ?? null,
+        subheading:      galleryBlock?.subheading ?? null,
+        enableLightbox:  galleryBlock?.enable_lightbox ?? true,
+        images:          galleryImages,
+      }
+    : null;
+
   return (
     <>
       <Navbar lightHero={true} />
@@ -106,8 +177,11 @@ export default async function ContactUsPage() {
           heroPrimaryCtaHref={heroPrimaryCtaHref || undefined}
           formHeading={formEmbed?.heading || undefined}
           formSubheading={formEmbed?.subheading || undefined}
+          formDescription={formEmbed?.description || undefined}
           officesHeading={officesBlock?.heading || undefined}
           officeItems={officeItems}
+          sliderData={sliderData}
+          galleryData={galleryData}
         />
       </main>
       <Footer />

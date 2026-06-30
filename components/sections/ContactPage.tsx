@@ -1,5 +1,7 @@
 import DynamicCmsForm from "@/components/ui/DynamicCmsForm";
+import CmsSlider from "@/components/ui/CmsSlider";
 import type { CmsForm } from "@/lib/types";
+import type { CmsSlideItem } from "@/components/ui/CmsSlider";
 
 /* ── Office item shape (from CMS icon_features block) ── */
 interface CmsOfficeItem {
@@ -9,6 +11,29 @@ interface CmsOfficeItem {
   linkLabel: string | null;
   linkUrl: string | null;
   linkType: string | null;
+}
+
+interface CmsSliderData {
+  heading?: string | null;
+  subheading?: string | null;
+  autoplay?: boolean;
+  intervalMs?: number;
+  loop?: boolean;
+  showArrows?: boolean;
+  showDots?: boolean;
+  slides: CmsSlideItem[];
+}
+
+interface CmsGalleryImage {
+  imageUrl: string;
+  caption?: string | null;
+}
+
+interface CmsGalleryData {
+  heading?: string | null;
+  subheading?: string | null;
+  enableLightbox?: boolean;
+  images: CmsGalleryImage[];
 }
 
 export interface ContactPageProps {
@@ -21,8 +46,11 @@ export interface ContactPageProps {
   heroPrimaryCtaHref?: string;
   formHeading?: string;
   formSubheading?: string;
+  formDescription?: string;
   officesHeading?: string;
   officeItems?: CmsOfficeItem[] | null;
+  sliderData?: CmsSliderData | null;
+  galleryData?: CmsGalleryData | null;
 }
 
 /* ── Inline SVG icons keyed to CMS icon slugs ── */
@@ -70,8 +98,11 @@ export default function ContactPage({
   heroPrimaryCtaHref,
   formHeading,
   formSubheading,
+  formDescription,
   officesHeading,
   officeItems,
+  sliderData,
+  galleryData,
 }: ContactPageProps) {
   const resolvedOfficeItems = officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
 
@@ -171,7 +202,7 @@ export default function ContactPage({
         <div className="max-w-[1180px] mx-auto">
 
           {/* Section heading from form_embed block */}
-          {(formHeading || formSubheading) && (
+          {(formHeading || formSubheading || formDescription) && (
             <div className="mb-12">
               {formHeading && (
                 <h2
@@ -182,6 +213,11 @@ export default function ContactPage({
               {formSubheading && (
                 <p className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.75] text-[#6b7280]">
                   {formSubheading}
+                </p>
+              )}
+              {formDescription && (
+                <p className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.75] text-[#6b7280] mt-2">
+                  {formDescription}
                 </p>
               )}
             </div>
@@ -234,6 +270,74 @@ export default function ContactPage({
           </div>
         </div>
       </section>
+
+      {/* ── Slider section (from CMS slider block, only when slides have images) ── */}
+      {sliderData && (
+        <CmsSlider
+          heading={sliderData.heading}
+          subheading={sliderData.subheading}
+          slides={sliderData.slides}
+          autoplay={sliderData.autoplay}
+          intervalMs={sliderData.intervalMs}
+          loop={sliderData.loop}
+          showArrows={sliderData.showArrows}
+          showDots={sliderData.showDots}
+        />
+      )}
+
+      {/* ── Image gallery section (from CMS image_gallery block, only when images exist) ── */}
+      {galleryData && (
+        <section className="py-[60px] md:py-[80px] px-6 bg-white">
+          <div className="max-w-[1180px] mx-auto">
+            {(galleryData.heading || galleryData.subheading) && (
+              <div className="text-center mb-10">
+                {galleryData.heading && (
+                  <h2
+                    className="font-[family-name:var(--font-gothic-a1)] font-bold text-[26px] sm:text-[32px] md:text-[38px] leading-tight tracking-[-0.02em] text-[#0a0f1e] mb-3"
+                    dangerouslySetInnerHTML={{
+                      __html: galleryData.heading.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">'),
+                    }}
+                  />
+                )}
+                {galleryData.subheading && (
+                  <p className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.75] text-[#6b7280]">
+                    {galleryData.subheading}
+                  </p>
+                )}
+              </div>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {galleryData.images.map((img, idx) => (
+                <a
+                  key={idx}
+                  href={img.imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative overflow-hidden rounded-xl block aspect-square"
+                  style={{ background: "#f1f5f9" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img.imageUrl}
+                    alt={img.caption || ""}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {img.caption && (
+                    <div
+                      className="absolute inset-x-0 bottom-0 px-3 py-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                      style={{ background: "rgba(0,0,0,0.55)" }}
+                    >
+                      <p className="font-[family-name:var(--font-dm-sans)] text-[12px] text-white leading-tight">
+                        {img.caption}
+                      </p>
+                    </div>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }
