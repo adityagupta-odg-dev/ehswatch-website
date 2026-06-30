@@ -53,16 +53,25 @@ export default function AboutHero({
         }
       `}</style>
 
-      {/* Grid + animated squares */}
-      <div className="absolute inset-0 overflow-hidden about-grid-container pointer-events-none">
-        {Array.from({ length: 200 }, (_, i) => {
-          const shouldAnimate = (i * 7 + i * 3) % 17 === 0;
+      {/* Grid + animated squares — mask punches transparent ellipse over text zone
+          so squares only appear at the edges, never behind headings or CTAs */}
+      <div
+        className="absolute inset-0 overflow-hidden about-grid-container pointer-events-none"
+        style={{
+          zIndex: 0,
+          maskImage: "radial-gradient(ellipse 55% 50% at 50% 45%, transparent 40%, black 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse 55% 50% at 50% 45%, transparent 40%, black 70%)",
+        }}
+      >
+        {Array.from({ length: 320 }, (_, i) => {
+          const COLS = 32;
+          const row = Math.floor(i / COLS);
+          const col = i % COLS;
+          const shouldAnimate = (i * 10) % 17 === 0;
           const colorVariant = i % 4;
           const colors = ["#EFF6FF", "#DBEAFE", "#BFDBFE", "#93C5FD"];
           const animationDelay = (i * 0.3) % 12;
           const animationDuration = 4 + ((i * 2) % 6);
-          const row = Math.floor(i / 20);
-          const col = i % 20;
 
           return shouldAnimate ? (
             <div
@@ -85,10 +94,6 @@ export default function AboutHero({
           style={{
             background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.8) 70%, white 100%)",
           }}
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 75% 75% at 50% 45%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 50%, transparent 100%)" }}
         />
       </div>
 
