@@ -12,10 +12,14 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Product — EHSWatch",
-  description: "One Platform. Every EHSQ Process. From field incidents to board-level dashboards — all connected, all in real time.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("product").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "Product — EHSWatch",
+    description: attrs.meta?.meta_description || "One Platform. Every EHSQ Process. From field incidents to board-level dashboards — all connected, all in real time.",
+  };
+}
 
 export default async function ProductPage() {
   const pageRes = await getPage("product");
@@ -56,7 +60,18 @@ export default async function ProductPage() {
     heading?: string;
     subheading?: string;
     visible_count?: number;
+    items?: Array<{ slug?: string; name?: string; tagline?: string; icon?: string; icon_url?: string }>;
   }>(blocks, "product_modules");
+
+  const cmsModules = normalizeArray<{
+    slug?: string; name?: string; tagline?: string; icon?: string; icon_url?: string;
+  }>(productModulesBlock?.items).map((m) => ({
+    slug:     m.slug,
+    name:     m.name     ?? "",
+    tagline:  m.tagline  ?? "",
+    icon:     m.icon,
+    icon_url: m.icon_url,
+  }));
 
   // ── cta_banner block ──────────────────────────────────────────────────────
   const ctaBlock = findBlock<{
@@ -102,6 +117,7 @@ export default async function ProductPage() {
         <ProductModules
           cmsHeading={productModulesBlock?.heading || undefined}
           cmsSubheading={productModulesBlock?.subheading || undefined}
+          cmsModules={cmsModules.length > 0 ? cmsModules : undefined}
         />
         <CTABanner
           cmsHeadline={ctaBlock?.headline || undefined}
