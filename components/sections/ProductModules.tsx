@@ -137,8 +137,10 @@ const STEP = COLS;
 
 // ── Module cell ────────────────────────────────────────────────────────────
 
+type ResolvedModule = { name: string; href: string; desc: string; icon: string; icon_url?: string; color: string };
+
 function ModuleCell({ mod, isLastRow, colIndex }: {
-  mod: typeof MODULES[number];
+  mod: ResolvedModule;
   isLastRow: boolean;
   colIndex: number;
 }) {
@@ -158,7 +160,9 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
         className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
         style={{ backgroundColor: mod.color + "14", color: mod.color }}
       >
-        {Icons[mod.icon]}
+        {mod.icon_url
+          ? <img src={mod.icon_url} alt="" width={22} height={22} style={{ filter: `brightness(0) saturate(100%) invert(0)` }} />
+          : Icons[mod.icon]}
       </div>
 
       <h3 className="font-[family-name:var(--font-gothic-a1)] font-semibold text-[15px] text-[#0a0f1e] leading-snug">
@@ -190,28 +194,52 @@ function ModuleCell({ mod, isLastRow, colIndex }: {
 
 // ── Props ──────────────────────────────────────────────────────────────────
 
+interface CmsModule {
+  name: string;
+  tagline: string;
+  slug?: string;
+  icon?: string;
+  icon_url?: string;
+}
+
 interface ProductModulesProps {
   cmsHeading?: string;
   cmsSubheading?: string;
+  cmsModules?: CmsModule[];
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
 
+const MODULE_COLORS = ["#155eef","#6366f1","#0891b2","#ef4444","#059669","#f59e0b","#7c3aed","#f97316"];
+
 export default function ProductModules({
   cmsHeading,
   cmsSubheading,
+  cmsModules,
 }: ProductModulesProps = {}) {
+  /* Build the resolved module list: CMS items take priority over hardcoded */
+  const resolvedModules = cmsModules && cmsModules.length > 0
+    ? cmsModules.map((m, i) => ({
+        name:    m.name,
+        href:    m.slug ? `/modules/${m.slug}` : "#",
+        desc:    m.tagline,
+        icon:    m.icon ?? "",
+        icon_url: m.icon_url,
+        color:   MODULE_COLORS[i % MODULE_COLORS.length],
+      }))
+    : MODULES.map((m) => ({ ...m, icon_url: undefined }));
+
   const [visibleCount, setVisibleCount] = useState(INITIAL_ROWS * COLS);
   const [animatedRows, setAnimatedRows] = useState<Set<number>>(
     () => new Set(Array.from({ length: INITIAL_ROWS }, (_, i) => i))
   );
   const [sectionEl, setSectionEl] = useState<HTMLElement | null>(null);
 
-  const visibleModules = MODULES.slice(0, visibleCount);
-  const hasMore = visibleCount < MODULES.length;
+  const visibleModules = resolvedModules.slice(0, visibleCount);
+  const hasMore = visibleCount < resolvedModules.length;
 
   const handleViewMore = () => {
-    const nextCount = Math.min(visibleCount + STEP, MODULES.length);
+    const nextCount = Math.min(visibleCount + STEP, resolvedModules.length);
     setVisibleCount(nextCount);
     const newRowIdx = Math.ceil(visibleCount / COLS);
     requestAnimationFrame(() => {
@@ -229,7 +257,7 @@ export default function ProductModules({
     }
   };
 
-  const rows: typeof MODULES[] = [];
+  const rows: ResolvedModule[][] = [];
   for (let i = 0; i < visibleModules.length; i += COLS) {
     rows.push(visibleModules.slice(i, i + COLS));
   }

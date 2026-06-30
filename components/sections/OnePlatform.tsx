@@ -464,14 +464,21 @@ const TAB_DURATION = 4000;
 /* ══════════════════════════════════════════════════════════════════
    MAIN EXPORT
    ══════════════════════════════════════════════════════════════════ */
-export default function OnePlatform() {
+interface OnePlatformProps {
+  cmsHeading?: string;
+  cmsSubheading?: string;
+  cmsTabs?: Array<{ label: string; title: string; desc: string; link?: string }>;
+}
+
+export default function OnePlatform({ cmsHeading, cmsSubheading, cmsTabs }: OnePlatformProps = {}) {
+  const tabs = cmsTabs && cmsTabs.length > 0 ? cmsTabs : TABS;
   const [active, setActive]       = useState(0);
   const [inView, setInView]       = useState(false);
   const [cycleKey, setCycleKey]   = useState(0);
   // stylesReady gates mockup rendering so animations always have keyframes available
   const [stylesReady, setStylesReady] = useState(false);
   const sectionRef                = useRef<HTMLElement>(null);
-  const MockupPanel               = MOCKUPS[active];
+  const MockupPanel               = MOCKUPS[active % MOCKUPS.length];
 
   // Inject keyframes first, then mark ready — forces a second render with animations available
   useEffect(() => {
@@ -503,12 +510,15 @@ export default function OnePlatform() {
 
         {/* heading */}
         <div className="text-center mb-10 md:mb-14">
-          <h2 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b]">
-            One Platform for <span className="text-[#155eef]">Everyday Safety</span>
-          </h2>
+          <h2
+            className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[36px] md:text-[42px] leading-tight text-[#1b1b1b]"
+            dangerouslySetInnerHTML={{
+              __html: (cmsHeading ?? "One Platform for <span>Everyday Safety</span>")
+                .replace(/<span\b[^>]*>/gi, '<span style="color:#155eef">'),
+            }}
+          />
           <p className="mt-3 font-[family-name:var(--font-dm-sans)] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-relaxed text-[#727272] max-w-[809px] mx-auto">
-            EHSWatch brings all your EHSQ activities into a single, easy-to-use platform so
-            everyone, from workers in the field to leadership, works from the same, up-to-date information.
+            {cmsSubheading ?? "EHSWatch brings all your EHSQ activities into a single, easy-to-use platform so everyone, from workers in the field to leadership, works from the same, up-to-date information."}
           </p>
         </div>
 
@@ -521,7 +531,7 @@ export default function OnePlatform() {
             aria-label="Platform features"
             className="flex border-b border-[#dde2eb] overflow-x-auto scrollbar-none"
           >
-            {TABS.map((tab, i) => (
+            {tabs.map((tab, i) => (
               <button
                 key={tab.label}
                 role="tab"
@@ -545,7 +555,7 @@ export default function OnePlatform() {
                     className="absolute bottom-0 left-0 h-[2.5px] w-full bg-[#f97316]"
                     style={{ transform: "scaleX(0)", transformOrigin: "left center", animation: `op-bar-grow ${TAB_DURATION}ms linear forwards` }}
                     onAnimationEnd={() => {
-                      setActive((p) => (p + 1) % TABS.length);
+                      setActive((p) => (p + 1) % tabs.length);
                       setCycleKey((k) => k + 1);
                     }}
                   />
@@ -557,19 +567,19 @@ export default function OnePlatform() {
           {/* content */}
           <div
             role="tabpanel"
-            aria-label={TABS[active].label}
+            aria-label={tabs[active]?.label}
             className="flex flex-col md:flex-row min-h-[420px] md:min-h-[580px] lg:min-h-[620px]"
           >
             {/* left — text */}
             <div className="flex-none md:flex-[0_0_38%] px-6 md:px-12 py-8 md:py-12 flex flex-col justify-center">
               <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[20px] md:text-[24px] leading-snug text-[#0a0f1e] mb-3">
-                {TABS[active].title}
+                {tabs[active]?.title}
               </h3>
               <p className="font-[family-name:var(--font-dm-sans)] text-[13px] md:text-[15px] text-[#555] leading-relaxed">
-                {TABS[active].desc}
+                {tabs[active]?.desc}
               </p>
               <button className="mt-6 self-start font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold text-[#f97316] hover:text-[#ea6c00] transition-colors cursor-pointer">
-                {TABS[active].link} →
+                {tabs[active]?.link} →
               </button>
             </div>
             {/* right — mockup, fills remaining space */}
