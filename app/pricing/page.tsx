@@ -114,9 +114,9 @@ export default async function PricingPage() {
     : undefined;
 
   const cmsCalcAddons = calcBlock?.addons
-    ? normalizeArray<{ id?: string; name?: string; description?: string; color?: string }>(calcBlock.addons)
+    ? normalizeArray<{ id?: string; name?: string; description?: string; icon?: string; color?: string }>(calcBlock.addons)
         .filter((a) => a.id && a.name)
-        .map((a) => ({ id: a.id!, name: a.name!, description: a.description || "", color: a.color }))
+        .map((a) => ({ id: a.id!, name: a.name!, description: a.description || "", icon: a.icon, color: a.color }))
     : undefined;
 
   const cmsCalcIndustries = calcBlock?.industries

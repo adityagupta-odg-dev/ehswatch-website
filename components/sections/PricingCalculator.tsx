@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TurnstileField from "@/components/ui/TurnstileField";
 import { z } from "zod";
+import * as LucideIcons from "lucide-react";
 
 /* ── Proposal form schema ── */
 const proposalSchema = z.object({
@@ -29,34 +30,34 @@ const PROPOSAL_FIELDS: ProposalField[] = [
 const APPS = [
   { id: "action",         name: "Action Tracker",             desc: "Track corrective actions to closure with accountability.",  color: "#155eef", icon: "check-circle" },
   { id: "eightd",         name: "8D Report",                  desc: "Structured 8-discipline problem-solving reports.",          color: "#6366f1", icon: "clipboard" },
-  { id: "audit",          name: "Audit Management",           desc: "Plan audits, capture findings, close compliance gaps.",     color: "#6366f1", icon: "clipboard" },
-  { id: "communications", name: "Communications",             desc: "Share safety alerts, updates and bulletins org-wide.",      color: "#0891b2", icon: "chat-warning" },
-  { id: "complaints",     name: "Customer Complaint Details", desc: "Structured complaints workflow with full audit trail.",     color: "#0891b2", icon: "chat-warning" },
-  { id: "emergency",      name: "Emergency Response Drills",  desc: "Schedule drills and capture lessons learned.",              color: "#ef4444", icon: "alarm" },
+  { id: "audit",          name: "Audit Management",           desc: "Plan audits, capture findings, close compliance gaps.",     color: "#6366f1", icon: "clipboard-check" },
+  { id: "communications", name: "Communications",             desc: "Share safety alerts, updates and bulletins org-wide.",      color: "#0891b2", icon: "message-circle" },
+  { id: "complaints",     name: "Customer Complaint Details", desc: "Structured complaints workflow with full audit trail.",     color: "#0891b2", icon: "message-square" },
+  { id: "emergency",      name: "Emergency Response Drills",  desc: "Schedule drills and capture lessons learned.",              color: "#ef4444", icon: "alarm-clock" },
   { id: "files",          name: "File Management",            desc: "Version-controlled EHSQ documents with access control.",    color: "#059669", icon: "folder" },
-  { id: "hsestats",       name: "HSE Monthly Statistics",     desc: "Aggregate and report monthly HSE performance data.",        color: "#155eef", icon: "chart" },
+  { id: "hsestats",       name: "HSE Monthly Statistics",     desc: "Aggregate and report monthly HSE performance data.",        color: "#155eef", icon: "bar-chart-2" },
   { id: "hseplans",       name: "HSE Plans",                  desc: "Build and track health & safety plans across sites.",       color: "#7c3aed", icon: "book" },
   { id: "observations",   name: "HSE Observations",           desc: "Capture unsafe acts and positive safety behaviours.",       color: "#f59e0b", icon: "eye" },
   { id: "inspections",    name: "Inspections",                desc: "Conduct digital inspections with custom checklists.",       color: "#155eef", icon: "search" },
-  { id: "incident",       name: "Incident Management",        desc: "Report, investigate and close incidents end-to-end.",       color: "#ef4444", icon: "warning" },
-  { id: "legal",          name: "Legal Register",             desc: "Track regulatory obligations and stay audit-ready.",        color: "#7c3aed", icon: "book" },
-  { id: "moc",            name: "Management of Change",       desc: "Control operational changes with structured approvals.",    color: "#0891b2", icon: "arrows-cycle" },
+  { id: "incident",       name: "Incident Management",        desc: "Report, investigate and close incidents end-to-end.",       color: "#ef4444", icon: "alert-triangle" },
+  { id: "legal",          name: "Legal Register",             desc: "Track regulatory obligations and stay audit-ready.",        color: "#7c3aed", icon: "book-open" },
+  { id: "moc",            name: "Management of Change",       desc: "Control operational changes with structured approvals.",    color: "#0891b2", icon: "refresh-cw" },
   { id: "meetings",       name: "Meetings Management",        desc: "Capture decisions and track action follow-through.",        color: "#059669", icon: "calendar" },
   { id: "mutualaid",      name: "Mutual Aid",                 desc: "Coordinate shared resources and emergency assistance.",     color: "#ef4444", icon: "heart" },
   { id: "nonconformance", name: "Non Conformance",            desc: "Record, investigate and prevent recurring issues.",         color: "#f97316", icon: "x-circle" },
   { id: "permit",         name: "Permit to Work",             desc: "Digitise high-risk work permits with approval workflows.",  color: "#155eef", icon: "lock" },
   { id: "risk",           name: "Risk Assessments",           desc: "Identify hazards, assess risk and document controls.",      color: "#6366f1", icon: "shield" },
-  { id: "survey",         name: "Survey",                     desc: "Create and distribute safety culture surveys.",             color: "#f59e0b", icon: "clipboard" },
-  { id: "training",       name: "Training Management",        desc: "Manage training records and certification expiries.",       color: "#f59e0b", icon: "graduation" },
+  { id: "survey",         name: "Survey",                     desc: "Create and distribute safety culture surveys.",             color: "#f59e0b", icon: "clipboard-list" },
+  { id: "training",       name: "Training Management",        desc: "Manage training records and certification expiries.",       color: "#f59e0b", icon: "graduation-cap" },
 ];
 
 const ADDONS = [
-  { id: "iris",     name: "IRIS AI",                desc: "AI incident analysis & smart insights",    color: "#6366f1" },
-  { id: "whatsapp", name: "WhatsApp Reporting",     desc: "Report incidents directly from WhatsApp",  color: "#25d366" },
-  { id: "api",      name: "API Integrations",       desc: "Connect with existing systems",            color: "#0891b2" },
-  { id: "bi",       name: "3rd Party BI Connector", desc: "Power BI / Tableau connectivity",          color: "#f59e0b" },
-  { id: "hr",       name: "HR Integration",         desc: "Sync users from your HRMS",               color: "#7c3aed" },
-  { id: "sso",      name: "Single Sign On (SSO)",   desc: "Azure / Google / Active Directory login",  color: "#155eef" },
+  { id: "iris",     name: "IRIS AI",                desc: "AI incident analysis & smart insights",    color: "#6366f1", icon: "sparkles" },
+  { id: "whatsapp", name: "WhatsApp Reporting",     desc: "Report incidents directly from WhatsApp",  color: "#25d366", icon: "message-circle" },
+  { id: "api",      name: "API Integrations",       desc: "Connect with existing systems",            color: "#0891b2", icon: "link" },
+  { id: "bi",       name: "3rd Party BI Connector", desc: "Power BI / Tableau connectivity",          color: "#f59e0b", icon: "bar-chart-2" },
+  { id: "hr",       name: "HR Integration",         desc: "Sync users from your HRMS",               color: "#7c3aed", icon: "users" },
+  { id: "sso",      name: "Single Sign On (SSO)",   desc: "Azure / Google / Active Directory login",  color: "#155eef", icon: "lock" },
 ];
 
 const INDUSTRIES = [
@@ -67,58 +68,17 @@ const INDUSTRIES = [
 
 const STEPS = ["Applications", "Add-Ons", "Organisation", "Get Proposal"];
 
-// ── Icon SVGs (inline) ────────────────────────────────────────────────────────
+// ── Dynamic Lucide icon renderer ──────────────────────────────────────────────
+// Converts CMS kebab-case icon name (e.g. "check-circle") to PascalCase and
+// renders the matching lucide-react component. Any name from the CMS IconPicker
+// works automatically — no manual SVG mapping needed.
 
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M2.5 7l3 3 6-6" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function AppIcon({ icon, size = 18 }: { icon: string; size?: number }) {
-  const s = size;
-  const icons: Record<string, React.ReactNode> = {
-    "warning":      <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M10 3L18 17H2L10 3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 9v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="10" cy="14.5" r="0.8" fill="currentColor"/></svg>,
-    "check-circle": <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M6.5 10l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-    "clipboard":    <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M7 4V3.5A1.5 1.5 0 0 1 8.5 2h3A1.5 1.5 0 0 1 13 3.5V4" stroke="currentColor" strokeWidth="1.5"/><path d="M7 9h6M7 12h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "shield":       <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v5c0 4-3 7.5-7 9-4-1.5-7-5-7-9V5l7-3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-    "lock":         <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="10" cy="14" r="1.2" fill="currentColor"/></svg>,
-    "eye":          <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg>,
-    "search":       <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M13.5 13.5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "graduation":   <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M10 3l9 4-9 4-9-4 9-4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M5 11v4c0 1.7 2.2 3 5 3s5-1.3 5-3v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M19 7v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "book":         <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M4 3h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="1.5"/><path d="M7 7h5M7 10h5M7 13h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "arrows-cycle": <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 0 1 10.9-3.4L16 5v4h-4l1.8-1.8A4 4 0 0 0 6 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M16 10a6 6 0 0 1-10.9 3.4L4 15v-4h4L6.2 12.8A4 4 0 0 0 14 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
-    "alarm":        <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M10 4a6 6 0 1 0 0 12A6 6 0 0 0 10 4z" stroke="currentColor" strokeWidth="1.5"/><path d="M10 7v3.5l2 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3.5 4.5L5 3M16.5 4.5L15 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "x-circle":     <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "chat-warning": <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6l-3 3V4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 7v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="10" cy="12" r="0.8" fill="currentColor"/></svg>,
-    "calendar":     <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M7 2v3M13 2v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="7" cy="13" r="1" fill="currentColor"/><circle cx="10" cy="13" r="1" fill="currentColor"/><circle cx="13" cy="13" r="1" fill="currentColor"/></svg>,
-    "folder":       <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M2 6a2 2 0 0 1 2-2h3.17a2 2 0 0 1 1.42.59L9.41 5.4A2 2 0 0 0 10.83 6H16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6z" stroke="currentColor" strokeWidth="1.5"/></svg>,
-    "flask":        <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M7 3h6M8 3v6l-4 8h12l-4-8V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 14h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "hard-hat":     <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M4 12V9a6 6 0 0 1 12 0v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M2 12h16v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2z" stroke="currentColor" strokeWidth="1.5"/><path d="M10 3v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "leaf":         <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M17 3C9 3 4 8 4 14c0 0 4-2 7-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 17c2-4 4-8 8-11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    "heart":        <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M10 16s-7-4.5-7-9a4 4 0 0 1 7-2.65A4 4 0 0 1 17 7c0 4.5-7 9-7 9z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-    "chart":        <svg width={s} height={s} viewBox="0 0 20 20" fill="none"><path d="M3 15V9M7 15V6M11 15V11M15 15V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  };
-  return <span style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>{icons[icon] ?? null}</span>;
-}
-
-function AddonIcon({ id }: { id: string }) {
-  const icons: Record<string, React.ReactNode> = {
-    iris:     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l1.5 6L18 10l-6.5 2L10 18l-1.5-6L2 10l6.5-2L10 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-    whatsapp: (
-      <svg width="20" height="20" viewBox="0 0 36 36" fill="none">
-        <path d="M26.6 21.442l-3-2.171a2.23 2.23 0 0 0-2.706.078l-1.427 1.159a8.372 8.372 0 0 1-3.985-3.985l1.108-1.362a2.235 2.235 0 0 0 .1-2.678l-2.139-3.053a2.166 2.166 0 0 0-3.467-.112l-1.663 2.082a4.13 4.13 0 0 0-.907 2.993 14.585 14.585 0 0 0 13.086 13.083c.131.013.262.019.393.019a4.15 4.15 0 0 0 2.6-.924l2.1-1.684a2.162 2.162 0 0 0-.09-3.445zm-1.16 1.884l-2.1 1.683a2.164 2.164 0 0 1-1.549.477 12.582 12.582 0 0 1-11.291-11.286 2.178 2.178 0 0 1 .478-1.551l1.664-2.08a.16.16 0 0 1 .128-.062h.007a.161.161 0 0 1 .131.071l2.134 3.053a.222.222 0 0 1-.01.27l-1.489 1.832a1 1 0 0 0-.155.995 10.376 10.376 0 0 0 5.875 5.872 1 1 0 0 0 .995-.156l1.9-1.541a.228.228 0 0 1 .275-.008l3.006 2.171a.165.165 0 0 1 .071.132.156.156 0 0 1-.066.128z" fill="currentColor"/>
-        <path d="M18 1a16.975 16.975 0 0 0-14.7 25.5l-2.25 7.2a1 1 0 0 0 .95 1.3 1.016 1.016 0 0 0 .3-.045l7.2-2.255a16.993 16.993 0 1 0 8.5-31.7zm0 32a14.959 14.959 0 0 1-7.848-2.235 1 1 0 0 0-.524-.149.976.976 0 0 0-.3.046l-5.805 1.814 1.815-5.806a1 1 0 0 0-.1-.823 14.988 14.988 0 1 1 12.762 7.153z" fill="currentColor"/>
-      </svg>
-    ),
-    api:      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="7" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="11" y="6" width="7" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M9 10h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    bi:       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 15V9M7 15V6M11 15V11M15 15V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    hr:       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    sso:      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="10" cy="13" r="1.2" fill="currentColor"/></svg>,
-  };
-  return <span style={{ color: "currentColor" }}>{icons[id]}</span>;
+function LucideIcon({ name, size = 18 }: { name?: string; size?: number }) {
+  if (!name) return null;
+  const pascal = name.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+  const Icon = (LucideIcons as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[pascal];
+  if (!Icon) return null;
+  return <Icon size={size} strokeWidth={1.5} />;
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -137,7 +97,7 @@ interface PricingCalculatorProps {
   cmsFormSteps?: CmsFormStep[];
   cmsStepLabels?: string[];
   cmsApplications?: Array<{ id: string; name: string; description: string; icon?: string; color?: string }>;
-  cmsAddons?: Array<{ id: string; name: string; description: string; color?: string }>;
+  cmsAddons?: Array<{ id: string; name: string; description: string; icon?: string; color?: string }>;
   cmsIndustries?: string[];
   cmsSubmitLabel?: string;
   cmsSuccessHeading?: string;
@@ -201,7 +161,7 @@ export default function PricingCalculator({
 
   // Addons: pricing_calculator block drives the list; falls back to hardcoded ADDONS
   const addons = (cmsAddons && cmsAddons.length > 0)
-    ? cmsAddons.map(a => ({ id: a.id, name: a.name, desc: a.description, color: a.color || "#6366f1" }))
+    ? cmsAddons.map(a => ({ id: a.id, name: a.name, desc: a.description, color: a.color || "#6366f1", icon: a.icon }))
     : ADDONS;
 
   const submitLabel    = cmsSubmitLabel    || "Get My EHSWatch Proposal →";
@@ -389,7 +349,7 @@ export default function PricingCalculator({
                             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                             style={{ background: app.color + "14", color: app.color }}
                           >
-                            <AppIcon icon={app.icon} size={16} />
+                            <LucideIcon name={app.icon} size={16} />
                           </div>
                           {/* Square checkbox */}
                           <div
@@ -449,7 +409,7 @@ export default function PricingCalculator({
                             className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                             style={{ background: addon.color + "14", color: addon.color }}
                           >
-                            <AddonIcon id={addon.id} />
+                            <LucideIcon name={addon.icon} size={20} />
                           </div>
                           <div
                             className="w-4 h-4 rounded flex items-center justify-center shrink-0 mt-0.5 border transition-all duration-200"
@@ -659,7 +619,7 @@ export default function PricingCalculator({
                         className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
                         style={{ background: a.color + "18", color: a.color }}
                       >
-                        <AppIcon icon={a.icon} size={13} />
+                        <LucideIcon name={a.icon} size={13} />
                       </div>
                       <span className="font-[family-name:var(--font-dm-sans)] text-[12.5px] text-[#374151]">{a.name}</span>
                     </li>
@@ -680,7 +640,7 @@ export default function PricingCalculator({
                             className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
                             style={{ background: a.color + "18", color: a.color }}
                           >
-                            <AddonIcon id={a.id} />
+                            <LucideIcon name={a.icon} size={13} />
                           </div>
                           <span className="font-[family-name:var(--font-dm-sans)] text-[12.5px] text-[#374151]">{a.name}</span>
                         </li>
