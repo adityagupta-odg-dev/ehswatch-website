@@ -103,11 +103,13 @@ function getPost(slug: string): BlogPostData {
   return POSTS[slug] ?? POSTS["near-miss-reporting-culture"];
 }
 
-function getPrevNext(slug: string) {
-  const idx = SLUGS.indexOf(slug);
+function getPrevNext(slug: string, cmsSlugs?: string[]) {
+  const list = cmsSlugs && cmsSlugs.length > 0 ? cmsSlugs : SLUGS;
+  const idx = list.indexOf(slug);
+  if (idx === -1) return { prev: null, next: null };
   return {
-    prev: idx > 0 ? POSTS[SLUGS[idx - 1]] : null,
-    next: idx < SLUGS.length - 1 ? POSTS[SLUGS[idx + 1]] : null,
+    prev: idx < list.length - 1 ? { slug: list[idx + 1] } : null,
+    next: idx > 0 ? { slug: list[idx - 1] } : null,
   };
 }
 
@@ -115,7 +117,7 @@ function getPrevNext(slug: string) {
 // Main component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function BlogPost({ slug, cmsPost }: { slug: string; cmsPost?: CmsBlogPost }) {
+export default function BlogPost({ slug, cmsPost, cmsSlugs }: { slug: string; cmsPost?: CmsBlogPost; cmsSlugs?: string[] }) {
   const post: BlogPostData = cmsPost
     ? {
         slug,
@@ -128,7 +130,7 @@ export default function BlogPost({ slug, cmsPost }: { slug: string; cmsPost?: Cm
         coverImg: cmsPost.attributes.cover?.url ?? `${basePath}/images/blogs/blog-1.png`,
       }
     : getPost(slug);
-  const { prev, next } = getPrevNext(slug);
+  const { prev, next } = getPrevNext(slug, cmsSlugs);
 
   return (
     <>
