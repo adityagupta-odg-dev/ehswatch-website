@@ -135,6 +135,10 @@ interface PricingCalculatorProps {
   cmsSubheading?: string;
   cmsFormSlug?: string;
   cmsFormSteps?: CmsFormStep[];
+  cmsStepLabels?: string[];
+  cmsApplications?: Array<{ id: string; name: string; description: string; icon?: string; color?: string }>;
+  cmsAddons?: Array<{ id: string; name: string; description: string; color?: string }>;
+  cmsIndustries?: string[];
   cmsSubmitLabel?: string;
   cmsSuccessHeading?: string;
   cmsSuccessBody?: string;
@@ -145,6 +149,10 @@ export default function PricingCalculator({
   cmsSubheading,
   cmsFormSlug,
   cmsFormSteps,
+  cmsStepLabels,
+  cmsApplications,
+  cmsAddons,
+  cmsIndustries,
   cmsSubmitLabel,
   cmsSuccessHeading,
   cmsSuccessBody,
@@ -153,15 +161,18 @@ export default function PricingCalculator({
   const heading    = cmsHeading    || "Build Your EHSWatch Package";
   const subheading = cmsSubheading || "Select what you need and we’ll put together a tailored proposal.";
 
-  // Derive step labels and descriptions from CMS form steps
+  // Derive step labels from CMS form steps (form schema titles)
   const WIZARD_KEYS = ["applications", "addons", "organisation", "contact"] as const;
   const getStep = (key: string) => cmsFormSteps?.find(s => s.key === key);
-  const cmsStepLabelsDerived = cmsFormSteps
+  const formStepLabels = cmsFormSteps
     ? WIZARD_KEYS.map(k => getStep(k)?.title).filter(Boolean) as string[]
     : [];
-  const steps = cmsStepLabelsDerived.length === 4 ? cmsStepLabelsDerived : STEPS;
+  // pricing_calculator.step_labels takes precedence, then form step titles, then hardcoded
+  const steps = (cmsStepLabels && cmsStepLabels.length === 4)
+    ? cmsStepLabels
+    : formStepLabels.length === 4 ? formStepLabels : STEPS;
 
-  // Per-step title/description from CMS
+  // Per-step title/description from CMS form schema
   const appsStepTitle    = getStep("applications")?.title       || "Step 1 — Application Selection";
   const appsStepDesc     = getStep("applications")?.description || "Select the applications you need in your organisation";
   const addonsStepTitle  = getStep("addons")?.title             || "Step 2 — Advanced Features";
@@ -170,7 +181,7 @@ export default function PricingCalculator({
   const orgStepDesc      = getStep("organisation")?.description || "Tell us about your organisation";
   const contactStepTitle = getStep("contact")?.title            || "Step 4 — Get Your Proposal";
 
-  // Organisation field options from CMS
+  // Organisation field options: form schema options (always present)
   const orgFields = getStep("organisation")?.fields ?? [];
   const getOpts = (key: string, fallback: string[]) => {
     const f = orgFields.find(f => f.key === key);
@@ -178,10 +189,21 @@ export default function PricingCalculator({
   };
   const employeeOptions = getOpts("employees", ["< 50", "50–200", "201–1,000", "1,001–5,000", "5,000+"]);
   const siteOptions     = getOpts("sites",     ["1", "2–5", "6–20", "21–50", "50+"]);
-  const industryOptions = getOpts("industry",  INDUSTRIES);
+  // Industries: pricing_calculator block overrides form schema options
+  const industryOptions = (cmsIndustries && cmsIndustries.length > 0)
+    ? cmsIndustries
+    : getOpts("industry", INDUSTRIES);
 
-  const apps    = APPS;
-  const addons  = ADDONS;
+  // Apps: pricing_calculator block drives the list; falls back to hardcoded APPS
+  const apps = (cmsApplications && cmsApplications.length > 0)
+    ? cmsApplications.map(a => ({ id: a.id, name: a.name, desc: a.description, icon: a.icon || "check-circle", color: a.color || "#155eef" }))
+    : APPS;
+
+  // Addons: pricing_calculator block drives the list; falls back to hardcoded ADDONS
+  const addons = (cmsAddons && cmsAddons.length > 0)
+    ? cmsAddons.map(a => ({ id: a.id, name: a.name, desc: a.description, color: a.color || "#6366f1" }))
+    : ADDONS;
+
   const submitLabel    = cmsSubmitLabel    || "Get My EHSWatch Proposal →";
   const successHeading = cmsSuccessHeading || "Proposal Request Sent!";
 
@@ -562,6 +584,8 @@ export default function PricingCalculator({
                   <p className="font-[family-name:var(--font-dm-sans)] text-[15px] text-[#6b7280] leading-[1.75] text-pretty">
                     {cmsSuccessBody
                       ? cmsSuccessBody
+                          .replace(/{name}/g, getValues("name").split(" ")[0])
+                          .replace(/{email}/g, getValues("email"))
                       : <>Thanks {getValues("name").split(" ")[0]}! Our team will review your selections and send a tailored proposal to <strong>{getValues("email")}</strong> within 1 business day.</>
                     }
                   </p>
