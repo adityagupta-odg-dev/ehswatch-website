@@ -123,13 +123,18 @@ function AddonIcon({ id }: { id: string }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+interface CmsFormStep {
+  key: string;
+  title: string;
+  description: string;
+  fields: Array<{ key: string; label: string; field_type: string; options?: string[] | null }>;
+}
+
 interface PricingCalculatorProps {
   cmsHeading?: string;
   cmsSubheading?: string;
-  cmsStepLabels?: string[];
-  cmsApplications?: Array<{ id: string; name: string; description: string; icon?: string; color?: string }>;
-  cmsAddons?: Array<{ id: string; name: string; description: string; color?: string }>;
-  cmsIndustries?: string[];
+  cmsFormSlug?: string;
+  cmsFormSteps?: CmsFormStep[];
   cmsSubmitLabel?: string;
   cmsSuccessHeading?: string;
   cmsSuccessBody?: string;
@@ -138,27 +143,47 @@ interface PricingCalculatorProps {
 export default function PricingCalculator({
   cmsHeading,
   cmsSubheading,
-  cmsStepLabels,
-  cmsApplications,
-  cmsAddons,
-  cmsIndustries,
+  cmsFormSlug,
+  cmsFormSteps,
   cmsSubmitLabel,
   cmsSuccessHeading,
   cmsSuccessBody,
 }: PricingCalculatorProps = {}) {
-  // Resolve CMS data — CMS takes precedence, fall back to hardcoded defaults
+  const formSlug   = cmsFormSlug || "build-ehswatch-package";
   const heading    = cmsHeading    || "Build Your EHSWatch Package";
   const subheading = cmsSubheading || "Select what you need and we’ll put together a tailored proposal.";
-  const steps      = (cmsStepLabels && cmsStepLabels.length === 4) ? cmsStepLabels : STEPS;
-  const apps       = (cmsApplications && cmsApplications.length > 0)
-    ? cmsApplications.map(a => ({ id: a.id, name: a.name, desc: a.description, icon: a.icon || "check-circle", color: a.color || "#155eef" }))
-    : APPS;
-  const addons     = (cmsAddons && cmsAddons.length > 0)
-    ? cmsAddons.map(a => ({ id: a.id, name: a.name, desc: a.description, color: a.color || "#6366f1" }))
-    : ADDONS;
-  const industries = (cmsIndustries && cmsIndustries.length > 0) ? cmsIndustries : INDUSTRIES;
-  const submitLabel     = cmsSubmitLabel     || "Get My EHSWatch Proposal →";
-  const successHeading  = cmsSuccessHeading  || "Proposal Request Sent!";
+
+  // Derive step labels and descriptions from CMS form steps
+  const WIZARD_KEYS = ["applications", "addons", "organisation", "contact"] as const;
+  const getStep = (key: string) => cmsFormSteps?.find(s => s.key === key);
+  const cmsStepLabelsDerived = cmsFormSteps
+    ? WIZARD_KEYS.map(k => getStep(k)?.title).filter(Boolean) as string[]
+    : [];
+  const steps = cmsStepLabelsDerived.length === 4 ? cmsStepLabelsDerived : STEPS;
+
+  // Per-step title/description from CMS
+  const appsStepTitle    = getStep("applications")?.title       || "Step 1 — Application Selection";
+  const appsStepDesc     = getStep("applications")?.description || "Select the applications you need in your organisation";
+  const addonsStepTitle  = getStep("addons")?.title             || "Step 2 — Advanced Features";
+  const addonsStepDesc   = getStep("addons")?.description       || "Enhance your EHSWatch experience";
+  const orgStepTitle     = getStep("organisation")?.title       || "Step 3 — Organisation Details";
+  const orgStepDesc      = getStep("organisation")?.description || "Tell us about your organisation";
+  const contactStepTitle = getStep("contact")?.title            || "Step 4 — Get Your Proposal";
+
+  // Organisation field options from CMS
+  const orgFields = getStep("organisation")?.fields ?? [];
+  const getOpts = (key: string, fallback: string[]) => {
+    const f = orgFields.find(f => f.key === key);
+    return f?.options && f.options.length > 0 ? f.options : fallback;
+  };
+  const employeeOptions = getOpts("employees", ["< 50", "50–200", "201–1,000", "1,001–5,000", "5,000+"]);
+  const siteOptions     = getOpts("sites",     ["1", "2–5", "6–20", "21–50", "50+"]);
+  const industryOptions = getOpts("industry",  INDUSTRIES);
+
+  const apps    = APPS;
+  const addons  = ADDONS;
+  const submitLabel    = cmsSubmitLabel    || "Get My EHSWatch Proposal →";
+  const successHeading = cmsSuccessHeading || "Proposal Request Sent!";
 
   const [step, setStep] = useState(0);
   const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
@@ -189,7 +214,7 @@ export default function PricingCalculator({
   const onSubmit = async (data: ProposalData) => {
     try {
       const { submitForm } = await import("@/lib/api");
-      await submitForm("contact", {
+      await submitForm(formSlug, {
         ...data,
         selected_apps: Array.from(selectedApps),
         selected_addons: Array.from(selectedAddons),
@@ -318,10 +343,10 @@ export default function PricingCalculator({
             {step === 0 && (
               <div>
                 <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[20px] md:text-[22px] text-[#0a0f1e] mb-2">
-                  Step 1 — Application Selection
+                  {appsStepTitle}
                 </h3>
                 <p className="font-[family-name:var(--font-dm-sans)] text-[14px] text-[#6b7280] mb-7">
-                  Select the applications you need in your organisation
+                  {appsStepDesc}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {apps.map((app) => {
@@ -378,10 +403,10 @@ export default function PricingCalculator({
             {step === 1 && (
               <div>
                 <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[20px] md:text-[22px] text-[#0a0f1e] mb-2">
-                  Step 2 — Advanced Features
+                  {addonsStepTitle}
                 </h3>
                 <p className="font-[family-name:var(--font-dm-sans)] text-[14px] text-[#6b7280] mb-7">
-                  Enhance your EHSWatch experience <span className="text-[#9ca3af]">(optional)</span>
+                  {addonsStepDesc} <span className="text-[#9ca3af]">(optional)</span>
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {addons.map((addon) => {
@@ -437,28 +462,16 @@ export default function PricingCalculator({
             {step === 2 && (
               <div className="max-w-[560px]">
                 <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[20px] md:text-[22px] text-[#0a0f1e] mb-2">
-                  Step 3 — Organisation Details
+                  {orgStepTitle}
                 </h3>
                 <p className="font-[family-name:var(--font-dm-sans)] text-[14px] text-[#6b7280] mb-7">
-                  Tell us about your organisation
+                  {orgStepDesc}
                 </p>
                 <div className="flex flex-col gap-5">
                   {[
-                    {
-                      label: "Number of Employees",
-                      key: "employees",
-                      options: ["0–100", "100–500", "500–2,000", "2,000+"],
-                    },
-                    {
-                      label: "Number of Sites",
-                      key: "sites",
-                      options: ["1", "2–5", "6–15", "16+"],
-                    },
-                    {
-                      label: "Industry",
-                      key: "industry",
-                      options: industries,
-                    },
+                    { label: "Number of Employees", key: "employees", options: employeeOptions },
+                    { label: "Number of Sites",     key: "sites",     options: siteOptions },
+                    { label: "Industry",            key: "industry",  options: industryOptions },
                   ].map(({ label, key, options }) => (
                     <div key={key} className="flex flex-col gap-2">
                       <label className="font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold text-[#374151]">
@@ -485,7 +498,7 @@ export default function PricingCalculator({
             {step === 3 && !submitted && (
               <div className="max-w-[560px]">
                 <h3 className="font-[family-name:var(--font-gothic-a1)] font-bold text-[20px] md:text-[22px] text-[#0a0f1e] mb-2">
-                  Step 4 — Get Your Proposal
+                  {contactStepTitle}
                 </h3>
                 <p className="font-[family-name:var(--font-dm-sans)] text-[14px] text-[#6b7280] mb-7">
                   We&apos;ll send you a detailed proposal based on your selections

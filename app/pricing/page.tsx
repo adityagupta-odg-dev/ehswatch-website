@@ -5,7 +5,7 @@ import PricingOverview from "@/components/sections/PricingOverview";
 import PricingCalculator from "@/components/sections/PricingCalculator";
 import PricingFAQ from "@/components/sections/PricingFAQ";
 import CTABanner from "@/components/sections/CTABanner";
-import { getPage } from "@/lib/api";
+import { getPage, getForm } from "@/lib/api";
 import { findBlock, normalizeArray } from "@/lib/blocks";
 import type { Metadata } from "next";
 
@@ -69,38 +69,28 @@ export default async function PricingPage() {
         .map((item) => ({ question: item.question!, answer: item.answer || "" }))
     : [];
 
-  // ── pricing_calculator block ────────────────────────────────────────────────
-  const calcBlock = findBlock<{
+  // ── form_embed block (pricing wizard) ────────────────────────────────────────
+  const formEmbedBlock = findBlock<{
     heading?: string;
-    subheading?: string;
-    step_labels?: unknown;
-    applications?: unknown;
-    addons?: unknown;
-    industries?: unknown;
+    description?: string;
+    form_slug?: string;
+  }>(blocks, "form_embed");
+
+  const calcFormSlug = formEmbedBlock?.form_slug ?? "build-ehswatch-package";
+
+  // Fetch the multi-step form schema for step titles, org options, and success messaging
+  const calcFormRes = await getForm(calcFormSlug).catch(() => null);
+  const calcFormAttrs = (calcFormRes?.data as any)?.attributes as {
+    steps?: Array<{
+      key: string;
+      title: string;
+      description: string;
+      fields: Array<{ key: string; label: string; field_type: string; options?: string[] | null }>;
+    }>;
     submit_label?: string;
     success_heading?: string;
-    success_body?: string;
-  }>(blocks, "pricing_calculator");
-
-  const cmsCalcApplications = calcBlock?.applications
-    ? normalizeArray<{ id?: string; name?: string; description?: string; icon?: string; color?: string }>(calcBlock.applications)
-        .filter((a) => a.id && a.name)
-        .map((a) => ({ id: a.id!, name: a.name!, description: a.description || "", icon: a.icon, color: a.color }))
-    : undefined;
-
-  const cmsCalcAddons = calcBlock?.addons
-    ? normalizeArray<{ id?: string; name?: string; description?: string; color?: string }>(calcBlock.addons)
-        .filter((a) => a.id && a.name)
-        .map((a) => ({ id: a.id!, name: a.name!, description: a.description || "", color: a.color }))
-    : undefined;
-
-  const cmsCalcIndustries = calcBlock?.industries
-    ? normalizeArray<{ label?: string }>(calcBlock.industries).map((i) => i.label || "").filter(Boolean)
-    : undefined;
-
-  const cmsCalcStepLabels = calcBlock?.step_labels
-    ? normalizeArray<{ label?: string }>(calcBlock.step_labels).map((s) => s.label || "").filter(Boolean)
-    : undefined;
+    success_message?: string;
+  } | undefined;
 
   // ── cta_banner block ────────────────────────────────────────────────────────
   const ctaBlock = findBlock<{
@@ -137,15 +127,13 @@ export default async function PricingPage() {
           checklistItems={overviewChecklistItems.length > 0 ? overviewChecklistItems : undefined}
         />
         <PricingCalculator
-          cmsHeading={calcBlock?.heading || undefined}
-          cmsSubheading={calcBlock?.subheading || undefined}
-          cmsStepLabels={cmsCalcStepLabels && cmsCalcStepLabels.length === 4 ? cmsCalcStepLabels : undefined}
-          cmsApplications={cmsCalcApplications && cmsCalcApplications.length > 0 ? cmsCalcApplications : undefined}
-          cmsAddons={cmsCalcAddons && cmsCalcAddons.length > 0 ? cmsCalcAddons : undefined}
-          cmsIndustries={cmsCalcIndustries && cmsCalcIndustries.length > 0 ? cmsCalcIndustries : undefined}
-          cmsSubmitLabel={calcBlock?.submit_label || undefined}
-          cmsSuccessHeading={calcBlock?.success_heading || undefined}
-          cmsSuccessBody={calcBlock?.success_body || undefined}
+          cmsHeading={formEmbedBlock?.heading || undefined}
+          cmsSubheading={formEmbedBlock?.description || undefined}
+          cmsFormSlug={calcFormSlug}
+          cmsFormSteps={calcFormAttrs?.steps}
+          cmsSubmitLabel={calcFormAttrs?.submit_label || undefined}
+          cmsSuccessHeading={calcFormAttrs?.success_heading || undefined}
+          cmsSuccessBody={calcFormAttrs?.success_message || undefined}
         />
         <PricingFAQ
           heading={faqHeading}
