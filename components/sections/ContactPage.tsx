@@ -1,36 +1,80 @@
 import DynamicCmsForm from "@/components/ui/DynamicCmsForm";
 import type { CmsForm } from "@/lib/types";
 
-export interface ContactOfficeItem {
-  label: string;
-  description: string;
+/* ── Office item shape (from CMS icon_features block) ── */
+interface CmsOfficeItem {
+  icon: string;
+  title: string;
+  description: string | null;
+  linkLabel: string | null;
+  linkUrl: string | null;
+  linkType: string | null;
 }
 
 export interface ContactPageProps {
+  formAttrs: CmsForm["attributes"];
+  heroEyebrow?: string;
   heroHeadline?: string;
   heroSubheadline?: string;
-  officeItems?: ContactOfficeItem[];
-  formAttrs: CmsForm["attributes"];
+  formHeading?: string;
+  formSubheading?: string;
+  officeItems?: CmsOfficeItem[] | null;
 }
 
-const DEFAULT_OFFICE_ITEMS: ContactOfficeItem[] = [
-  { label: "USA Office", description: "7138 Sale Ave,\nWest Hills, CA 91307, USA" },
-  { label: "India Office", description: "Awfis Space Solutions,\nHyderabad, Telangana, India" },
-  { label: "Email", description: "sales@ehswatch.com" },
+/* ── Inline SVG icons keyed to CMS icon slugs ── */
+function OfficeIcon({ name }: { name: string }) {
+  if (name === "mail" || name === "email") {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </svg>
+    );
+  }
+  if (name === "phone") {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+      </svg>
+    );
+  }
+  /* building-office (default) */
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 21h18" />
+      <path d="M5 21V7l7-4 7 4v14" />
+      <path d="M9 21v-4h6v4" />
+      <rect x="9" y="9" width="2" height="2" />
+      <rect x="13" y="9" width="2" height="2" />
+    </svg>
+  );
+}
+
+const DEFAULT_OFFICE_ITEMS: CmsOfficeItem[] = [
+  { icon: "building-office", title: "USA Office",   description: "7138 Sale Ave,\nWest Hills, CA 91307, USA",          linkLabel: null, linkUrl: null, linkType: null },
+  { icon: "building-office", title: "India Office", description: "Awfis Space Solutions,\nHyderabad, Telangana, India", linkLabel: null, linkUrl: null, linkType: null },
+  { icon: "mail",            title: "Email",        description: null, linkLabel: "sales@ehswatch.com", linkUrl: "sales@ehswatch.com", linkType: "email" },
 ];
 
 export default function ContactPage({
+  formAttrs,
+  heroEyebrow,
   heroHeadline,
   heroSubheadline,
+  formHeading,
+  formSubheading,
   officeItems,
-  formAttrs,
 }: ContactPageProps) {
-  const resolvedOfficeItems =
-    officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
+  const resolvedOfficeItems = officeItems && officeItems.length > 0 ? officeItems : DEFAULT_OFFICE_ITEMS;
+
+  /* Resolve the form section heading — prefer form_embed.heading, fall back to plain text */
+  const sectionHeading = formHeading
+    ? formHeading.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">')
+    : 'Get in Touch with <span style="color:#1d4ed8">Our Team</span>';
 
   return (
     <>
-      {/* ── Banner ── */}
+      {/* ── Hero banner ── */}
       <section className="relative overflow-hidden flex items-center justify-center px-6 pt-[148px] pb-[40px]">
         <style>{`
           .ct-grid {
@@ -63,47 +107,92 @@ export default function ContactPage({
           })}
           <div
             className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.9) 60%, #fff 100%)",
-            }}
+            style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.9) 60%, #fff 100%)" }}
           />
         </div>
 
         <div className="relative z-20 max-w-[700px] w-full mx-auto text-center flex flex-col items-center gap-4">
+          {/* Eyebrow */}
+          {heroEyebrow && (
+            <span className="font-[family-name:var(--font-dm-sans)] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#1d4ed8] animate-hero-rise">
+              {heroEyebrow}
+            </span>
+          )}
+
+          {/* Headline */}
           <h1
             className="font-[family-name:var(--font-gothic-a1)] font-bold text-[36px] sm:text-[52px] md:text-[64px] leading-[1.05] tracking-[-0.03em] text-[#0a0f1e] animate-hero-rise"
             style={{ animationDelay: "80ms" }}
             dangerouslySetInnerHTML={{
-              __html:
-                heroHeadline ??
-                'Get in Touch with <span style="color:#1d4ed8">Our Team</span>',
+              __html: heroHeadline
+                ? heroHeadline.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">')
+                : 'Get in Touch with <span style="color:#1d4ed8">Our Team</span>',
             }}
           />
+
+          {/* Subheadline */}
           <p
             className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] text-[#6b7280] max-w-[520px] text-pretty animate-hero-rise"
             style={{ animationDelay: "180ms" }}
           >
-            {heroSubheadline ??
-              "Reach out for demos, onboarding support, or to discuss how EHSWatch fits your organisation."}
+            {heroSubheadline ?? "Reach out for demos, onboarding support, or to discuss how EHSWatch fits your organisation."}
           </p>
         </div>
       </section>
 
       {/* ── Contact section ── */}
-      <section className="bg-white px-6 sm:px-10 lg:px-20 pt-[36px] pb-[72px] md:pt-[48px] md:pb-[96px]">
+      <section id="contact-form" className="bg-white px-6 sm:px-10 lg:px-20 pt-[36px] pb-[72px] md:pt-[48px] md:pb-[96px]">
         <div className="max-w-[1180px] mx-auto">
+
+          {/* Section heading from form_embed block */}
+          {(formHeading || formSubheading) && (
+            <div className="mb-12">
+              {formHeading && (
+                <h2
+                  className="font-[family-name:var(--font-gothic-a1)] font-bold text-[28px] sm:text-[34px] md:text-[40px] leading-tight tracking-[-0.02em] text-[#0a0f1e] mb-3"
+                  dangerouslySetInnerHTML={{ __html: sectionHeading }}
+                />
+              )}
+              {formSubheading && (
+                <p className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.75] text-[#6b7280]">
+                  {formSubheading}
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-14 lg:gap-24">
-            {/* ── Left: contact info ── */}
-            <div className="flex flex-col gap-9">
+
+            {/* ── Left: office items from icon_features block ── */}
+            <div className="flex flex-col gap-8">
               {resolvedOfficeItems.map((item, idx) => (
-                <div key={idx}>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-2.5">
-                    {item.label}
-                  </p>
-                  <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151] text-pretty whitespace-pre-line">
-                    {item.description}
-                  </p>
+                <div key={idx} className="flex items-start gap-4">
+                  {/* Icon chip */}
+                  <div
+                    className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center flex-shrink-0"
+                    style={{ background: "#eef4ff" }}
+                  >
+                    <OfficeIcon name={item.icon} />
+                  </div>
+
+                  {/* Text */}
+                  <div>
+                    <p className="font-[family-name:var(--font-dm-sans)] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9ca3af] mb-1.5">
+                      {item.title}
+                    </p>
+                    {item.description ? (
+                      <p className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#374151] whitespace-pre-line">
+                        {item.description}
+                      </p>
+                    ) : item.linkLabel ? (
+                      <a
+                        href={item.linkType === "email" ? `mailto:${item.linkUrl}` : item.linkUrl ?? "#"}
+                        className="font-[family-name:var(--font-dm-sans)] text-[14px] leading-[1.8] text-[#1d4ed8] hover:underline"
+                      >
+                        {item.linkLabel}
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               ))}
             </div>

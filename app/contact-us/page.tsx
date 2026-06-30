@@ -1,17 +1,23 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ContactPage from "@/components/sections/ContactPage";
-import { getForm } from "@/lib/api";
+import { getForm, getPage } from "@/lib/api";
+import { findBlock, normalizeArray } from "@/lib/blocks";
 import type { CmsForm } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Contact Us — EHSWatch",
-  description:
-    "Get in touch with the EHSWatch team for demos, onboarding support, or to find out how we can help your organisation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageRes = await getPage("contact-us").catch(() => null);
+  const meta = (pageRes?.data as any)?.attributes?.meta;
+  return {
+    title: meta?.meta_title || "Contact Us — EHSWatch",
+    description:
+      meta?.meta_description ||
+      "Get in touch with the EHSWatch team for demos, onboarding support, or to find out how we can help your organisation.",
+  };
+}
 
 const CONTACT_FALLBACK: CmsForm["attributes"] = {
   slug: "contact",
@@ -24,22 +30,73 @@ const CONTACT_FALLBACK: CmsForm["attributes"] = {
   redirect_url: null,
   captcha: { provider: "turnstile", site_key: "1x00000000000000000000AA" },
   fields: [
-    { key: "name", label: "Full Name", field_type: "text", required: true, placeholder: "Enter your name", help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "email", label: "Email Address", field_type: "email", required: true, placeholder: "Email address", help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "company", label: "Company", field_type: "text", required: false, placeholder: "Company name", help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "message", label: "Message", field_type: "textarea", required: false, placeholder: "How can we help?", help_text: null, options: null, default_value: null, full_width: true, catalogue_slug: null },
+    { key: "name",    label: "Full Name",      field_type: "text",     required: true,  placeholder: "Enter your name", help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "email",   label: "Email Address",  field_type: "email",    required: true,  placeholder: "Email address",  help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "company", label: "Company",        field_type: "text",     required: false, placeholder: "Company name",   help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
+    { key: "message", label: "Message",        field_type: "textarea", required: false, placeholder: "How can we help?", help_text: null, options: null, default_value: null, full_width: true,  catalogue_slug: null },
   ],
 };
 
 export default async function ContactUsPage() {
-  const formRes = await getForm("contact").catch(() => null);
+  const [pageRes, formRes] = await Promise.all([
+    getPage("contact-us").catch(() => null),
+    getForm("contact").catch(() => null),
+  ]);
+
+  const blocks: any[] = (pageRes?.data as any)?.attributes?.content ?? [];
   const formAttrs = formRes?.data?.attributes ?? CONTACT_FALLBACK;
+
+  /* ── hero block ── */
+  const heroBlock = findBlock<{
+    eyebrow?: string;
+    headline?: string;
+    subheadline?: string;
+  }>(blocks, "hero");
+
+  /* ── form_embed block ── */
+  const formEmbed = findBlock<{
+    heading?: string;
+    subheading?: string;
+    description?: string;
+  }>(blocks, "form_embed");
+
+  /* ── icon_features block (offices) ── */
+  const officesBlock = findBlock<{
+    heading?: string;
+    items?: unknown;
+  }>(blocks, "icon_features");
+
+  const rawItems = normalizeArray<{
+    icon?: string;
+    title?: string;
+    description?: string | null;
+    link?: { link?: { label?: string; url?: string; type?: string } };
+  }>(officesBlock?.items);
+
+  const officeItems = rawItems.length > 0
+    ? rawItems.map((item) => ({
+        icon:        item.icon        ?? "building-office",
+        title:       item.title       ?? "",
+        description: item.description ?? null,
+        linkLabel:   item.link?.link?.label ?? null,
+        linkUrl:     item.link?.link?.url   ?? null,
+        linkType:    item.link?.link?.type  ?? null,
+      }))
+    : null;
 
   return (
     <>
       <Navbar lightHero={true} />
       <main>
-        <ContactPage formAttrs={formAttrs} />
+        <ContactPage
+          formAttrs={formAttrs}
+          heroEyebrow={heroBlock?.eyebrow || undefined}
+          heroHeadline={heroBlock?.headline || undefined}
+          heroSubheadline={heroBlock?.subheadline || undefined}
+          formHeading={formEmbed?.heading || undefined}
+          formSubheading={formEmbed?.subheading || undefined}
+          officeItems={officeItems}
+        />
       </main>
       <Footer />
     </>
