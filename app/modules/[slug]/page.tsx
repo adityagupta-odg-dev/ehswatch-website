@@ -296,8 +296,8 @@ export default async function ModulePage(
           <CTABanner
             cmsHeadline={ctaBlock.headline}
             cmsSubhead={ctaBlock.subhead}
-            cmsPrimaryCta={resolveCta(ctaBlock.primary_cta)}
-            cmsSecondaryCta={resolveCta(ctaBlock.secondary_cta)}
+            cmsPrimaryCta={(() => { const c = resolveCta(ctaBlock.primary_cta); return c?.label ? { label: c.label, url: c.url ?? "#" } : undefined; })()}
+            cmsSecondaryCta={(() => { const c = resolveCta(ctaBlock.secondary_cta); return c?.label ? { label: c.label, url: c.url ?? "#" } : undefined; })()}
           />
         )}
       </main>
