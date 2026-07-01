@@ -29,7 +29,7 @@ function cmsToPost(p: CmsBlogPost): Post {
     date:     new Date(p.attributes.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
     dateSort: new Date(p.attributes.published_at).getTime(),
     readTime: `${p.attributes.read_time_minutes} min read`,
-    img:      p.attributes.cover?.url ?? "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80",
+    img:      p.attributes.cover?.attributes?.url ?? (p.attributes.cover as any)?.url ?? "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80",
   };
 }
 
