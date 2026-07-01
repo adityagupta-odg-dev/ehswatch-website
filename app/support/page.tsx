@@ -4,6 +4,7 @@ import SupportHero from "@/components/sections/SupportHero";
 import SupportContact from "@/components/sections/SupportContact";
 import SupportMap from "@/components/sections/SupportMap";
 import { getForm, getPage } from "@/lib/api";
+import { findBlock } from "@/lib/blocks";
 import type { CmsForm } from "@/lib/types";
 import type { Metadata } from "next";
 
@@ -40,16 +41,27 @@ const SUPPORT_FALLBACK: CmsForm["attributes"] = {
 };
 
 export default async function SupportPage() {
-  const formRes = await getForm("support").catch(() => null);
+  const [pageData, formRes] = await Promise.all([
+    getPage("support").catch(() => null),
+    getForm("support").catch(() => null),
+  ]);
   const contactFormAttrs = formRes?.data?.attributes ?? SUPPORT_FALLBACK;
+
+  const blocks: any[] = (pageData?.data as any)?.attributes?.content ?? [];
+  const heroBlock = findBlock<{ headline?: string; subheadline?: string }>(blocks, "hero");
+  const mapBlock  = findBlock<{ body?: string }>(blocks, "rich_text");
+  const mapEmbedUrl = mapBlock?.body?.startsWith("http") ? mapBlock.body : undefined;
 
   return (
     <>
       <Navbar lightHero={true} />
       <main>
-        <SupportHero />
+        <SupportHero
+          headline={heroBlock?.headline || undefined}
+          subheadline={heroBlock?.subheadline || undefined}
+        />
         <SupportContact contactFormAttrs={contactFormAttrs} />
-        <SupportMap />
+        <SupportMap embedUrl={mapEmbedUrl} />
       </main>
       <Footer />
     </>

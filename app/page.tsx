@@ -13,8 +13,18 @@ import Blogs from "@/components/sections/Blogs";
 import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
 import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("home").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "EHSWatch — From Manual Chaos to AI Clarity",
+    description: attrs.meta?.meta_description || "The connected EHS platform that turns incidents, audits and observations into closed actions — across every site, every team, every time.",
+  };
+}
 
 export default async function HomePage() {
   const [testimonialsRes, logosRes, homePageRes] = await Promise.all([

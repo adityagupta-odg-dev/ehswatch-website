@@ -1,6 +1,12 @@
 "use client";
 
-export default function SupportHero() {
+export default function SupportHero({
+  headline,
+  subheadline,
+}: {
+  headline?: string;
+  subheadline?: string;
+}) {
   return (
     <section
       className="relative overflow-hidden flex items-center justify-center px-4 sm:px-6 pt-[90px] sm:pt-[120px] md:pt-[148px] pb-[60px] sm:pb-[80px] md:pb-[100px]"
@@ -66,10 +72,15 @@ export default function SupportHero() {
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[30px] sm:text-[42px] md:text-[52px] leading-[1.1] text-[#0f1728] tracking-[-0.02em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
-        >
-          We're Here When You Need Us —{" "}
-          <span className="text-[#155eef]">Before, During and After Go-Live.</span>
-        </h1>
+          dangerouslySetInnerHTML={{
+            __html: (headline || "We're Here When You Need Us").replace(/<span\b[^>]*>/gi, '<span class="text-[#155eef]">'),
+          }}
+        />
+        {subheadline && (
+          <p className="font-[family-name:var(--font-dm-sans)] text-[15px] sm:text-[17px] leading-[1.8] text-[#6b7280] max-w-[520px] text-pretty animate-hero-rise" style={{ animationDelay: "160ms" }}>
+            {subheadline}
+          </p>
+        )}
       </div>
     </section>
   );
