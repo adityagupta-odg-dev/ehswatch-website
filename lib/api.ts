@@ -98,6 +98,13 @@ export async function submitForm(slug: string, data: Record<string, unknown>): P
   }
 }
 
+// ─── Preview (draft content, token-gated) ────────────────────────────────────
+
+export async function getPreviewBlogPost(slug: string, token: string, exp: string) {
+  const qs = new URLSearchParams({ token, exp }).toString();
+  return apiFetch<SingletonResponse<CmsBlogPost>>(`/preview/blog-post/${encodeURIComponent(slug)}?${qs}`);
+}
+
 // ─── Product Modules ─────────────────────────────────────────────────────────
 
 export async function getProductModules() {
