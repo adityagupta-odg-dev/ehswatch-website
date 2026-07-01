@@ -304,12 +304,11 @@ export default function NavbarClient({
 
         <div className="flex-1 lg:hidden" />
 
-        {/* ── Language Switcher ─────────────────────────────── */}
-        <div className="hidden sm:block">
+        {/* ── Right cluster: Language Switcher + CTA ───────── */}
+        <div className="hidden sm:flex items-center gap-3 shrink-0">
           <LanguageSwitcher lightHero={lightHero} />
-        </div>
 
-        {/* ── Desktop CTA ───────────────────────────────────── */}
+        {/* ── Desktop CTA ─────────────────────────────────── */}
         <Link
           href={ctaHref}
           ref={ctaRef}
@@ -321,7 +320,7 @@ export default function NavbarClient({
             const r = ctaRef.current?.getBoundingClientRect();
             if (r) setCtaFill({ x: e.clientX - r.left, y: e.clientY - r.top, on: false });
           }}
-          className="hidden sm:inline-flex shrink-0 items-center relative overflow-hidden font-medium tracking-[-0.24px] rounded-full whitespace-nowrap font-[family-name:var(--font-dm-sans)] border-[1.5px]"
+          className="inline-flex shrink-0 items-center relative overflow-hidden font-medium tracking-[-0.24px] rounded-full whitespace-nowrap font-[family-name:var(--font-dm-sans)] border-[1.5px]"
           style={{
             background: "rgba(255,109,0,0)",
             color: "rgb(255,109,0)",
@@ -349,6 +348,7 @@ export default function NavbarClient({
             {ctaLabel}
           </span>
         </Link>
+        </div>{/* end right cluster */}
 
         {/* ── Mobile hamburger ──────────────────────────────── */}
         <button
