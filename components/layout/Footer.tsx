@@ -240,8 +240,8 @@ export default async function Footer() {
               ))
             : ([
                 { label: "Privacy Policy",  href: "/privacy-policy" },
-                { label: "Terms of Service", href: "#" },
-                { label: "Cookie Settings",  href: "#" },
+                { label: "Terms of Service", href: "/terms-of-service" },
+                { label: "Cookie Policy",    href: "/cookie-policy" },
               ] as { label: string; href: string }[]).map(({ label, href }) => (
                 <Link
                   key={label}
