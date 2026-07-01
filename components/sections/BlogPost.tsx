@@ -127,7 +127,7 @@ export default function BlogPost({ slug, cmsPost, cmsSlugs }: { slug: string; cm
         readTime: `${cmsPost.attributes.read_time_minutes} min read`,
         author: cmsPost.attributes.author?.name ?? "EHSWatch Team",
         authorRole: "EHS Editorial",
-        coverImg: cmsPost.attributes.cover?.url ?? `${basePath}/images/blogs/blog-1.png`,
+        coverImg: cmsPost.attributes.cover?.attributes?.url ?? (cmsPost.attributes.cover as any)?.url ?? `${basePath}/images/blogs/blog-1.png`,
       }
     : getPost(slug);
   const { prev, next } = getPrevNext(slug, cmsSlugs);

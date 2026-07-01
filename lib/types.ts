@@ -132,7 +132,7 @@ export interface CmsBlogPost {
     published_at: string;
     read_time_minutes: number;
     author: { name: string; email: string } | null;
-    cover: CmsImage | null;
+    cover: CmsMedia | null;
     meta: CmsPageMeta;
     structured_data: object[];
     updated_at: string;

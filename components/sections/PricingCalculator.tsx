@@ -204,6 +204,18 @@ export default function PricingCalculator({
   const orgStepTitle     = getStep("organisation")?.title       || "Step 3 — Organisation Details";
   const orgStepDesc      = getStep("organisation")?.description || "Tell us about your organisation";
   const contactStepTitle = getStep("contact")?.title            || "Step 4 — Get Your Proposal";
+  const contactStepDesc  = getStep("contact")?.description      || "We'll send you a detailed proposal based on your selections";
+
+  // Contact step fields — use CMS labels when available, keep hardcoded structure for validation
+  const cmsContactFields = getStep("contact")?.fields ?? [];
+  const getCmsLabel = (key: string, fallback: string) =>
+    cmsContactFields.find((f) => f.key === key)?.label || fallback;
+  const contactProposalFields: ProposalField[] = [
+    { label: getCmsLabel("name",    "Full Name"),    key: "name",    type: "text",  placeholder: "Jane Smith" },
+    { label: getCmsLabel("email",   "Work Email"),   key: "email",   type: "email", placeholder: "jane@company.com" },
+    { label: getCmsLabel("phone",   "Phone Number"), key: "phone",   type: "tel",   placeholder: "+1 000 000 0000" },
+    { label: getCmsLabel("company", "Company"),      key: "company", type: "text",  placeholder: "Your organisation name" },
+  ];
 
   // Organisation field options: form schema options (always present)
   const orgFields = getStep("organisation")?.fields ?? [];
@@ -547,10 +559,10 @@ export default function PricingCalculator({
                   {contactStepTitle}
                 </h3>
                 <p className="font-[family-name:var(--font-dm-sans)] text-[14px] text-[#6b7280] mb-7">
-                  We&apos;ll send you a detailed proposal based on your selections
+                  {contactStepDesc}
                 </p>
                 <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-                  {PROPOSAL_FIELDS.map(({ label, key, type, placeholder }) => (
+                  {contactProposalFields.map(({ label, key, type, placeholder }) => (
                     <div key={key} className="flex flex-col gap-2">
                       <label className="font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold text-[#374151]">
                         {label} <span style={{ color: "#ef4444" }}>*</span>
