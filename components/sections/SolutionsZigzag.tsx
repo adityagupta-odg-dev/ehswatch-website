@@ -5,8 +5,8 @@ import { basePath } from "@/lib/basePath";
 
 const VID = basePath + "/images/Solutions_/Videos/";
 
-function resolveVideoUrl(video: string | null | undefined): string | null {
-  if (!video) return null;
+function resolveVideoUrl(video: unknown): string | null {
+  if (!video || typeof video !== "string") return null;
   if (video.startsWith("/")) return `https://stage.odigma.ooo${video}`;
   return video;
 }
