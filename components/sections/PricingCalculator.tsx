@@ -251,12 +251,14 @@ export default function PricingCalculator({
   const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set());
   const [org, setOrg] = useState({ employees: "", sites: "", industry: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     getValues,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ProposalData>({ resolver: zodResolver(proposalSchema) });
 
@@ -273,9 +275,10 @@ export default function PricingCalculator({
   };
 
   const onSubmit = async (data: ProposalData) => {
+    setSubmitError(null);
     try {
       const { submitForm } = await import("@/lib/api");
-      await submitForm(formSlug, {
+      const result = await submitForm(formSlug, {
         ...data,
         selected_applications: Array.from(selectedApps),
         selected_addons: Array.from(selectedAddons),
@@ -284,8 +287,33 @@ export default function PricingCalculator({
         industry: org.industry,
         captcha_token: captchaToken ?? "",
       });
-    } finally {
+
+      if (!result.ok) {
+        // Map CMS field errors back to their input fields where possible
+        const fieldKeys = new Set(Object.keys(proposalSchema.shape));
+        let mappedAny = false;
+        for (const err of result.errors ?? []) {
+          const field = err.source?.pointer?.split("/").pop() as keyof ProposalData | undefined;
+          if (field && fieldKeys.has(field)) {
+            setError(field, { type: "server", message: err.detail });
+            mappedAny = true;
+          }
+        }
+        // Unmapped errors (e.g. selected_applications, captcha) shown as banner
+        const unmapped = (result.errors ?? []).filter(
+          (e) => !fieldKeys.has((e.source?.pointer?.split("/").pop() ?? "") as keyof ProposalData)
+        );
+        if (unmapped.length > 0) {
+          setSubmitError(unmapped.map((e) => e.detail).join(" "));
+        } else if (!mappedAny) {
+          setSubmitError("Submission failed. Please check your details and try again.");
+        }
+        return;
+      }
+
       setSubmitted(true);
+    } catch {
+      setSubmitError("Network error. Please check your connection and try again.");
     }
   };
 
@@ -598,8 +626,17 @@ export default function PricingCalculator({
                     );
                   })}
                   <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
-                  <button
-                    type="submit"
+
+                  {submitError && (
+                    <div
+                      className="rounded-xl px-4 py-3 font-[family-name:var(--font-dm-sans)] text-[13.5px] leading-[1.6]"
+                      style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c" }}
+                    >
+                      {submitError}
+                    </div>
+                  )}
+
+                  <button type="submit"
                     disabled={isSubmitting || !captchaToken}
                     className="mt-2 w-full py-[13px] rounded-full font-[family-name:var(--font-dm-sans)] font-semibold text-[15px] text-white transition-all duration-300"
                     style={{
