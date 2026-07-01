@@ -9,20 +9,22 @@ import * as LucideIcons from "lucide-react";
 
 /* ── Proposal form schema ── */
 const proposalSchema = z.object({
-  name:    z.string().min(2, "Full name must be at least 2 characters"),
-  email:   z.string().email("Enter a valid work email"),
-  phone:   z.string().min(7, "Enter a valid phone number"),
-  company: z.string().min(1, "Company name is required"),
+  name:       z.string().min(2, "Full name must be at least 2 characters"),
+  email:      z.string().email("Enter a valid work email"),
+  phone:      z.string().min(7, "Enter a valid phone number"),
+  company:    z.string().min(1, "Company name is required"),
+  messagebox: z.string().optional(),
 });
 
 type ProposalData = z.infer<typeof proposalSchema>;
 
 type ProposalField = { label: string; key: keyof ProposalData; type: string; placeholder: string };
 const PROPOSAL_FIELDS: ProposalField[] = [
-  { label: "Full Name",    key: "name",    type: "text",  placeholder: "Jane Smith" },
-  { label: "Work Email",   key: "email",   type: "email", placeholder: "jane@company.com" },
-  { label: "Phone Number", key: "phone",   type: "tel",   placeholder: "+1 000 000 0000" },
-  { label: "Company",      key: "company", type: "text",  placeholder: "Your organisation name" },
+  { label: "Full Name",          key: "name",       type: "text",     placeholder: "Jane Smith" },
+  { label: "Work Email",         key: "email",      type: "email",    placeholder: "jane@company.com" },
+  { label: "Phone Number",       key: "phone",      type: "tel",      placeholder: "+1 000 000 0000" },
+  { label: "Company",            key: "company",    type: "text",     placeholder: "Your organisation name" },
+  { label: "Message (optional)", key: "messagebox", type: "textarea", placeholder: "Anything specific you'd like us to know?" },
 ];
 
 // ── App data ──────────────────────────────────────────────────────────────────
@@ -206,15 +208,16 @@ export default function PricingCalculator({
   const contactStepTitle = getStep("contact")?.title            || "Step 4 — Get Your Proposal";
   const contactStepDesc  = getStep("contact")?.description      || "We'll send you a detailed proposal based on your selections";
 
-  // Contact step fields — use CMS labels when available, keep hardcoded structure for validation
+  // Contact step fields — labels from CMS, structure covers all 5 fields including messagebox
   const cmsContactFields = getStep("contact")?.fields ?? [];
   const getCmsLabel = (key: string, fallback: string) =>
     cmsContactFields.find((f) => f.key === key)?.label || fallback;
   const contactProposalFields: ProposalField[] = [
-    { label: getCmsLabel("name",    "Full Name"),    key: "name",    type: "text",  placeholder: "Jane Smith" },
-    { label: getCmsLabel("email",   "Work Email"),   key: "email",   type: "email", placeholder: "jane@company.com" },
-    { label: getCmsLabel("phone",   "Phone Number"), key: "phone",   type: "tel",   placeholder: "+1 000 000 0000" },
-    { label: getCmsLabel("company", "Company"),      key: "company", type: "text",  placeholder: "Your organisation name" },
+    { label: getCmsLabel("name",       "Full Name"),          key: "name",       type: "text",     placeholder: "Jane Smith" },
+    { label: getCmsLabel("email",      "Work Email"),         key: "email",      type: "email",    placeholder: "jane@company.com" },
+    { label: getCmsLabel("phone",      "Phone Number"),       key: "phone",      type: "tel",      placeholder: "+1 000 000 0000" },
+    { label: getCmsLabel("company",    "Company"),            key: "company",    type: "text",     placeholder: "Your organisation name" },
+    { label: getCmsLabel("messagebox", "Message (optional)"), key: "messagebox", type: "textarea", placeholder: "Anything specific you'd like us to know?" },
   ];
 
   // Organisation field options: form schema options (always present)
@@ -274,7 +277,7 @@ export default function PricingCalculator({
       const { submitForm } = await import("@/lib/api");
       await submitForm(formSlug, {
         ...data,
-        selected_apps: Array.from(selectedApps),
+        selected_applications: Array.from(selectedApps),
         selected_addons: Array.from(selectedAddons),
         employees: org.employees,
         sites: org.sites,
@@ -562,25 +565,38 @@ export default function PricingCalculator({
                   {contactStepDesc}
                 </p>
                 <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-                  {contactProposalFields.map(({ label, key, type, placeholder }) => (
-                    <div key={key} className="flex flex-col gap-2">
-                      <label className="font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold text-[#374151]">
-                        {label} <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        type={type}
-                        placeholder={placeholder}
-                        className="calc-input w-full rounded-xl border px-4 py-3 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#0a0f1e] placeholder:text-[#9ca3af] transition-all duration-200"
-                        style={{ borderColor: errors[key] ? "#f87171" : "#e5e7eb" }}
-                        {...register(key)}
-                      />
-                      {errors[key] && (
-                        <p className="text-[12px] text-red-500 font-[family-name:var(--font-dm-sans)]">
-                          {errors[key]?.message}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                  {contactProposalFields.map(({ label, key, type, placeholder }) => {
+                    const isOptional = key === "messagebox";
+                    return (
+                      <div key={key} className="flex flex-col gap-2">
+                        <label className="font-[family-name:var(--font-dm-sans)] text-[13px] font-semibold text-[#374151]">
+                          {label}{!isOptional && <span style={{ color: "#ef4444" }}> *</span>}
+                        </label>
+                        {type === "textarea" ? (
+                          <textarea
+                            rows={4}
+                            placeholder={placeholder}
+                            className="calc-input w-full rounded-xl border px-4 py-3 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#0a0f1e] placeholder:text-[#9ca3af] transition-all duration-200 resize-none"
+                            style={{ borderColor: errors[key] ? "#f87171" : "#e5e7eb" }}
+                            {...register(key)}
+                          />
+                        ) : (
+                          <input
+                            type={type}
+                            placeholder={placeholder}
+                            className="calc-input w-full rounded-xl border px-4 py-3 font-[family-name:var(--font-dm-sans)] text-[14px] text-[#0a0f1e] placeholder:text-[#9ca3af] transition-all duration-200"
+                            style={{ borderColor: errors[key] ? "#f87171" : "#e5e7eb" }}
+                            {...register(key)}
+                          />
+                        )}
+                        {errors[key] && (
+                          <p className="text-[12px] text-red-500 font-[family-name:var(--font-dm-sans)]">
+                            {errors[key]?.message}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                   <TurnstileField onToken={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
                   <button
                     type="submit"
