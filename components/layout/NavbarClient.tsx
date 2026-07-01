@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { basePath } from "@/lib/basePath";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 
 /* ── Nav config ────────────────────────────────────────────────────
    hideOnScroll: true  → fades out when navbar collapses to pill
@@ -303,6 +304,11 @@ export default function NavbarClient({
 
         <div className="flex-1 lg:hidden" />
 
+        {/* ── Language Switcher ─────────────────────────────── */}
+        <div className="hidden sm:block">
+          <LanguageSwitcher lightHero={lightHero} />
+        </div>
+
         {/* ── Desktop CTA ───────────────────────────────────── */}
         <Link
           href={ctaHref}
@@ -407,6 +413,9 @@ export default function NavbarClient({
             </Link>
           )
         )}
+        <div className="mt-1 px-4">
+          <LanguageSwitcher lightHero={true} />
+        </div>
         <Link href="#" onClick={() => setOpen(false)}
           className="sm:hidden mt-2 px-4 py-3 text-center border border-[rgba(255,109,0,0.65)] text-[#ff6d00] rounded-full font-medium text-[15px] font-[family-name:var(--font-dm-sans)] hover:bg-orange-50 transition-colors">
           {ctaLabel}

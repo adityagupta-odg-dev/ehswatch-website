@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Gothic_A1, Inter, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "@/components/ui/CustomCursor";
+import GoogleTranslate from "@/components/ui/GoogleTranslate";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -45,11 +46,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${dmSans.variable} ${gothicA1.variable} ${inter.variable} ${instrumentSans.variable}`}
     >
       <body className="antialiased">
-        <CustomCursor />
-        {children}
+        <GoogleTranslate>
+          <CustomCursor />
+          {children}
+        </GoogleTranslate>
       </body>
     </html>
   );
