@@ -2,11 +2,10 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CTABanner from "@/components/sections/CTABanner";
 import PricingFAQ from "@/components/sections/PricingFAQ";
-import { getPage } from "@/lib/api";
-import { findBlock, findBlocks, normalizeArray } from "@/lib/blocks";
+import { getProductModule } from "@/lib/api";
+import { findBlock, findBlocks } from "@/lib/blocks";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { basePath } from "@/lib/basePath";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +13,13 @@ export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   const { slug } = await params;
-  const pageData = await getPage(`modules/${slug}`).catch(() => null);
-  const attrs = (pageData?.data as any)?.attributes ?? {};
+  const pageData = await getProductModule(slug).catch(() => null);
+  const attrs = pageData?.data?.attributes ?? ({} as any);
   const blocks: any[] = attrs.content ?? [];
   const hero = findBlock<{ headline?: string; subheadline?: string }>(blocks, "hero");
   return {
-    title: attrs.meta?.meta_title || (hero?.headline ? `${hero.headline} — EHSWatch` : "EHSWatch"),
-    description: attrs.meta?.meta_description || hero?.subheadline || "",
+    title: attrs.meta?.meta_title || (hero?.headline ? `${hero.headline} — EHSWatch` : attrs.name ? `${attrs.name} — EHSWatch` : "EHSWatch"),
+    description: attrs.meta?.meta_description || hero?.subheadline || attrs.tagline || "",
   };
 }
 
@@ -50,8 +49,8 @@ function ModuleIcon({ name, size = 22 }: { name: string; size?: number }) {
   return <svg {...s}>{children}</svg>;
 }
 
-/* ── Icon Feature Grid section ── */
-function IconFeatureGrid({ heading, subheading, items }: {
+/* ── Icon Features section (icon_features block type) ── */
+function IconFeaturesSection({ heading, subheading, items }: {
   heading?: string;
   subheading?: string;
   items: { icon?: string; title?: string; description?: string }[];
@@ -100,6 +99,29 @@ function IconFeatureGrid({ heading, subheading, items }: {
   );
 }
 
+/* ── Rich text section (rich_text block type) ── */
+function RichTextSection({ heading, body }: { heading?: string; body?: string }) {
+  if (!heading && !body) return null;
+  return (
+    <section className="py-[60px] md:py-[80px] px-6 bg-[#f8fafc]">
+      <div className="max-w-[860px] mx-auto">
+        {heading && (
+          <h2
+            className="font-[family-name:var(--font-gothic-a1)] font-bold text-[24px] sm:text-[30px] md:text-[36px] leading-tight tracking-[-0.02em] text-[#0a0f1e] mb-8"
+            dangerouslySetInnerHTML={{ __html: heading.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">') }}
+          />
+        )}
+        {body && (
+          <div
+            className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.85] text-[#4b5563] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_li]:pb-1 [&_p+p]:mt-4"
+            dangerouslySetInnerHTML={{ __html: body }}
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ── Image + Text section ── */
 function ImageTextSection({ heading, body, imageUrl, side = "right" }: {
   heading?: string;
@@ -119,7 +141,7 @@ function ImageTextSection({ heading, body, imageUrl, side = "right" }: {
           )}
           {body && (
             <div
-              className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.85] text-[#4b5563] prose prose-p:mb-4"
+              className="font-[family-name:var(--font-dm-sans)] text-[15px] md:text-[16px] leading-[1.85] text-[#4b5563] [&_p+p]:mt-4"
               dangerouslySetInnerHTML={{ __html: body }}
             />
           )}
@@ -201,25 +223,30 @@ export default async function ModulePage(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
-  const pageData = await getPage(`modules/${slug}`).catch(() => null);
+  const pageData = await getProductModule(slug).catch(() => null);
   if (!pageData?.data) notFound();
 
   const blocks: any[] = (pageData.data as any).attributes?.content ?? [];
 
   const heroBlock = findBlock<{
     eyebrow?: string; headline?: string; subheadline?: string;
-    primary_cta?: { label?: string; url?: string };
-    secondary_cta?: { label?: string; url?: string };
+    primary_cta?: any; secondary_cta?: any;
   }>(blocks, "hero");
 
   const imageTextBlock = findBlock<{
     heading?: string; body?: string; side?: string; image?: { url?: string } | null;
   }>(blocks, "image_text");
 
-  const iconGridBlocks = findBlocks<{
-    heading?: string; subheading?: string;
+  /* icon_features — used by all module pages */
+  const iconFeaturesBlocks = findBlocks<{
+    anchor?: string; heading?: string; subheading?: string;
     items?: Array<{ icon?: string; title?: string; description?: string }> | Record<string, { icon?: string; title?: string; description?: string }>;
-  }>(blocks, "icon_feature_grid");
+  }>(blocks, "icon_features");
+
+  /* rich_text — used by some module pages for bullet-list "What Sets Us Apart" sections */
+  const richTextBlocks = findBlocks<{
+    heading?: string; body?: string;
+  }>(blocks, "rich_text");
 
   const faqBlock = findBlock<{
     heading?: string;
@@ -228,11 +255,9 @@ export default async function ModulePage(
 
   const ctaBlock = findBlock<{
     headline?: string; subhead?: string;
-    primary_cta?: { label?: string; url?: string } | { cta?: { label?: string; url?: string } };
-    secondary_cta?: { label?: string; url?: string } | { cta?: { label?: string; url?: string } };
+    primary_cta?: any; secondary_cta?: any;
   }>(blocks, "cta_banner");
 
-  /* Resolve CTA — the module pages use flat {label, url} not nested {cta:{...}} */
   function resolveCta(raw: any): { label?: string; url?: string } | undefined {
     if (!raw) return undefined;
     if (raw.label) return raw;
@@ -262,26 +287,31 @@ export default async function ModulePage(
           <ImageTextSection
             heading={imageTextBlock.heading}
             body={imageTextBlock.body}
-            imageUrl={imageTextBlock.image?.url || undefined}
+            imageUrl={(imageTextBlock.image as any)?.attributes?.url || imageTextBlock.image?.url || undefined}
             side={(imageTextBlock.side as "left" | "right") || "right"}
           />
         )}
 
-        {/* Icon feature grids (there are typically 2 per module page) */}
-        {iconGridBlocks.map((grid, i) => {
-          const rawItems = Array.isArray(grid.items)
-            ? grid.items
-            : Object.values((grid.items ?? {}) as Record<string, any>);
+        {/* Icon features — renders all icon_features blocks in CMS order */}
+        {iconFeaturesBlocks.map((feat, i) => {
+          const rawItems = Array.isArray(feat.items)
+            ? feat.items
+            : Object.values((feat.items ?? {}) as Record<string, any>);
           if (!rawItems.length) return null;
           return (
-            <IconFeatureGrid
+            <IconFeaturesSection
               key={i}
-              heading={grid.heading}
-              subheading={grid.subheading}
+              heading={feat.heading}
+              subheading={feat.subheading}
               items={rawItems}
             />
           );
         })}
+
+        {/* Rich text blocks */}
+        {richTextBlocks.map((rt, i) => (
+          <RichTextSection key={i} heading={rt.heading} body={rt.body} />
+        ))}
 
         {/* FAQ */}
         {faqItems.length > 0 && (
