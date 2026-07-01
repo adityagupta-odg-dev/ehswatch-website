@@ -3,7 +3,6 @@ import Footer from "@/components/layout/Footer";
 import ContactPage from "@/components/sections/ContactPage";
 import { getForm, getPage } from "@/lib/api";
 import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
-import type { CmsForm } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -19,25 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/* Fallback used only when the CMS form hasn't been created yet */
-const CONTACT_FALLBACK: CmsForm["attributes"] = {
-  slug: "contact",
-  name: "Contact",
-  form_type: "standard",
-  use_multi_step: false,
-  submit_label: "Send Message",
-  success_heading: "Message Received",
-  success_message: "Our team will get back to you within 1 business day.",
-  redirect_url: null,
-  captcha: { provider: "turnstile", site_key: "1x00000000000000000000AA" },
-  fields: [
-    { key: "name",    label: "Full Name",      field_type: "text",     required: true,  placeholder: "Enter your name",  help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "email",   label: "Email Address",  field_type: "email",    required: true,  placeholder: "Email address",    help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "phone",   label: "Phone",          field_type: "phone",    required: false, placeholder: "Phone number",     help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "company", label: "Company",        field_type: "text",     required: false, placeholder: "Company name",     help_text: null, options: null, default_value: null, full_width: false, catalogue_slug: null },
-    { key: "message", label: "Message",        field_type: "textarea", required: false, placeholder: "How can we help?", help_text: null, options: null, default_value: null, full_width: true,  catalogue_slug: null },
-  ],
-};
 
 export default async function ContactUsPage() {
   /* Step 1: fetch the page to read the CMS-configured form slug */
@@ -65,8 +45,9 @@ export default async function ContactUsPage() {
 
   /* Step 2: fetch the form schema using the CMS-defined slug */
   const formSlug = formEmbed?.form_slug ?? "contact";
+  /* null means the CMS form is disabled — ContactPage will hide the form */
   const formRes = await getForm(formSlug).catch(() => null);
-  const formAttrs = formRes?.data?.attributes ?? CONTACT_FALLBACK;
+  const formAttrs = formRes?.data?.attributes ?? null;
 
   /* ── icon_features block (offices) ── */
   const officesBlock = findBlock<{

@@ -37,7 +37,7 @@ interface CmsGalleryData {
 }
 
 export interface ContactPageProps {
-  formAttrs: CmsForm["attributes"];
+  formAttrs: CmsForm["attributes"] | null;
   formSlug?: string;
   heroEyebrow?: string;
   heroHeadline?: string;
@@ -227,7 +227,7 @@ export default function ContactPage({
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-14 lg:gap-24">
+          <div className={`grid grid-cols-1 gap-14${formAttrs ? " lg:grid-cols-[280px_1fr] lg:gap-24" : ""}`}>
 
             {/* ── Left: office items from icon_features block ── */}
             <div className="flex flex-col gap-8">
@@ -269,8 +269,8 @@ export default function ContactPage({
               ))}
             </div>
 
-            {/* ── Right: dynamic CMS form — slug comes from CMS form_embed block ── */}
-            <DynamicCmsForm formAttrs={formAttrs} slug={formSlug} variant="contact" />
+            {/* ── Right: dynamic CMS form — only rendered when CMS form is enabled ── */}
+            {formAttrs && <DynamicCmsForm formAttrs={formAttrs} slug={formSlug} variant="contact" />}
           </div>
         </div>
       </section>
