@@ -21,24 +21,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function IndustriesPage() {
-  const [solutionsData, industriesData, testimonialsRes] = await Promise.all([
-    getPage("solutions"),
+  const [industriesData, testimonialsRes] = await Promise.all([
     getPage("industries"),
     getTestimonials(),
   ]);
 
-  const solutionBlocks: any[] = (solutionsData?.data as any)?.attributes?.content ?? [];
   const industryBlocks: any[] = (industriesData?.data as any)?.attributes?.content ?? [];
   const cmsTestimonials = testimonialsRes?.data ?? [];
 
-  /* Hero — from solutions CMS page */
+  /* Hero — from industries CMS page */
   const cmsHero = findBlock<{
     eyebrow?: string;
     headline?: string;
     subheadline?: string;
     primary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
     secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string };
-  }>(solutionBlocks, "hero");
+  }>(industryBlocks, "hero");
 
   /* CTA banner — from industries CMS page */
   const ctaData = findBlock<{
@@ -63,7 +61,9 @@ export default async function IndustriesPage() {
       <Navbar lightHero={true} />
       <main>
         <SolutionsHero
+          cmsEyebrow={cmsHero?.eyebrow || undefined}
           cmsHeadline={cmsHero?.headline || undefined}
+          cmsSubheadline={cmsHero?.subheadline || undefined}
           cmsPrimaryCta={
             cmsHero?.primary_cta?.label
               ? { label: cmsHero.primary_cta.label, url: ctaHref(cmsHero.primary_cta) }
@@ -76,13 +76,17 @@ export default async function IndustriesPage() {
           }
         />
         <SolutionsZigzag cmsCards={cmsZigzagCards} />
-        <Testimonials title="A Snapshot of Real‑World Impact" cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
-        <CTABanner
-          cmsHeadline={ctaData?.headline || undefined}
-          cmsSubhead={ctaData?.subhead || undefined}
-          cmsPrimaryCta={ctaPrimary?.label ? { label: ctaPrimary.label, url: ctaHref(ctaPrimary) } : undefined}
-          cmsSecondaryCta={ctaSecondary?.label ? { label: ctaSecondary.label, url: ctaHref(ctaSecondary) } : undefined}
-        />
+        {cmsTestimonials.length > 0 && (
+          <Testimonials title="A Snapshot of Real‑World Impact" cmsItems={cmsTestimonials} />
+        )}
+        {ctaData?.headline && (
+          <CTABanner
+            cmsHeadline={ctaData.headline}
+            cmsSubhead={ctaData?.subhead || undefined}
+            cmsPrimaryCta={ctaPrimary?.label ? { label: ctaPrimary.label, url: ctaHref(ctaPrimary) } : undefined}
+            cmsSecondaryCta={ctaSecondary?.label ? { label: ctaSecondary.label, url: ctaHref(ctaSecondary) } : undefined}
+          />
+        )}
       </main>
       <Footer />
     </>

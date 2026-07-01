@@ -17,15 +17,7 @@ export default function SolutionsHero({
   cmsPrimaryCta,
   cmsSecondaryCta,
 }: SolutionsHeroProps = {}) {
-  const headline =
-    cmsHeadline ||
-    "Every Industry Has Different Risks. Your EHS Platform Should Know the Difference.";
-
-  const primaryLabel = cmsPrimaryCta?.label || "Book a Demo";
-  const primaryUrl = cmsPrimaryCta?.url || "#";
-
-  const secondaryLabel = cmsSecondaryCta?.label || "Explore Industries";
-  const secondaryUrl = cmsSecondaryCta?.url || "#industries";
+  if (!cmsHeadline) return null;
 
   return (
     <section
@@ -97,16 +89,10 @@ export default function SolutionsHero({
         <h1
           className="font-[family-name:var(--font-gothic-a1)] font-bold text-[30px] sm:text-[42px] md:text-[54px] leading-[1.08] text-gray-900 tracking-[-0.03em] animate-hero-rise"
           style={{ animationDelay: "80ms" }}
-        >
-          {headline.includes("Your EHS Platform Should Know the Difference") ? (
-            <>
-              Every Industry Has Different Risks.{" "}
-              <span style={{ color: "#1d4ed8" }}>Your EHS Platform Should Know the Difference.</span>
-            </>
-          ) : (
-            headline
-          )}
-        </h1>
+          dangerouslySetInnerHTML={{
+            __html: cmsHeadline.replace(/<span\b[^>]*>/gi, '<span style="color:#1d4ed8">'),
+          }}
+        />
 
         {cmsSubheadline && (
           <p
@@ -116,29 +102,35 @@ export default function SolutionsHero({
             {cmsSubheadline}
           </p>
         )}
-        <div className="flex flex-wrap gap-3 justify-center animate-hero-rise" style={{ animationDelay: "320ms" }}>
-          <GlareButton
-            href={primaryUrl}
-            className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white transition-all duration-200 hover:shadow-lg"
-            style={{
-              backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
-              boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
-            }}
-          >
-            {primaryLabel}
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </GlareButton>
-          <GlareButton
-            href={secondaryUrl}
-            fillColor="#FFA660"
-            hoverTextColor="#ffffff"
-            className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-[#1b1b1b] border border-[#d1d5db] hover:border-[#9ca3af]"
-          >
-            {secondaryLabel}
-          </GlareButton>
-        </div>
+        {(cmsPrimaryCta || cmsSecondaryCta) && (
+          <div className="flex flex-wrap gap-3 justify-center animate-hero-rise" style={{ animationDelay: "320ms" }}>
+            {cmsPrimaryCta && (
+              <GlareButton
+                href={cmsPrimaryCta.url}
+                className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-white transition-all duration-200 hover:shadow-lg"
+                style={{
+                  backgroundImage: "linear-gradient(102.8deg, #ffa964 0.12%, #ff8e37 34.34%, #ff7812 50.27%, #ff6d00 119.92%)",
+                  boxShadow: "0 4px 24px rgba(249,115,22,0.35)",
+                }}
+              >
+                {cmsPrimaryCta.label}
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </GlareButton>
+            )}
+            {cmsSecondaryCta && (
+              <GlareButton
+                href={cmsSecondaryCta.url}
+                fillColor="#FFA660"
+                hoverTextColor="#ffffff"
+                className="px-7 py-[11px] rounded-full font-[family-name:var(--font-dm-sans)] font-medium text-[15px] text-[#1b1b1b] border border-[#d1d5db] hover:border-[#9ca3af]"
+              >
+                {cmsSecondaryCta.label}
+              </GlareButton>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

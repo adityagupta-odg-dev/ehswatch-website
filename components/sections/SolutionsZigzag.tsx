@@ -330,9 +330,8 @@ function cmsCardToIndustry(card: CmsIndustryCard, idx: number): Industry {
 
 /* ── Main ── */
 export default function SolutionsZigzag({ cmsCards }: { cmsCards?: CmsIndustryCard[] }) {
-  const ACTIVE = cmsCards && cmsCards.length > 0
-    ? cmsCards.map(cmsCardToIndustry)
-    : INDUSTRIES;
+  if (!cmsCards || cmsCards.length === 0) return null;
+  const ACTIVE = cmsCards.map(cmsCardToIndustry);
   const total = ACTIVE.length;
 
   const [active, setActive] = useState(0);
