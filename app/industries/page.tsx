@@ -10,10 +10,14 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Industries — EHSWatch",
-  description: "Every industry has different risks. EHSWatch is configured to the compliance requirements, workflows and hazard profiles of your sector.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("industries").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "Industries — EHSWatch",
+    description: attrs.meta?.meta_description || "Every industry has different risks. EHSWatch is configured to the compliance requirements, workflows and hazard profiles of your sector.",
+  };
+}
 
 export default async function IndustriesPage() {
   const [solutionsData, industriesData, testimonialsRes] = await Promise.all([

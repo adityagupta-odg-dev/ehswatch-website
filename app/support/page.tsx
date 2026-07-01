@@ -3,17 +3,20 @@ import Footer from "@/components/layout/Footer";
 import SupportHero from "@/components/sections/SupportHero";
 import SupportContact from "@/components/sections/SupportContact";
 import SupportMap from "@/components/sections/SupportMap";
-import { getForm } from "@/lib/api";
+import { getForm, getPage } from "@/lib/api";
 import type { CmsForm } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Support — EHSWatch",
-  description:
-    "Get in touch with the EHSWatch team for demos, onboarding support, or to find out how we can help your organisation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("support").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "Support — EHSWatch",
+    description: attrs.meta?.meta_description || "Get in touch with the EHSWatch team for demos, onboarding support, or to find out how we can help your organisation.",
+  };
+}
 
 const SUPPORT_FALLBACK: CmsForm["attributes"] = {
   slug: "support",

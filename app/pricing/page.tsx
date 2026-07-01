@@ -11,10 +11,14 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Pricing — EHSWatch",
-  description: "Simple, flexible pricing for enterprise-grade EHS management. Pay only for the modules you need.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("pricing").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "Pricing — EHSWatch",
+    description: attrs.meta?.meta_description || "Simple, flexible pricing for enterprise-grade EHS management. Pay only for the modules you need.",
+  };
+}
 
 export default async function PricingPage() {
   const pageData = await getPage("pricing");

@@ -7,10 +7,14 @@ import { findBlock, iconFeaturesToArray } from "@/lib/blocks";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "IRIS — AI-Powered EHSQ | EHSWatch",
-  description: "Meet IRIS, EHSWatch's Intelligent Risk & Insight System. Six AI capabilities embedded across your EHSQ workflows.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pageData = await getPage("iris").catch(() => null);
+  const attrs = (pageData?.data as any)?.attributes ?? {};
+  return {
+    title: attrs.meta?.meta_title || "IRIS — AI-Powered EHSQ | EHSWatch",
+    description: attrs.meta?.meta_description || "Meet IRIS, EHSWatch's Intelligent Risk & Insight System. Six AI capabilities embedded across your EHSQ workflows.",
+  };
+}
 
 export default async function IrisPageRoute() {
   const pageData = await getPage("iris");
