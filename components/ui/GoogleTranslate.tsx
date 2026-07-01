@@ -129,6 +129,18 @@ export default function GoogleTranslate({ children }: { children: React.ReactNod
     script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.head.appendChild(script);
+
+    // 3. MutationObserver — Google's JS sets body.style.top / margin-top to
+    //    make room for its toolbar. Reset those inline styles immediately so
+    //    page layout never shifts.
+    const bodyObserver = new MutationObserver(() => {
+      const b = document.body;
+      if (b.style.top && b.style.top !== "0px") b.style.top = "";
+      if (b.style.marginTop && b.style.marginTop !== "0px") b.style.marginTop = "";
+    });
+    bodyObserver.observe(document.body, { attributes: true, attributeFilter: ["style"] });
+
+    return () => bodyObserver.disconnect();
   }, []);
 
   /* IP geolocation — run once per browser, skip if user already chose */

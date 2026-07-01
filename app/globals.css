@@ -162,9 +162,9 @@ main {
 .goog-te-balloon-frame,
 .goog-te-menu-value:after { display: none !important; }
 
-body { top: 0 !important; }
+body { top: 0 !important; margin-top: 0 !important; }
 .translated-ltr body,
-.translated-rtl body { top: 0 !important; }
+.translated-rtl body { top: 0 !important; margin-top: 0 !important; }
 
 /* RTL layout fixes */
 [dir="rtl"] { font-family: var(--font-dm-sans, "Segoe UI", Tahoma, sans-serif); }
