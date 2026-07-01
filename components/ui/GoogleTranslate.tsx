@@ -185,8 +185,12 @@ export default function GoogleTranslate({ children }: { children: React.ReactNod
 
   return (
     <TranslateContext.Provider value={{ lang, isReady, switchLang }}>
-      {/* Hidden mount point for Google widget */}
-      <div id="google_translate_element" style={{ display: "none" }} aria-hidden />
+      {/* Mount point for Google widget — must NOT be display:none or the combo never initialises */}
+      <div
+        id="google_translate_element"
+        aria-hidden
+        style={{ position: "fixed", bottom: 0, left: 0, width: "1px", height: "1px", overflow: "hidden", opacity: 0, pointerEvents: "none" }}
+      />
 
       {children}
 
