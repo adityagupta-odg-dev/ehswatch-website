@@ -4,13 +4,11 @@ import Hero from "@/components/sections/HeroV2";
 import TrustedLogos from "@/components/sections/TrustedLogos";
 import Stats from "@/components/sections/Stats";
 import PainPoints from "@/components/sections/PainPoints";
-import ProductModules from "@/components/sections/ProductModules";
 import AISection from "@/components/sections/AISection";
 import OnePlatform from "@/components/sections/OnePlatform";
 import WorkEnvironments from "@/components/sections/WorkEnvironments";
 import Testimonials from "@/components/sections/Testimonials";
 import Blogs from "@/components/sections/Blogs";
-import CTABanner from "@/components/sections/CTABanner";
 import { getTestimonials, getClientLogos, getPage } from "@/lib/api";
 import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
 import type { Metadata } from "next";
@@ -58,22 +56,6 @@ export default async function HomePage() {
     heading?: string; subheading?: string;
     items?: Array<{ label?: string; description?: string; icon?: string }>;
   }>(blocks, "pain_points");
-
-  // ── product_modules ───────────────────────────────────────────────────────
-  const modulesBlock = findBlock<{
-    heading?: string; subheading?: string;
-    items?: Array<{ slug?: string; name?: string; tagline?: string; icon?: string; icon_url?: string }>;
-  }>(blocks, "product_modules");
-
-  const cmsModules = normalizeArray<{
-    slug?: string; name?: string; tagline?: string; icon?: string; icon_url?: string;
-  }>(modulesBlock?.items).map((m) => ({
-    slug:     m.slug,
-    name:     m.name     ?? "",
-    tagline:  m.tagline  ?? "",
-    icon:     m.icon,
-    icon_url: m.icon_url,
-  }));
 
   // ── image_text (AI / IRIS section) ────────────────────────────────────────
   const imageTextBlock = findBlock<{
@@ -129,15 +111,6 @@ export default async function HomePage() {
         }))
     : undefined;
 
-  // ── cta_banner ────────────────────────────────────────────────────────────
-  const ctaBlock = findBlock<{
-    headline?: string; subhead?: string;
-    primary_cta?:   { label?: string; url?: string; type?: string; anchor?: string; cta?: { label?: string; url?: string; type?: string; anchor?: string } };
-    secondary_cta?: { label?: string; url?: string; type?: string; anchor?: string; cta?: { label?: string; url?: string; type?: string; anchor?: string } };
-  }>(blocks, "cta_banner");
-  const ctaPrimary   = ctaBlock?.primary_cta?.cta   ?? ctaBlock?.primary_cta;
-  const ctaSecondary = ctaBlock?.secondary_cta?.cta  ?? ctaBlock?.secondary_cta;
-
   return (
     <>
       <Navbar lightHero />
@@ -173,14 +146,7 @@ export default async function HomePage() {
             : undefined}
         />
 
-        {/* 5. product_modules */}
-        <ProductModules
-          cmsHeading={modulesBlock?.heading || undefined}
-          cmsSubheading={modulesBlock?.subheading || undefined}
-          cmsModules={cmsModules.length > 0 ? cmsModules : undefined}
-        />
-
-        {/* 6. image_text (AI / IRIS) */}
+        {/* 5. image_text (AI / IRIS) */}
         <AISection
           cmsHeading={imageTextBlock?.heading || undefined}
           cmsBody={imageTextBlock?.body || undefined}
@@ -210,14 +176,6 @@ export default async function HomePage() {
           cmsHeading={blogBlock?.heading || undefined}
           cmsSubheading={blogBlock?.subheading || undefined}
           cmsPosts={cmsBlogPosts}
-        />
-
-        {/* 11. cta_banner */}
-        <CTABanner
-          cmsHeadline={ctaBlock?.headline || undefined}
-          cmsSubhead={ctaBlock?.subhead || undefined}
-          cmsPrimaryCta={ctaPrimary?.label ? { label: ctaPrimary.label, url: ctaHref(ctaPrimary) } : undefined}
-          cmsSecondaryCta={ctaSecondary?.label ? { label: ctaSecondary.label, url: ctaHref(ctaSecondary) } : undefined}
         />
       </main>
       <Footer />
