@@ -140,7 +140,7 @@ function LucideIcon({ name, size = 18 }: { name?: string; size?: number }) {
   if (!name) return null;
   const resolved = ICON_ALIASES[name] ?? name;
   const pascal = resolved.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
-  const Icon = (LucideIcons as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[pascal];
+  const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[pascal];
   if (!Icon) return null;
   return <Icon size={size} strokeWidth={1.5} />;
 }
