@@ -619,7 +619,7 @@ export default function IRISChatShowcase() {
       </section>
 
       {/* ~170vh sticky scroll — one scroll click per step */}
-      <div ref={outerRef} style={{ height:"170vh" }}>
+      <div ref={outerRef} translate="no" style={{ height:"170vh" }}>
         <div className="sticky top-0 bg-white overflow-hidden" style={{ height:"100vh" }}>
 
           {/* Desktop: 3-col */}

@@ -205,6 +205,7 @@ export default function SolutionsIndustries({ cmsCards, cmsHeading, cmsSubheadin
     <section
       ref={sectionRef}
       id="industries"
+      translate="no"
       className="bg-white py-12 md:py-20 px-4 md:px-6"
     >
       <div className="max-w-[1160px] mx-auto">

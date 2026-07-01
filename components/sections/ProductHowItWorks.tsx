@@ -654,6 +654,7 @@ export default function ProductHowItWorks({
   return (
     <section
       ref={sectionRef}
+      translate="no"
       className="bg-[#f1f7ff]"
       style={{ height: `${steps.length * 100}vh` }}
     >

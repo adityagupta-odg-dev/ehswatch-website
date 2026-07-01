@@ -60,7 +60,7 @@ export default function CmsSlider({
   if (slides.length === 0) return null;
 
   return (
-    <section className="py-[60px] md:py-[80px] px-6 bg-[#f8fafc]">
+    <section translate="no" className="py-[60px] md:py-[80px] px-6 bg-[#f8fafc]">
       {(heading || subheading) && (
         <div className="max-w-[1180px] mx-auto text-center mb-10">
           {heading && (
