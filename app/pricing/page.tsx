@@ -90,7 +90,22 @@ export default async function PricingPage() {
     submit_label?: string;
     success_heading?: string;
     success_message?: string;
+    picker_catalogues?: {
+      applications?: Array<{ slug: string; name: string; icon?: string; description?: string; category?: string }>;
+      addons?: Array<{ slug: string; name: string; icon?: string; description?: string }>;
+    };
   } | undefined;
+
+  // ── picker_catalogues — apps and addons from the dedicated CMS admin sections
+  // Admin manages these at /admin/pricing-applications and /admin/pricing-addons.
+  // These are the primary source for apps/addons; pricing_calculator block overrides.
+  const formApplications = calcFormAttrs?.picker_catalogues?.applications
+    ?.filter((a) => a.slug && a.name)
+    .map((a) => ({ id: a.slug, name: a.name, description: a.description || "", icon: a.icon, color: undefined as string | undefined }));
+
+  const formAddons = calcFormAttrs?.picker_catalogues?.addons
+    ?.filter((a) => a.slug && a.name)
+    .map((a) => ({ id: a.slug, name: a.name, description: a.description || "", icon: a.icon, color: undefined as string | undefined }));
 
   // ── pricing_calculator block — applications, addons, step labels, industries ─
   // This block must be added to the pricing page in the CMS admin to activate.
@@ -167,8 +182,20 @@ export default async function PricingPage() {
           cmsFormSlug={calcFormSlug}
           cmsFormSteps={calcFormAttrs?.steps}
           cmsStepLabels={cmsCalcStepLabels && cmsCalcStepLabels.length === 4 ? cmsCalcStepLabels : undefined}
-          cmsApplications={cmsCalcApplications && cmsCalcApplications.length > 0 ? cmsCalcApplications : undefined}
-          cmsAddons={cmsCalcAddons && cmsCalcAddons.length > 0 ? cmsCalcAddons : undefined}
+          cmsApplications={
+            (cmsCalcApplications && cmsCalcApplications.length > 0)
+              ? cmsCalcApplications
+              : (formApplications && formApplications.length > 0)
+              ? formApplications
+              : undefined
+          }
+          cmsAddons={
+            (cmsCalcAddons && cmsCalcAddons.length > 0)
+              ? cmsCalcAddons
+              : (formAddons && formAddons.length > 0)
+              ? formAddons
+              : undefined
+          }
           cmsIndustries={cmsCalcIndustries && cmsCalcIndustries.length > 0 ? cmsCalcIndustries : undefined}
           cmsSubmitLabel={calcBlock?.submit_label || calcFormAttrs?.submit_label || undefined}
           cmsSuccessHeading={calcBlock?.success_heading || calcFormAttrs?.success_heading || undefined}

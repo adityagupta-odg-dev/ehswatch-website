@@ -69,13 +69,77 @@ const INDUSTRIES = [
 const STEPS = ["Applications", "Add-Ons", "Organisation", "Get Proposal"];
 
 // ── Dynamic Lucide icon renderer ──────────────────────────────────────────────
-// Converts CMS kebab-case icon name (e.g. "check-circle") to PascalCase and
-// renders the matching lucide-react component. Any name from the CMS IconPicker
-// works automatically — no manual SVG mapping needed.
+// CMS may return Heroicons-style names (Filament's default icon set).
+// This map converts them to their Lucide equivalents so rendering never breaks.
+const ICON_ALIASES: Record<string, string> = {
+  "magnifying-glass":               "search",
+  "exclamation-triangle":           "alert-triangle",
+  "exclamation-circle":             "alert-circle",
+  "arrow-path":                     "refresh-cw",
+  "lock-closed":                    "lock",
+  "chart-bar":                      "bar-chart-2",
+  "calendar-days":                  "calendar",
+  "clipboard-document-list":        "clipboard-list",
+  "clipboard-document-check":       "clipboard-check",
+  "academic-cap":                   "graduation-cap",
+  "rocket-launch":                  "rocket",
+  "arrow-down-tray":                "arrow-down-to-line",
+  "arrow-up-tray":                  "arrow-up-from-line",
+  "code-bracket":                   "code-2",
+  "code-bracket-square":            "code",
+  "user-group":                     "users",
+  "chat-bubble-bottom-center-text": "message-circle",
+  "chat-bubble-left-right":         "message-square",
+  "chat-warning":                   "message-circle",
+  "alarm":                          "alarm-clock",
+  "arrows-cycle":                   "refresh-cw",
+  "chart":                          "bar-chart-2",
+  "graduation":                     "graduation-cap",
+  "warning":                        "alert-triangle",
+  "minus-circle":                   "minus-circle",
+  "sparkle":                        "sparkles",
+  "document-text":                  "file-text",
+  "document-check":                 "file-check",
+  "building-office":                "building-2",
+  "building-office-2":              "building-2",
+  "shield-exclamation":             "shield-alert",
+  "information-circle":             "info",
+  "question-mark-circle":           "help-circle",
+  "hand-raised":                    "hand",
+  "globe-alt":                      "globe",
+  "sun":                            "sun",
+  "moon":                           "moon",
+  "fire":                           "flame",
+  "beaker":                         "flask-conical",
+  "identification":                 "id-card",
+  "paper-airplane":                 "send",
+  "printer":                        "printer",
+  "device-phone-mobile":            "smartphone",
+  "computer-desktop":               "monitor",
+  "server":                         "server",
+  "cpu-chip":                       "cpu",
+  "currency-dollar":                "dollar-sign",
+  "banknotes":                      "banknote",
+  "receipt-percent":                "receipt",
+  "arrow-trending-up":              "trending-up",
+  "arrow-trending-down":            "trending-down",
+  "chart-pie":                      "pie-chart",
+  "squares-2x2":                    "grid-2x2",
+  "list-bullet":                    "list",
+  "bars-3":                         "menu",
+  "adjustments-horizontal":         "sliders-horizontal",
+  "adjustments-vertical":           "sliders-vertical",
+  "funnel":                         "filter",
+  "tag":                            "tag",
+  "wrench-screwdriver":             "wrench",
+  "cog-6-tooth":                    "settings-2",
+  "cog-8-tooth":                    "settings",
+};
 
 function LucideIcon({ name, size = 18 }: { name?: string; size?: number }) {
   if (!name) return null;
-  const pascal = name.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+  const resolved = ICON_ALIASES[name] ?? name;
+  const pascal = resolved.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
   const Icon = (LucideIcons as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[pascal];
   if (!Icon) return null;
   return <Icon size={size} strokeWidth={1.5} />;
