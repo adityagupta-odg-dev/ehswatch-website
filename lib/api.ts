@@ -10,7 +10,38 @@ const API_BASE =
     ? "http://stage.odigma.ooo/ehswatch-cms/api/v1"
     : "https://stage.odigma.ooo/ehswatch-cms/api/v1";
 
+// Server-side cache: coalesces concurrent SSR renders hitting the same endpoint,
+// preventing bursts from exhausting the CMS rate limit (60 req/min per IP).
+// The CMS has its own 5-min cache; this 10-second window only handles bursts.
+const _ssrCache = new Map<string, { data: unknown; expires: number }>();
+const _inflight = new Map<string, Promise<unknown>>();
+
 async function apiFetch<T>(path: string): Promise<T | null> {
+  if (typeof window !== "undefined") {
+    // Client-side: no caching (form submits etc.)
+    return _doFetch<T>(path);
+  }
+
+  const now = Date.now();
+  const cached = _ssrCache.get(path);
+  if (cached && cached.expires > now) return cached.data as T | null;
+
+  const inflight = _inflight.get(path);
+  if (inflight) return inflight as Promise<T | null>;
+
+  const promise = _doFetch<T>(path).then((data) => {
+    _ssrCache.set(path, { data, expires: Date.now() + 10_000 });
+    _inflight.delete(path);
+    return data;
+  }).catch((err) => {
+    _inflight.delete(path);
+    throw err;
+  });
+  _inflight.set(path, promise);
+  return promise;
+}
+
+async function _doFetch<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       cache: "no-store",
