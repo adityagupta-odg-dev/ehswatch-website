@@ -5,7 +5,8 @@ import SolutionsZigzag from "@/components/sections/SolutionsZigzag";
 import CTABanner from "@/components/sections/CTABanner";
 import Testimonials from "@/components/sections/Testimonials";
 import { getPage, getTestimonials } from "@/lib/api";
-import { findBlock, ctaHref } from "@/lib/blocks";
+import { findBlock, normalizeArray, ctaHref } from "@/lib/blocks";
+import type { CmsIndustryCard } from "@/components/sections/SolutionsZigzag";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,14 @@ export default async function IndustriesPage() {
   const ctaPrimary   = ctaData?.primary_cta?.cta   ?? ctaData?.primary_cta;
   const ctaSecondary = ctaData?.secondary_cta?.cta  ?? ctaData?.secondary_cta;
 
+  // ── solution_carousel block → SolutionsZigzag ─────────────────────────────
+  const solutionCarousel = findBlock<{
+    cards?: Record<string, CmsIndustryCard> | CmsIndustryCard[];
+  }>(industryBlocks, "solution_carousel");
+  const cmsZigzagCards: CmsIndustryCard[] | undefined = solutionCarousel?.cards
+    ? normalizeArray<CmsIndustryCard>(solutionCarousel.cards).filter((c) => c.title)
+    : undefined;
+
   return (
     <>
       <Navbar lightHero={true} />
@@ -66,7 +75,7 @@ export default async function IndustriesPage() {
               : undefined
           }
         />
-        <SolutionsZigzag />
+        <SolutionsZigzag cmsCards={cmsZigzagCards} />
         <Testimonials title="A Snapshot of Real‑World Impact" cmsItems={cmsTestimonials.length > 0 ? cmsTestimonials : undefined} />
         <CTABanner
           cmsHeadline={ctaData?.headline || undefined}

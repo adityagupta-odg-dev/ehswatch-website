@@ -5,6 +5,12 @@ import { basePath } from "@/lib/basePath";
 
 const VID = basePath + "/images/Solutions_/Videos/";
 
+function resolveVideoUrl(video: string | null | undefined): string | null {
+  if (!video) return null;
+  if (video.startsWith("/")) return `https://stage.odigma.ooo${video}`;
+  return video;
+}
+
 interface Solution {
   heading: string;
   body: string;
@@ -152,7 +158,7 @@ const INDUSTRIES: Industry[] = [
   },
 ];
 
-const N = INDUSTRIES.length;
+const N = INDUSTRIES.length; // used only as fallback length when no CMS data
 
 /* ── Placeholder visual (for industries without video yet) ── */
 function MediaPlaceholder({ label }: { label: string }) {
@@ -300,17 +306,44 @@ function ArrowBtn({ dir, onClick }: { dir: "left" | "right"; onClick: () => void
   );
 }
 
+export interface CmsIndustryCard {
+  title: string;
+  subheading?: string;
+  video?: string | null;
+  accordion_items?: Record<string, { title?: string; description?: string }>;
+}
+
+function cmsCardToIndustry(card: CmsIndustryCard, idx: number): Industry {
+  const solutions: Solution[] = card.accordion_items
+    ? Object.values(card.accordion_items)
+        .filter((a) => a.title)
+        .map((a) => ({ heading: a.title!, body: a.description || "" }))
+    : [];
+  return {
+    label:     card.title,
+    subcopy:   card.subheading || "",
+    video:     resolveVideoUrl(card.video ?? null),
+    gif:       null,
+    solutions: solutions.length > 0 ? solutions : [],
+  };
+}
+
 /* ── Main ── */
-export default function SolutionsZigzag() {
+export default function SolutionsZigzag({ cmsCards }: { cmsCards?: CmsIndustryCard[] }) {
+  const ACTIVE = cmsCards && cmsCards.length > 0
+    ? cmsCards.map(cmsCardToIndustry)
+    : INDUSTRIES;
+  const total = ACTIVE.length;
+
   const [active, setActive] = useState(0);
   const [openIdx, setOpenIdx] = useState(0);
 
   const go = useCallback((dir: number) => {
-    setActive((prev) => (prev + dir + N) % N);
+    setActive((prev) => (prev + dir + total) % total);
     setOpenIdx(0);
-  }, []);
+  }, [total]);
 
-  const industry = INDUSTRIES[active];
+  const industry = ACTIVE[active];
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">

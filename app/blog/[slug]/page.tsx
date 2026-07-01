@@ -6,22 +6,6 @@ import Footer from "@/components/layout/Footer";
 import BlogPost from "@/components/sections/BlogPost";
 import { getBlogPost, getBlogPosts } from "@/lib/api";
 
-const STATIC_SLUGS = [
-  "near-miss-reporting-culture",
-  "iso-45001-transition",
-  "leading-indicators-safety",
-  "cost-manual-incident-reporting",
-  "contractor-safety-management",
-  "lagging-to-leading-metrics",
-];
-
-export async function generateStaticParams() {
-  const res = await getBlogPosts();
-  const cmsSlugs = res?.data?.map((p) => p.attributes.slug) ?? [];
-  const all = Array.from(new Set([...STATIC_SLUGS, ...cmsSlugs]));
-  return all.map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: {
