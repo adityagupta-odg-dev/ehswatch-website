@@ -1,8 +1,8 @@
 name: Deploy to Stage
 
+# Stage deploys moved to the `stage` branch workflow (2026-07-03).
+# This copy is manual-only so pushes to main no longer overwrite the stage server.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
