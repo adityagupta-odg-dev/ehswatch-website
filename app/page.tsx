@@ -180,7 +180,7 @@ export default async function HomePage() {
       <main>
         <Hero
           cmsHeadline={stripHtmlOpt(heroBlock?.headline)}
-          cmsSubheadline={stripHtmlOpt(heroBlock?.subheadline)}
+          cmsSubheadline="AI-powered EHS platform to streamline reporting"
           cmsEyebrow={stripHtmlOpt(heroBlock?.eyebrow)}
           cmsPrimaryCta={resolveCta(heroBlock?.primary_cta, pageMap) ?? undefined}
           cmsSecondaryCta={resolveCta(heroBlock?.secondary_cta, pageMap) ?? undefined}
