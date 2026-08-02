@@ -1568,6 +1568,70 @@ export default function IrisPage({
             opacity: 0;
             animation: irisCardFromBottom 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
           }
+          /* Hero stat row (Intelligent Data Synthesis).
+             Three side-by-side columns need ~49px each for labels like
+             "INCIDENTS", i.e. ~171px of inner width. That fits the 220px desktop
+             card and the wide 2-up card on tablets, but NOT the 2-up card on
+             phones (114-189px wide), where the row overflowed and the third stat
+             ("14 / SITES") was clipped at the screen edge.
+             On phones each stat becomes its own centred "247 INCIDENTS" row,
+             which fits comfortably and uses the card's spare vertical space. */
+          /* Card titles. letter-spacing:0.14em pushes a single long word such as
+             "RECOMMENDATIONS" (15 chars, ~122px) past what the 2-up card offers on
+             phones — 100px at 320px, 80px at 280px — and because it cannot wrap
+             mid-word the title was clipped at the card's edge ("RECOMMENDATION…").
+             Tracking and size tighten as the card narrows; the narrowest query
+             also lets a long word break rather than ever be hidden. Desktop and
+             tablet keep the original 10px/0.14em. */
+          .iris-card-title { font-size:10px; letter-spacing:0.14em; }
+          @media (max-width:374px) {
+            .iris-card-title { font-size:9px; letter-spacing:0.04em; }
+          }
+          @media (max-width:319px) {
+            /* 7px keeps "RECOMMENDATIONS" whole on one line in the ~80px the card
+               offers here; at 8px it broke mid-word, leaving a stray "S". The
+               overflow-wrap stays as a last-resort guard so text is never hidden. */
+            .iris-card-title { font-size:7px; letter-spacing:0; overflow-wrap:anywhere; }
+          }
+          .iris-stat-row   { display:flex; gap:12px; margin-bottom:8px; }
+          .iris-stat-col   { flex:1 1 0; min-width:0; text-align:center; }
+          .iris-stat-value { font-size:20px; }
+          .iris-stat-label { font-size:9px; letter-spacing:0.06em; margin-top:3px; }
+          @media (max-width:480px) {
+            .iris-stat-row   { flex-wrap:wrap; gap:7px; }
+            .iris-stat-col   { flex:1 1 100%; display:flex; align-items:baseline;
+                               justify-content:center; gap:6px; text-align:left; }
+            .iris-stat-label { margin-top:0; }
+          }
+          /* Very narrow phones (e.g. Galaxy Fold's 280px outer screen) leave only
+             ~80px of card width, where "247 INCIDENTS" at full size needs ~86px. */
+          @media (max-width:319px) {
+            .iris-stat-row   { gap:5px; }
+            .iris-stat-col   { gap:4px; }
+            .iris-stat-value { font-size:17px; }
+            .iris-stat-label { letter-spacing:0.02em; }
+          }
+          /* Below lg the four top cards wrap into two independent flex columns
+             (cards 1+2 left, 3+4 right), so card 1 and card 3 kept their own
+             natural heights and the two visual rows never lined up — the grid
+             looked ragged on small phones.
+             Fix: below lg the row becomes a real 2-col grid and the column
+             wrappers are display:contents, so all four cards become grid items.
+             Grid sizes each row to its tallest card, which aligns the rows
+             WITHOUT squeezing anything (equalising via flex:1 instead would force
+             a fixed share and clip the taller "Natural Language Query" card).
+             The explicit orders keep the original pairing: 1|3 then 2|4.
+             Desktop is untouched — this whole block is max-width:1023px. */
+          @media (max-width:1023px) {
+            .iris-hero-toprow { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+                                gap:16px; align-items:stretch; }
+            .iris-hero-toprow > .iris-hero-col { display:contents; }
+            .iris-hero-orb { grid-column:1 / -1; order:1; }
+            .iris-hero-col--l > .iris-hero-card:nth-child(1) { order:2; }
+            .iris-hero-col--r > .iris-hero-card:nth-child(1) { order:3; }
+            .iris-hero-col--l > .iris-hero-card:nth-child(2) { order:4; }
+            .iris-hero-col--r > .iris-hero-card:nth-child(2) { order:5; }
+          }
           .iris-hero-card { min-height:160px;
             transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s ease;
             cursor: default;
@@ -1669,13 +1733,13 @@ export default function IrisPage({
               Below lg the cards can't flank the orb, so the orb takes a full-width
               row of its own and the two columns wrap beneath it into a 2-col grid
               (they collapse to 1 col only when too narrow, e.g. small phones). */}
-          <div className="flex flex-wrap lg:flex-nowrap items-center justify-center gap-4 lg:gap-8">
+          <div className="iris-hero-toprow flex flex-wrap lg:flex-nowrap items-stretch lg:items-center justify-center gap-4 lg:gap-8">
 
             {/* Left column: 2 cards */}
-            <div className="flex flex-col gap-4 w-[calc(50%-10px)] lg:w-[220px] shrink-0 order-2 lg:order-none">
+            <div className="iris-hero-col iris-hero-col--l flex flex-col gap-4 w-[calc(50%-10px)] lg:w-[220px] shrink-0 order-2 lg:order-none">
               {/* Card 1: Hazard Intelligence */}
               <div className="iris-hero-card iris-card-left" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"350ms" }}>
-                <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Hazard Intelligence</p>
+                <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Hazard Intelligence</p>
                 {[["Chemical exposure","#ef4444",78],["Height work","#f97316",54],["Electrical","#eab308",35]].map(([l,c,w]) => (
                   <div key={String(l)} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
                     <span style={{ fontSize:10, color:"#6b7280", width:88, flexShrink:0, fontFamily:"var(--font-dm-sans,sans-serif)" }}>{l}</span>
@@ -1688,7 +1752,7 @@ export default function IrisPage({
 
               {/* Card 2: Predictive Analytics */}
               <div className="iris-hero-card iris-card-left" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"480ms" }}>
-                <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Predictive Analytics</p>
+                <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Predictive Analytics</p>
                 <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:40 }}>
                   {[14,22,18,30,26,38,34,44].map((h,i) => (
                     <div key={i} style={{ flex:1, height:`${h}px`, background:`rgba(59,130,246,${0.25+i*0.09})`, borderRadius:"3px 3px 0 0" }} />
@@ -1700,7 +1764,7 @@ export default function IrisPage({
 
             {/* Center: Orb + IRIS logo. Full-width on mobile/tablet so it sits on
                 its own row and the card columns wrap into a grid beneath it. */}
-            <div className="order-1 lg:order-none basis-full lg:basis-auto flex justify-center">
+            <div className="iris-hero-orb order-1 lg:order-none basis-full lg:basis-auto flex justify-center">
               <div className="relative shrink-0" style={{ width: 280, height: 280 }}>
                 <Orb
                   hue={30}
@@ -1732,10 +1796,10 @@ export default function IrisPage({
             </div>
 
             {/* Right column: 2 cards */}
-            <div className="flex flex-col gap-4 w-[calc(50%-10px)] lg:w-[220px] shrink-0 order-3 lg:order-none">
+            <div className="iris-hero-col iris-hero-col--r flex flex-col gap-4 w-[calc(50%-10px)] lg:w-[220px] shrink-0 order-3 lg:order-none">
               {/* Card 3: Workflow Acceleration */}
               <div className="iris-hero-card iris-card-right" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"350ms" }}>
-                <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Workflow Acceleration</p>
+                <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Workflow Acceleration</p>
                 {[["Investigation","92%","#f59e0b"],["Actions closed","78%","#f97316"],["Reports filed","100%","#10b981"]].map(([l,v,c]) => (
                   <div key={String(l)} style={{ marginBottom:7 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
@@ -1751,7 +1815,7 @@ export default function IrisPage({
 
               {/* Card 4: Natural Language Query */}
               <div className="iris-hero-card iris-card-right" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"480ms" }}>
-                <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Natural Language Query</p>
+                <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Natural Language Query</p>
                 <div style={{ background:"#f3f4f6", borderRadius:8, padding:"7px 10px", marginBottom:7 }}>
                   <p style={{ fontSize:10, color:"#374151", fontFamily:"var(--font-dm-sans,sans-serif)", fontStyle:"italic" }}>&ldquo;Top risks this quarter?&rdquo;</p>
                 </div>
@@ -1767,7 +1831,7 @@ export default function IrisPage({
           <div className="flex flex-row items-stretch justify-center gap-4 mt-4">
             {/* Card 5: Smart Recommendations */}
             <div className="iris-hero-card iris-card-bottom w-[calc(50%-10px)] lg:w-[220px]" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"560ms" }}>
-              <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Smart Recommendations</p>
+              <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Smart Recommendations</p>
               {["Deploy safety barriers","Retrain 3 operators","Update risk register"].map((t,i) => (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:7, marginBottom:6 }}>
                   <div style={{ width:15, height:15, borderRadius:4, background:i===0?"#10b981":"transparent", border:i===0?"none":"1.5px solid #d1d5db", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -1780,12 +1844,12 @@ export default function IrisPage({
 
             {/* Card 6: Intelligent Data Synthesis */}
             <div className="iris-hero-card iris-card-bottom w-[calc(50%-10px)] lg:w-[220px]" style={{ background:"white", border:"1px solid #e8edf5", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", animationDelay:"620ms" }}>
-              <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:"0.14em", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Intelligent Data Synthesis</p>
-              <div style={{ display:"flex", gap:12, marginBottom:8 }}>
+              <p className="iris-card-title" style={{ fontWeight:700, color:"#374151", textTransform:"uppercase", marginBottom:10, fontFamily:"var(--font-dm-sans,sans-serif)" }}>Intelligent Data Synthesis</p>
+              <div className="iris-stat-row">
                 {[["Incidents","247","#6366f1"],["Actions","89","#8b5cf6"],["Sites","14","#a78bfa"]].map(([l,v,c]) => (
-                  <div key={String(l)} style={{ flex:1, textAlign:"center" }}>
-                    <p style={{ fontSize:20, fontWeight:800, color:String(c), fontFamily:"var(--font-gothic-a1,sans-serif)", lineHeight:1 }}>{v}</p>
-                    <p style={{ fontSize:9, color:"#6b7280", fontFamily:"var(--font-dm-sans,sans-serif)", marginTop:3, textTransform:"uppercase", letterSpacing:"0.06em" }}>{l}</p>
+                  <div key={String(l)} className="iris-stat-col">
+                    <p className="iris-stat-value" style={{ fontWeight:800, color:String(c), fontFamily:"var(--font-gothic-a1,sans-serif)", lineHeight:1 }}>{v}</p>
+                    <p className="iris-stat-label" style={{ color:"#6b7280", fontFamily:"var(--font-dm-sans,sans-serif)", textTransform:"uppercase" }}>{l}</p>
                   </div>
                 ))}
               </div>
